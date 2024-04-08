@@ -1,0 +1,25 @@
+# See docs at: https://mystmd.org/guide/frontmatter
+version: 1
+project:
+  title: 'JupyterHealth Software'
+  description: 'Documentation on JupyterHealth Software'
+  keywords: []
+  #authors: ['JupyterHealth Software Team']
+  github: https://github.com/jupyterhealth/Jupyter-health-software-documentation
+  jupyter:
+    lite: true
+site:
+  template: book-theme
+  title: 'JupyterHealth Software'
+  options:
+    logo: 'jupyter.png'
+  nav: []
+  actions:
+    - title: Project Jupyter
+      url: https://jupyter.org
+    - title: CommonHealth
+      url: https://www.commonhealth.org
+    - title: 2i2c
+      url: https://2i2c.org
+  domains:
+    - jupyterhealth.github.io

@@ -1,5 +1,5 @@
 ---
-title: "Stage 1"
+title: "Preliminary Blood Pressure Prototype"
 subtitle: 'Development: "Pre MVP"'
 ---
 

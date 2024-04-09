@@ -1,6 +1,6 @@
 # software-documentation
 
-This repository contains a MyST-based website for JupyerHealth software documentation. You can see a preview of it at [https://jupyterhealth.github.io/Jupyter-health-software-documentation](https://jupyterhealth.github.io/Jupyter-health-software-documentation).
+This repository contains a [MyST-based](https://mystmd.org) website for JupyerHealth software documentation. You can see a preview of it at [https://jupyterhealth.github.io/Jupyter-health-software-documentation](https://jupyterhealth.github.io/Jupyter-health-software-documentation).
 
 ## Preview Changes (Optional)
 

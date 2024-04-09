@@ -1,6 +1,6 @@
 # software-documentation
 
-This repository contains a [MyST-based](https://mystmd.org) website for JupyerHealth software documentation. You can see a preview of it at [https://jupyterhealth.github.io/Jupyter-health-software-documentation](https://jupyterhealth.github.io/Jupyter-health-software-documentation).
+This repository contains a [MyST-based](https://mystmd.org) website for JupyerHealth software documentation. You can see a preview of it at [https://jupyterhealth.github.io/software-documentation](https://jupyterhealth.github.io/software-documentation).
 
 ## Preview Changes (Optional)
 
@@ -49,6 +49,6 @@ If you want to preview the website locally on your own computer before they go l
    ```
    This will cause GitHub to rebuild your site.
 
-2.  You can observe the build process at GitHub by clicking on the Actions button at the top of your repository, e.g. https://github.com/jupyterhealth/Jupyter-health-software-documentation/actions. It usually takes a couple of minutes for this to complete. 
+2.  You can observe the build process at GitHub by clicking on the Actions button at the top of your repository, e.g. https://github.com/jupyterhealth/software-documentation/actions. It usually takes a couple of minutes for this to complete.
 
-3. If there are no problems, your website will be publicly available at https://jupyterhealth.github.io/Jupyter-health-software-documentation.
+3. If there are no problems, your website will be publicly available at https://jupyterhealth.github.io/software-documentation.

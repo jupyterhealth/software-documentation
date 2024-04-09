@@ -5,7 +5,7 @@ project:
   description: 'Documentation on JupyterHealth Software'
   keywords: []
   #authors: ['JupyterHealth Software Team']
-  github: https://github.com/jupyterhealth/Jupyter-health-software-documentation
+  github: https://github.com/jupyterhealth/software-documentation
   jupyter:
     lite: true
 site:

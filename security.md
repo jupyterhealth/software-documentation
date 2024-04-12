@@ -1,12 +1,17 @@
 ---
-title: 'JupyterHealth Pre-MVP Documentation'
-subtitle: 'Security Overview'
+title: Security Overview
 ---
 
 # Introduction
 The JupyterHealth Pre-MVP security focuses on establishing a secure privacy perserving transmission of patient data from:
 
- Medical Device API --> CommonHealth Application --> CloudStorage Service --> Partner Data Store
+```mermaid
+flowchart LR
+  A[Medical Device API] --> B
+  B[CommonHealth Application] --> C
+  C[CloudStorage Service] --> D
+  D[Partner Data Store]
+```
 
 # API Credentials
 - CommonHealth Application will authenticate with the Medical Device API using:

@@ -4,3 +4,4 @@ root: index
 chapters:
 - file: preliminary
 - file: security
+- file: examples/openmhealth-bp

@@ -1,6 +1,5 @@
 ---
-title: 'JupyterHealth Pre-MVP Documentation'
-subtitle: 'Security Overview'
+title: 'Security Overview'
 ---
 
 # Introduction

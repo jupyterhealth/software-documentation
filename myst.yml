@@ -6,8 +6,8 @@ project:
   keywords: []
   #authors: ['JupyterHealth Software Team']
   github: https://github.com/jupyterhealth/software-documentation
-  jupyter:
-    lite: true
+  #jupyter:
+  #  lite: true
 site:
   template: book-theme
   title: 'JupyterHealth Software'

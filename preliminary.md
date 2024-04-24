@@ -72,3 +72,9 @@ bp_readings = [
 
 Which will select the data according to the openmhealth blood pressure schema.
 These readings can then be passed to a plotting utility like [this one](./examples/openmhealth-bp).
+
+### Demo dashboards
+
+The [jupyterhealth/demos](https://github.com/jupyterhealth/demos) repo contains some example notebooks and voilá dashboards,
+which can be cloned and launched via nbgitpuller links [in the readme](https://github.com/jupyterhealth/demos?tab=readme-ov-file#demos).
+Anyone with access to the JupyterHealth JupyterHub should be able to run these.

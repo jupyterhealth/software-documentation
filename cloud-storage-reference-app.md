@@ -35,7 +35,7 @@ The new Cloud Storage Service implementation will support the following use case
 1. Provider interacts with the Jupyter Health dashboards. Initially this may be a simple web application, but will eventually be a Provider SMART app within the EHR vendor environment.
 1. A REST API with OAuth2 for programmatic access
 
-![](assets/images/chcs_iam_overview.jpg)
+![](assets/images/css_iam_overview.jpg)
 
 # Technical Design
 

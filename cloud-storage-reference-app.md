@@ -5,7 +5,7 @@ subtitle: Reference Application - WIP
 
 # Background
 
-CommonHealth-CloudStorage Service (CHCS) is a web app built with Django that is used to share a patient's medical device data with researchers via the Common Health Android app. The established CHCS was required to support deployment to third-party servers without compromising data privacy and security. This was achieved by extensive use of cryptography and proxy design patterns, as outlined in [this Google doc](https://docs.google.com/document/d/1jyS6A78BfAVTRzmwBRAim5MyQUOUHa_T7rm9tbzWLaE/edit?usp=sharing).
+CommonHealth-CloudStorage Service (CHCS) is a web app built with Django that is used to share a patient's personal device data with researchers via the Common Health Android app. The established CHCS was required to support deployment to third-party servers without compromising data privacy and security. This was achieved by extensive use of cryptography and proxy design patterns, as outlined in [this Google doc](https://docs.google.com/document/d/1jyS6A78BfAVTRzmwBRAim5MyQUOUHa_T7rm9tbzWLaE/edit?usp=sharing).
 
 The CHCS service is a temporary solution being utilized for the Preliminary Blood Pressure Prototype project.
 
@@ -20,22 +20,24 @@ Drop the requirement to host CHCS on third-party servers and therefore the depen
 The new Cloud Storage Service implementation will support the following use cases for researcher end-users:
 
 1. Provider and Researcher access:
-   1. Administrator sets up organization hierarchies for institution, department, etc. (Not displayed in diagram)
-   1. Administrator creates study groups and invites Providers and Researchers to study groups.
-   1. Provider or Researcher signs-in from web browser or from a SMART on FHIR EHR launch.
+      1. Administrator sets up organization hierarchies for institution, department, etc. (Not displayed in diagram)
+      1. Administrator creates study groups and invites Providers and Researchers to study groups. 
+      1. Provider or Researcher signs-in from web browser or from a SMART on FHIR EHR launch.
 1. Provider searches for existing patients or registers new patients. If SMART on FHIR launch, patient details are pulled from the EHR context.
 1. Provider invites selected patients to selected study group (pending consent).
 1. Deep Link is sent by SMS or E-mail to invited patients.
-1. Patient launches deep link via Common Health Android app and gives explicit consent for their specific device data to be shared with a specific study group.
-1. The Patient authorizes the Common Health Android app to sync with the device vendor's api.
-1. The Common Health Android app periodically downloads vendor medical device data to the patient's Android device.
-1. The Common Health Android app periodically uploads device data in Open mHealth format to the Cloud Storage Service.
+1. Patient launches deep link via Common Health Android app and gives explicit consent for their specific personal device data to be shared with a specific study group.
+1. The Patient authorizes the Common Health Android app to sync with the personal device vendor's api.
+1. The Common Health Android app periodically downloads vendor personal device data to the patient's Android device.
+1. The Common Health Android app periodically uploads pesonal device data in Open mHealth format to the Cloud Storage Service.
 1. Jupyter Health hub programmatically accesses the Cloud Storage Service REST API with OAuth2/OIDC.
 1. Researcher interacts with study group data via a Jupyter Health hub creating intuitive dashboards for the Provider to view and interact with the study group data.
 1. Provider interacts with the Jupyter Health dashboards. Initially this may be a simple web application, but will eventually be a Provider SMART app within the EHR vendor environment.
 1. A REST API with OAuth2 for programmatic access
 
 ![](assets/images/chcs_iam_overview.jpg)
+
+
 
 # Technical Design
 
@@ -51,7 +53,7 @@ A separate URI will be set up for EHR SMART on FHIR launches and the application
 
 ### Access Control
 
-A user may choose to consent/share only a specific subset of *scopes* (eg Heart Rate) from a specific subset of device data (eg *iHealth*) with a specific study group. This fine-grained access control requires joining study groups (organizations) and device data (observations) with a reference to scopes.
+A user may choose to consent/share only a specific subset of *scopes* (eg Heart Rate) from a specific subset of personal device data (eg *iHealth*) with a specific study group. This fine-grained access control requires joining study groups (organizations) and personal device data (observations) with a reference to scopes.
 
 The original requirements envisioned this IAM web app to be only concerned with authentication and authorization and retain the existing CHCS for data management. However to support the required fine-grained access control, the IAM web app needs to maintain a database with references to the complete catalog of data (or at minimum proxies for all data records). To achieve this with two different databases requires a syncing process to keep both databases up to date which adds significant complexity. It is therefore proposed to consolidate the IAM app and database with the Cloud Storage Service app and database.
 
@@ -71,13 +73,13 @@ A `code` parameter will be used to map SMART scopes to the corresponding Open mH
 ### Deep Link launches from Web Browsers
 
 - There may be a future requirement to support a web-based flow in addition to CommonHealth app-based flows. For example, it may be impractical to send different Deep Links based on the OS or whether or not the patient has an Android device. Instead, the Deep Link could launch a regular browser screen and display the consent prompt.
-- In order to implement this, instead of the medical device data downloading from the vendor server to the patient's phone or tablet (and then syncing from the mobile device to the Cloud Storage Service), the Cloud Storage Service backend would instead fetch the data directly from the device vendor's server in the background.
+- In order to implement this, instead of the personal device data downloading from the vendor server to the patient's phone or tablet (and then syncing from the Android device to the Cloud Storage Service), the Cloud Storage Service backend would instead fetch the data directly from the personal device vendor's server in the background.
 
 ## Data Model
 
 ### Open mHealth
 
-Device data is expected to be in the [Open mHealth](https://www.openmhealth.org/documentation/#/overview/get-started) (JSON) format however the system can be easily extended to support binary data attachments or individual observation records. Binary JSON database fields (such as `jsonb` in Postgres) allow the structured JSON data to be queried from SQL.
+Personal device data is expected to be in the [Open mHealth](https://www.openmhealth.org/documentation/#/overview/get-started) (JSON) format however the system can be easily extended to support binary data attachments or individual observation records. Binary JSON database fields (such as `jsonb` in Postgres) allow the structured JSON data to be queried from SQL.
 
 ### FHIR
 
@@ -142,7 +144,7 @@ erDiagram
         int patient_id
         int user_id
     }
-
+    
     "observations (FHIR Observation)" ||--|{ "study_group_observation_consents": ""
     "observations (FHIR Observation)" ||--|| "codeable_concepts (FHIR CodeableConcept)": ""
     "observations (FHIR Observation)" {
@@ -188,19 +190,18 @@ erDiagram
 - Used by some parent Organizations (eg facilities) to configure SMART on FHIR launches
 - All sub-organizations share the same config
 
+
 #### Study Groups ([FHIR Group](https://build.fhir.org/group.html))
 
 - Study Groups belong to exactly one Organization.
-
   - All Organization members implicitly have access to the Study Group so it is up to the user to create the Study Group from the correct Organization level (ie create a sub-organization to restrict access)
 
 - Study Groups have one or more Patients.
-
 - Study Groups can have zero or many Users (this allows for collaborators outside of the Organization)
 
 #### Observations ([FHIR Observation](https://build.fhir.org/observation.html))
 
-- An Observation stores device data as Open mHealth JSON.
+- An Observation stores personal device data as Open mHealth JSON.
 - An Observation belongs to exactly one Patient.
 - The `code` references a FHIR CodeableConcept, eg  `http://purl.bioontology.org/ontology/SNOMEDCT/78564009 (Read Heart Rate)`
 - When a patient is invited to share data (but prior to consent) `study_group_observation_consents.consented == false`
@@ -226,7 +227,7 @@ erDiagram
 - Where practical third-party libraries will be used on both the back-end and front-end (eg OIDC/OAuth2 server and client)
 - The final package will include a dockerized version for portability
 
-## Capability Statement
+## Capability Statement 
 
 - A public `/metadata` endpoint will be implemented to respond with a subset of the [FHIR Capability Statement](https://build.fhir.org/capabilitystatement.html) that introspects the service and describes the Observation resources available (including the search/filter by coded Open mHealth type) and how they can be accessed via the REST API.
 
@@ -245,13 +246,13 @@ sequenceDiagram
     Note right of CHCS-IAM Web App: Deeplink is standard<br/>OAuth2 presigned URL<br/>mapped to patient.id in DB
     CHCS-IAM Web App->>Researcher Rachel: Returns Deep Link<br/>as text
     Researcher Rachel->>Researcher Rachel: Sends Deep Link to<br/>Patient Peter off-platform
-    Patient Peter CH App->>CHCS-IAM Web App: Launches Deep Link,<br/>Displays CHCS Scope<br/>Consent Requests
+    Patient Peter CH App->>CHCS-IAM Web App: Launches Deep Link,<br/>Displays CHCS Scope<br/>Consent Requests 
     CHCS-IAM Web App->>Patient Peter CH App: Access Token<br/>& Refresh Token
     Note right of Patient Peter CH App: Token contain user.id<br/>and consented scopes
     Patient Peter CH App->>Patient Peter CH App: Vendor Sign-in and Sharing Consent
     Patient Peter CH App->>Patient Peter CH App: Periodic Vendor Data Download
     Patient Peter CH App->>CHCS-IAM Web App: Uploads Data with<br/>OAuth2 Access Token
-    Researcher Rachel->>CHCS-IAM Web App: Views/sorts/downloads<br/>Patient Peter data
+    Researcher Rachel->>CHCS-IAM Web App: Views/sorts/downloads<br/>Patient Peter data 
 ```
 
 ## SMART Client Flow
@@ -274,19 +275,16 @@ sequenceDiagram
     EHR->>SMART CHCS: First Name, Last Name, Cell, E-mail
     SMART CHCS->>SMART CHCS: Matches EHR patient.id<br/>to CHCS patient
     SMART CHCS->>SMART CHCS: (Continues flow with Patient Peter<br/>SMART CHCS as above)
-    SMART CHCS->>Dr Debora: Dr Debora signed in<br/>Patient Peter shared device data displayed
+    SMART CHCS->>Dr Debora: Dr Debora signed in<br/>Patient Peter shared personal device data displayed
 ```
 
-______________________________________________________________________
-
+-----
 # Reference Material
-
 ## Considerations
-
 ### Cloud Storage Service(CSS) as a SMART Server
 
 - SMART Cloud Storage Service is source of truth for auth (with exception of SAML/SSO)
-- For access control against device data Cloud Storage Service should also be store of records, otherwise will require double-auth or some kind of pre-signed URIs and additional complexity unnecessary for a reference implementation
+- For access control against personal device data Cloud Storage Service should also be store of records, otherwise will require double-auth or some kind of pre-signed URIs and additional complexity unnecessary for a reference implementation
 - Without Secondary App access, auth is really just OAuth2 and not SMART
 
 ```mermaid
@@ -298,18 +296,18 @@ sequenceDiagram
     Dr Debora->>SMART CSS: css.org<br/>Sign up / Sign in
     opt
         SMART CSS->>Provider Directory Service: SAML/SSO Auth
-        Provider Directory Service->>SMART CSS:
+        Provider Directory Service->>SMART CSS: 
     end
     Dr Debora->>SMART CSS: Set up study, users and groups
     Dr Debora->>SMART CSS: Register Patient, create and send deep link
     Dr Debora->>Secondary App (SMART Client): Click to launch
     Secondary App (SMART Client)->>SMART CSS: SMART Auth flow
-    SMART CSS->>Secondary App (SMART Client):
+    SMART CSS->>Secondary App (SMART Client): 
     Secondary App (SMART Client)->>SMART CSS: GET /fhir/metadata
     SMART CSS->>Secondary App (SMART Client): Describe Observation valueAttachments
     Secondary App (SMART Client)->>SMART CSS: GET /observation?patient=123456
     SMART CSS->>Secondary App (SMART Client): Observation valueAttachments
-    Secondary App (SMART Client)->>Dr Debora: Display shared device data
+    Secondary App (SMART Client)->>Dr Debora: Display shared personal device data
 ```
 
 - If launched from an EHR context, map user and patient to Cloud Storage Service IDs, otherwise act as SMART Server
@@ -362,5 +360,6 @@ end
 ### Previous CHCS Data Model
 
 ![DB ERD](/assets/images/chcs_db_erd.png)
+
 
 Last Updated: 2024-06-27

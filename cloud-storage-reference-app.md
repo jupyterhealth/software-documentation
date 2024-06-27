@@ -20,9 +20,9 @@ Drop the requirement to host CHCS on third-party servers and therefore the depen
 The new Cloud Storage Service implementation will support the following use cases for researcher end-users:
 
 1. Provider and Researcher access:
-      1. Administrator sets up organization hierarchies for institution, department, etc. (Not displayed in diagram)
-      1. Administrator creates study groups and invites Providers and Researchers to study groups. 
-      1. Provider or Researcher signs-in from web browser or from a SMART on FHIR EHR launch.
+   1. Administrator sets up organization hierarchies for institution, department, etc. (Not displayed in diagram)
+   1. Administrator creates study groups and invites Providers and Researchers to study groups.
+   1. Provider or Researcher signs-in from web browser or from a SMART on FHIR EHR launch.
 1. Provider searches for existing patients or registers new patients. If SMART on FHIR launch, patient details are pulled from the EHR context.
 1. Provider invites selected patients to selected study group (pending consent).
 1. Deep Link is sent by SMS or E-mail to invited patients.
@@ -36,8 +36,6 @@ The new Cloud Storage Service implementation will support the following use case
 1. A REST API with OAuth2 for programmatic access
 
 ![](assets/images/chcs_iam_overview.jpg)
-
-
 
 # Technical Design
 
@@ -144,7 +142,7 @@ erDiagram
         int patient_id
         int user_id
     }
-    
+
     "observations (FHIR Observation)" ||--|{ "study_group_observation_consents": ""
     "observations (FHIR Observation)" ||--|| "codeable_concepts (FHIR CodeableConcept)": ""
     "observations (FHIR Observation)" {
@@ -190,13 +188,14 @@ erDiagram
 - Used by some parent Organizations (eg facilities) to configure SMART on FHIR launches
 - All sub-organizations share the same config
 
-
 #### Study Groups ([FHIR Group](https://build.fhir.org/group.html))
 
 - Study Groups belong to exactly one Organization.
+
   - All Organization members implicitly have access to the Study Group so it is up to the user to create the Study Group from the correct Organization level (ie create a sub-organization to restrict access)
 
 - Study Groups have one or more Patients.
+
 - Study Groups can have zero or many Users (this allows for collaborators outside of the Organization)
 
 #### Observations ([FHIR Observation](https://build.fhir.org/observation.html))
@@ -227,7 +226,7 @@ erDiagram
 - Where practical third-party libraries will be used on both the back-end and front-end (eg OIDC/OAuth2 server and client)
 - The final package will include a dockerized version for portability
 
-## Capability Statement 
+## Capability Statement
 
 - A public `/metadata` endpoint will be implemented to respond with a subset of the [FHIR Capability Statement](https://build.fhir.org/capabilitystatement.html) that introspects the service and describes the Observation resources available (including the search/filter by coded Open mHealth type) and how they can be accessed via the REST API.
 
@@ -246,13 +245,13 @@ sequenceDiagram
     Note right of CHCS-IAM Web App: Deeplink is standard<br/>OAuth2 presigned URL<br/>mapped to patient.id in DB
     CHCS-IAM Web App->>Researcher Rachel: Returns Deep Link<br/>as text
     Researcher Rachel->>Researcher Rachel: Sends Deep Link to<br/>Patient Peter off-platform
-    Patient Peter CH App->>CHCS-IAM Web App: Launches Deep Link,<br/>Displays CHCS Scope<br/>Consent Requests 
+    Patient Peter CH App->>CHCS-IAM Web App: Launches Deep Link,<br/>Displays CHCS Scope<br/>Consent Requests
     CHCS-IAM Web App->>Patient Peter CH App: Access Token<br/>& Refresh Token
     Note right of Patient Peter CH App: Token contain user.id<br/>and consented scopes
     Patient Peter CH App->>Patient Peter CH App: Vendor Sign-in and Sharing Consent
     Patient Peter CH App->>Patient Peter CH App: Periodic Vendor Data Download
     Patient Peter CH App->>CHCS-IAM Web App: Uploads Data with<br/>OAuth2 Access Token
-    Researcher Rachel->>CHCS-IAM Web App: Views/sorts/downloads<br/>Patient Peter data 
+    Researcher Rachel->>CHCS-IAM Web App: Views/sorts/downloads<br/>Patient Peter data
 ```
 
 ## SMART Client Flow
@@ -278,9 +277,12 @@ sequenceDiagram
     SMART CHCS->>Dr Debora: Dr Debora signed in<br/>Patient Peter shared device data displayed
 ```
 
------
+______________________________________________________________________
+
 # Reference Material
+
 ## Considerations
+
 ### Cloud Storage Service(CSS) as a SMART Server
 
 - SMART Cloud Storage Service is source of truth for auth (with exception of SAML/SSO)
@@ -296,13 +298,13 @@ sequenceDiagram
     Dr Debora->>SMART CSS: css.org<br/>Sign up / Sign in
     opt
         SMART CSS->>Provider Directory Service: SAML/SSO Auth
-        Provider Directory Service->>SMART CSS: 
+        Provider Directory Service->>SMART CSS:
     end
     Dr Debora->>SMART CSS: Set up study, users and groups
     Dr Debora->>SMART CSS: Register Patient, create and send deep link
     Dr Debora->>Secondary App (SMART Client): Click to launch
     Secondary App (SMART Client)->>SMART CSS: SMART Auth flow
-    SMART CSS->>Secondary App (SMART Client): 
+    SMART CSS->>Secondary App (SMART Client):
     Secondary App (SMART Client)->>SMART CSS: GET /fhir/metadata
     SMART CSS->>Secondary App (SMART Client): Describe Observation valueAttachments
     Secondary App (SMART Client)->>SMART CSS: GET /observation?patient=123456
@@ -360,6 +362,5 @@ end
 ### Previous CHCS Data Model
 
 ![DB ERD](/assets/images/chcs_db_erd.png)
-
 
 Last Updated: 2024-06-27

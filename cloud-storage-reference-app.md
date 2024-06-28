@@ -259,22 +259,24 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     actor Dr Debora
-    participant EHR
-    participant SMART CHCS
-    Dr Debora->>EHR: Seaches Patient Peter<br/>Clicks to launch CH
-    EHR->>SMART CHCS: GET chcs.org/launch<br/>?iss=https://fhir.example.com&launch=xyz123
-    SMART CHCS->>EHR: GET fhir.ehr.com/.well-known/smart-configuration
-    EHR->>SMART CHCS: Conformance JSON<br/>grant_types_supported, authorization_endpoint,<br/>jwks_uri, token_endpoint, capabilities,<br/>code_challenge_methods_supported
-    SMART CHCS->>EHR: GET auth.ehr.com<br/>?client_id=abc123&launch=xyz123<br/>&state=999&scope=launch+patient<br/>&redirect_uri=https://chcs.org/redirect&...
-    EHR->>SMART CHCS: GET chcs.org/redirect<br/>?code=1111&state=999
-    SMART CHCS->>EHR: POST<br/>code=1111, grant_type=access_token,scope=launch+patient,<br/>code_verifier=0f01, redirect_uri=https://chcs.org/redirect
-    EHR->>SMART CHCS: Auth JSON<br/>access_token, token_type, scope, patient=def123.456
-    SMART CHCS->>EHR: GET /fhir/patients/def.456<br/>Bearer: access_token
-    SMART CHCS->>SMART CHCS: Matches EHR user.id<br/>to CHCS user
-    EHR->>SMART CHCS: First Name, Last Name, Cell, E-mail
-    SMART CHCS->>SMART CHCS: Matches EHR patient.id<br/>to CHCS patient
-    SMART CHCS->>SMART CHCS: (Continues flow with Patient Peter<br/>SMART CHCS as above)
-    SMART CHCS->>Dr Debora: Dr Debora signed in<br/>Patient Peter shared personal device data displayed
+    participant SMART CSS
+    participant Provider Directory Service
+    participant Secondary App (SMART Client)
+    Dr Debora->>SMART CSS: css.org<br/>Sign up / Sign in
+    opt
+        SMART CSS->>Provider Directory Service: SAML/SSO Auth
+        Provider Directory Service->>SMART CSS: 
+    end
+    Dr Debora->>SMART CSS: Set up study, users and groups
+    Dr Debora->>SMART CSS: Register Patient, create and send deep link
+    Dr Debora->>Secondary App (SMART Client): Click to launch
+    Secondary App (SMART Client)->>SMART CSS: SMART Auth flow
+    SMART CSS->>Secondary App (SMART Client):  
+    Secondary App (SMART Client)->>SMART CSS: GET /fhir/metadata
+    SMART CSS->>Secondary App (SMART Client): Describe Observation valueAttachments
+    Secondary App (SMART Client)->>SMART CSS: GET /observation?patient=123456
+    SMART CSS->>Secondary App (SMART Client): Observation valueAttachments
+    Secondary App (SMART Client)->>Dr Debora: Display shared personal device data
 ```
 
 ______________________________________________________________________
@@ -298,13 +300,13 @@ sequenceDiagram
     Dr Debora->>SMART CSS: css.org<br/>Sign up / Sign in
     opt
         SMART CSS->>Provider Directory Service: SAML/SSO Auth
-        Provider Directory Service->>SMART CSS:
+        Provider Directory Service->>SMART CSS:  
     end
     Dr Debora->>SMART CSS: Set up study, users and groups
     Dr Debora->>SMART CSS: Register Patient, create and send deep link
     Dr Debora->>Secondary App (SMART Client): Click to launch
     Secondary App (SMART Client)->>SMART CSS: SMART Auth flow
-    SMART CSS->>Secondary App (SMART Client):
+    SMART CSS->>Secondary App (SMART Client):  
     Secondary App (SMART Client)->>SMART CSS: GET /fhir/metadata
     SMART CSS->>Secondary App (SMART Client): Describe Observation valueAttachments
     Secondary App (SMART Client)->>SMART CSS: GET /observation?patient=123456

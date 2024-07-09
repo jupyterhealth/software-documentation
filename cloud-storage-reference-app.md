@@ -265,13 +265,11 @@ sequenceDiagram
     Dr Debora->>SMART CSS: css.org<br/>Sign up / Sign in
     opt
         SMART CSS->>Provider Directory Service: SAML/SSO Auth
-        Provider Directory Service->>SMART CSS: 
     end
     Dr Debora->>SMART CSS: Set up study, users and groups
     Dr Debora->>SMART CSS: Register Patient, create and send deep link
     Dr Debora->>Secondary App (SMART Client): Click to launch
     Secondary App (SMART Client)->>SMART CSS: SMART Auth flow
-    SMART CSS->>Secondary App (SMART Client):  
     Secondary App (SMART Client)->>SMART CSS: GET /fhir/metadata
     SMART CSS->>Secondary App (SMART Client): Describe Observation valueAttachments
     Secondary App (SMART Client)->>SMART CSS: GET /observation?patient=123456
@@ -300,13 +298,11 @@ sequenceDiagram
     Dr Debora->>SMART CSS: css.org<br/>Sign up / Sign in
     opt
         SMART CSS->>Provider Directory Service: SAML/SSO Auth
-        Provider Directory Service->>SMART CSS:  
     end
     Dr Debora->>SMART CSS: Set up study, users and groups
     Dr Debora->>SMART CSS: Register Patient, create and send deep link
     Dr Debora->>Secondary App (SMART Client): Click to launch
     Secondary App (SMART Client)->>SMART CSS: SMART Auth flow
-    SMART CSS->>Secondary App (SMART Client):  
     Secondary App (SMART Client)->>SMART CSS: GET /fhir/metadata
     SMART CSS->>Secondary App (SMART Client): Describe Observation valueAttachments
     Secondary App (SMART Client)->>SMART CSS: GET /observation?patient=123456

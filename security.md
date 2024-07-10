@@ -80,4 +80,4 @@ This will allow per-user access control, registered and enforced by SMART-on-FHI
 
 ## Data Flow Diagram
 
-![](CHCS-Architecture.png)
+![](assets/images/CHCS-Architecture.png)

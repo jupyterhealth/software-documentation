@@ -5,3 +5,4 @@ chapters:
 - file: preliminary
 - file: security
 - file: examples/openmhealth-bp
+- file: cloud-storage-reference-app

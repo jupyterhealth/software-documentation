@@ -202,7 +202,7 @@ erDiagram
 
 - An Observation stores personal device data as Open mHealth JSON.
 - An Observation belongs to exactly one Patient.
-- The `code` references a FHIR CodeableConcept, eg  `http://purl.bioontology.org/ontology/SNOMEDCT/78564009 (Read Heart Rate)`
+- The `code` references a FHIR CodeableConcept, eg `http://purl.bioontology.org/ontology/SNOMEDCT/78564009 (Read Heart Rate)`
 - When a patient is invited to share data (but prior to consent) `study_group_observation_consents.consented == false`
 - After consent is explicitly granted for the specific scopes/codes to be accessed by a Study Group `study_group_observation_consents.consented == true`
 - The `study_group_observation_consents.scope_action` is the [SMART scope](https://hl7.org/fhir/smart-app-launch/scopes-and-launch-context.html#scopes-for-requesting-fhir-resources) action component which will always be `r` for "read" but is included for completeness

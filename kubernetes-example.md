@@ -1,5 +1,5 @@
 ---
-title: "Example: Deploying JupyterHealth Exchange on Kubernetes"
+title: 'Example: Deploying JupyterHealth Exchange on Kubernetes'
 downloads:
   - file: ./examples/jhe-example.yml
     title: Example kubernetes resources
@@ -44,11 +44,12 @@ managedNodeGroups:
 
 The configuration will be provided to `eksctl` which in this case had access to the following environment variables:
 
-  - `AWS_SECRET_ACCESS_KEY`
-  - `AWS_ACCESS_KEY_ID`
-  - `AWS_DEFAULT_REGION`
+- `AWS_SECRET_ACCESS_KEY`
+- `AWS_ACCESS_KEY_ID`
+- `AWS_DEFAULT_REGION`
 
 Create the cluster:
+
 ```shell
 eksctl create cluster -f cluster.yml
 ```
@@ -56,6 +57,7 @@ eksctl create cluster -f cluster.yml
 ## Install Cluster Components
 
 Install ingress-nginx.
+
 ```shell
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
@@ -83,57 +85,61 @@ This is an example configuration for an Amazon RDS PostgreSQL instance. Use valu
 
 ### Example RDS
 
-:::{table} AWS RDS Configuration
-| **Parameter** | **Value** |
-|---------------|-----------|
-| Creation method | Standard create |
-| Engine type | PostgreSQL |
-| Engine version | 16.3-R3 |
-| Templates | Dev/Test |
-| Availability and durability, deployment | Multi-AZ DB Instance |
-| DB instance identifier | jhe-db-staging-1 |
-| Credentials management | Self managed, not auto generated |
-| DB instance class | Burstable classes, db.t3.small |
-| Storage type | General Purpose SSD (gp2) |
-| Allocated storage | 100 GiB |
-| Enable storage autoscaling | yes |
-| Maximum storage threshold | 1000 GiB |
-| Compute resource | Don't connect to an EC2 compute resource |
-| VPC | eksctl-jhe-cluster/VPC |
-| DB subnet group | create new db subnet group |
-| Public access | no |
-| VPC security group | choose existing |
-| Existing VPC security groups | default, `eks-cluster-jhe-...` |
-| Database authentication | password |
-| Enable Performance insights | yes |
-| Retention period | 7 days (free tier) |
-| AWS KMS key | (default) aws/rds |
-| Initial database name | `jhe` |
-:::
+:::\{table} AWS RDS Configuration
+
+| **Parameter**                           | **Value**                                |
+| --------------------------------------- | ---------------------------------------- |
+| Creation method                         | Standard create                          |
+| Engine type                             | PostgreSQL                               |
+| Engine version                          | 16.3-R3                                  |
+| Templates                               | Dev/Test                                 |
+| Availability and durability, deployment | Multi-AZ DB Instance                     |
+| DB instance identifier                  | jhe-db-staging-1                         |
+| Credentials management                  | Self managed, not auto generated         |
+| DB instance class                       | Burstable classes, db.t3.small           |
+| Storage type                            | General Purpose SSD (gp2)                |
+| Allocated storage                       | 100 GiB                                  |
+| Enable storage autoscaling              | yes                                      |
+| Maximum storage threshold               | 1000 GiB                                 |
+| Compute resource                        | Don't connect to an EC2 compute resource |
+| VPC                                     | eksctl-jhe-cluster/VPC                   |
+| DB subnet group                         | create new db subnet group               |
+| Public access                           | no                                       |
+| VPC security group                      | choose existing                          |
+| Existing VPC security groups            | default, `eks-cluster-jhe-...`           |
+| Database authentication                 | password                                 |
+| Enable Performance insights             | yes                                      |
+| Retention period                        | 7 days (free tier)                       |
+| AWS KMS key                             | (default) aws/rds                        |
+| Initial database name                   | `jhe`                                    |
+| :::                                     |                                          |
 
 Note the attributes of the database, e.g.
 
-:::{table} Database Attributes
-| Parameter | Value |
-|-----------|-------|
-| db identifier | `database-1` |
-| endpoint | `database-1...rds.amazonaws.com` |
-| port | `5432` |
-| master username | `postgres` |
-| secret value | (your secret) |
-| rotation | `365d` |
-:::
+:::\{table} Database Attributes
+
+| Parameter       | Value                            |
+| --------------- | -------------------------------- |
+| db identifier   | `database-1`                     |
+| endpoint        | `database-1...rds.amazonaws.com` |
+| port            | `5432`                           |
+| master username | `postgres`                       |
+| secret value    | (your secret)                    |
+| rotation        | `365d`                           |
+| :::             |                                  |
 
 ### Test the Database
 
 Launch a shell in the cluster.
+
 ```shell
 $ kubectl run postgres-test -it --rm --image=postgres:16.3 -- bash
 If you don't see a command prompt, try pressing enter.
-root@postgres-test:/# 
+root@postgres-test:/#
 ```
 
 Use the database endpoint, username, and secret to connect to the database you created.
+
 ```shell
 root@postgres-test:/# psql -h {endpoint} -U {master username} -d postgres
 Password for user postgres:
@@ -151,7 +157,7 @@ postgres=>
 
 Create a Job to migrate the database using our existing ConfigMap.
 
-:::{note}
+:::\{note}
 This job uses code from jupyterhealth-exchange software. While the project includes a `Dockerfile`, there is no official docker image for it. An example was built and pushed to `ryanlovett/jupyterhealth-exchange:a30ad58` representing the latest commit to the jupyterhealth-exchange repo at the time.
 :::
 
@@ -178,6 +184,7 @@ spec:
 ```
 
 Run the job.
+
 ```shell
 kubectl apply -f job-manage-migrate.yml
 ```
@@ -187,7 +194,6 @@ kubectl apply -f job-manage-migrate.yml
 This requires the [seed.sql](https://github.com/the-commons-project/jupyterhealth-exchange/blob/main/db/seed.sql) file from the [jupyterhealth-exchange repository](https://github.com/the-commons-project/jupyterhealth-exchange), and a new python script, `jhe/scripts/seed.py` to import it. `seed.py` is currently available in a [pull request to jupyterhealth-exchange](https://github.com/the-commons-project/jupyterhealth-exchange/pull/37/files).
 
 Injest them as ConfigMaps by running the following commands from within the working directory of [jupyterhealth-exchange](https://github.com/the-commons-project/jupyterhealth-exchange).
-
 
 ```shell
 kubectl -n jhe create configmap db-seed-sql --from-file=db/seed.sql
@@ -233,6 +239,7 @@ spec:
 ```
 
 and run it
+
 ```shell
 kubectl apply -f job-import-seed.yml
 ```
@@ -248,16 +255,18 @@ kubectl apply -f jhe-example.yml
 ## Administering JHE
 
 1. Login to your JupyterHealth Exchange app, https://jhe.example.org/admin/
+
 1. Under Django OAuth Toolkit, add application
 
    a. Save Client id
 
    b. Add space-separated redirect uris for hubs
-      - http://localhost:8000/auth/callback
-      - https://jupyterhub.example.org/hub/oauth_callback
-      - https://jupyterhub.example.org/services/smart/oauth_callback
-      - https://jupyterhub.example.org/user-redirect/smart/oauth_callback
-      - https://jhe.example.org/auth/callback
+
+   - http://localhost:8000/auth/callback
+   - https://jupyterhub.example.org/hub/oauth_callback
+   - https://jupyterhub.example.org/services/smart/oauth_callback
+   - https://jupyterhub.example.org/user-redirect/smart/oauth_callback
+   - https://jhe.example.org/auth/callback
 
    c. Client type: Public
 
@@ -270,4 +279,3 @@ kubectl apply -f jhe-example.yml
    g. Skip authorization: yes
 
    h. Algorithm: RSA with SHA-2 256
-

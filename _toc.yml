@@ -1,8 +1,0 @@
-# See https://mystmd.org/guide/table-of-contents
-format: jb-book
-root: index
-chapters:
-- file: preliminary
-- file: security
-- file: examples/openmhealth-bp
-- file: cloud-storage-reference-app

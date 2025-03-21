@@ -56,7 +56,21 @@ eksctl create cluster -f cluster.yml
 
 ## Install Cluster Components
 
-Install ingress-nginx.
+### Install ingress-nginx
+
+First, prepare parameters in `ingress-nginx.yaml`:
+
+```yaml
+controller:
+  service:
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: nlb
+      service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+  config:
+    use-forwarded-headers: "true"
+```
+
+Then run the following:
 
 ```shell
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
@@ -64,7 +78,7 @@ helm repo update
 helm install nginx-ingress ingress-nginx/ingress-nginx -f ingress-nginx.yml
 ```
 
-Install certmanager.
+### Install certmanager
 
 ```shell
 helm repo add jetstack https://charts.jetstack.io

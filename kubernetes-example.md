@@ -86,7 +86,6 @@ This is an example configuration for an Amazon RDS PostgreSQL instance. Use valu
 ### Example RDS
 
 :::{table} AWS RDS Configuration
-
 | **Parameter**                           | **Value**                                |
 | --------------------------------------- | ---------------------------------------- |
 | Creation method                         | Standard create                          |
@@ -112,12 +111,11 @@ This is an example configuration for an Amazon RDS PostgreSQL instance. Use valu
 | Retention period                        | 7 days (free tier)                       |
 | AWS KMS key                             | (default) aws/rds                        |
 | Initial database name                   | `jhe`                                    |
-| :::                                     |                                          |
+:::
 
 Note the attributes of the database, e.g.
 
 :::{table} Database Attributes
-
 | Parameter       | Value                            |
 | --------------- | -------------------------------- |
 | db identifier   | `database-1`                     |
@@ -126,7 +124,7 @@ Note the attributes of the database, e.g.
 | master username | `postgres`                       |
 | secret value    | (your secret)                    |
 | rotation        | `365d`                           |
-| :::             |                                  |
+:::
 
 ### Test the Database
 

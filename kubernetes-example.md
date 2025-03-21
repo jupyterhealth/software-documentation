@@ -157,9 +157,9 @@ postgres=>
 
 Create a Job to migrate the database using our existing ConfigMap.
 
-:::\{note}
+```{note}
 This job uses code from jupyterhealth-exchange software. While the project includes a `Dockerfile`, there is no official docker image for it. An example was built and pushed to `ryanlovett/jupyterhealth-exchange:a30ad58` representing the latest commit to the jupyterhealth-exchange repo at the time.
-:::
+```
 
 ```yaml
 # job-manage-migrate.yml

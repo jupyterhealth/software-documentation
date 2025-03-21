@@ -293,3 +293,68 @@ kubectl apply -f jhe-example.yml
    g. Skip authorization: yes
 
    h. Algorithm: RSA with SHA-2 256
+
+## Authenticating JupyterHub with JHE
+
+In order for users of JupyterHub to have access to JHE,
+the simplest way is to use JHE as the OAuth provider for logging into JupyterHub.
+To do that, configure.
+Below is the configuration to login to JupyterHub with JHE as OAuth provider:
+
+```{literalinclude} examples/hub-jhe-auth.yaml
+```
+
+You have 3 choices for _authorizing_ JHE users to access the Hub:
+
+1. allow any JHE user to use the Hub. In which case, set:
+
+   ```yaml
+   GenericOAuthenticator:
+     allow_all: true
+   ```
+
+1. allow specific users by email address:
+
+   ```yaml
+   GenericOAuthenticator:
+     allowed_users:
+       - user@example.org
+   ```
+
+1. allow based on _organization membership_ in JHE, which requires a bit more configuration.
+
+### Authorizing the Hub via JHE organization
+
+To authorize access to the Hub based on JHE organization membership,
+we need to connect JupyterHub groups with JHE organizations.
+This lets you manage access to the Hub in the JHE UI
+by adding/removing users to the authorized groups.
+
+1. [In JHE] create the organization(s) that you want to grant access to the Hub. Note the integer "organization id" of each organization (they probably look like 2000X).
+
+1. [In JHE] add users to these organizations
+
+1. configure JupyterHub to populate group membership based on JHE organization membership:
+
+   ```{literalinclude} examples/hub-jhe-access-groups.yaml
+   ```
+
+### Accessing JHE from the Hub
+
+With the above configuration, when a user logs in to the Hub,
+two environment variables are set when a user starts their server:
+
+```shell
+$JHE_URL  # the URL of the Exchange
+$JHE_TOKEN  # the user's access token for the Exchange
+```
+
+You can use these to make API requests to the Exchange.
+There is also the [jupyterhealth-client](xref:jupyterhealth_client) package,
+which you can add to your user image:
+
+```shell
+pip install --pre jupyterhealth-client
+```
+
+And then you can use the [JupyterHealthClient](xref:jupyterhealth_client#jupyterhealth_client.JupyterHealthClient) class to fetch patient data.

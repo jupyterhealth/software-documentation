@@ -1,0 +1,37 @@
+hub:
+  config:
+    JupyterHub:
+      # first chunk:use Exchange as oauth provider
+      authenticator_class: generic-oauth
+      GenericOAuthenticator:
+        client_id: ${{ saved from JHE }}
+        cookie_max_age_days: 1
+        authorize_url: https://jhe.example.org/authorize/
+        token_url: https://jhe.example.org/o/token/
+        userdata_url: https://jhe.example.org/api/v1/users/profile
+        username_claim: email
+        login_service: JupyterHealth Exchange
+        scope:
+          - openid
+        admin_users:
+          - email@example.org
+        enable_auth_state: true
+        # grant specific users access by email
+        allowed_users:
+          - user-email@example.org
+        # or allow all JHE users to access the Hub with:
+        # allow_all: true
+        # see other example for group-based access
+    extraConfig:
+      # add access tokens from auth state to user env
+      auth_state_env.py: |
+        def auth_state_env(spawner, auth_state):
+            if not auth_state:
+                spawner.log.warning(f"Missing auth state for user {spawner.user.name}")
+                return
+            spawner.environment["JHE_TOKEN"] = auth_state["access_token"]
+
+        c.Spawner.auth_state_hook = auth_state_env
+singleuser:
+  extraEnv:
+    JHE_URL: https://jhe.example.org

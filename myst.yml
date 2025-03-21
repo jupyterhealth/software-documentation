@@ -8,7 +8,9 @@ project:
   github: https://github.com/jupyterhealth/software-documentation
   #jupyter:
   #  lite: true
-# See https://mystmd.org/guide/table-of-contents
+  references:
+    jupyterhealth_client: https://jupyterhealth-client.readthedocs.io/en/latest
+  # See https://mystmd.org/guide/table-of-contents
   toc:
     - file: index.md
     - file: preliminary.md

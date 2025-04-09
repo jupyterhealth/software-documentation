@@ -298,6 +298,27 @@ kubectl apply -f job-import-seed.yml
 
    h. Algorithm: RSA with SHA-2 256
 
+   i. Create an [RS256 private key](https://django-oauth-toolkit.readthedocs.io/en/latest/oidc.html#creating-rsa-private-key): `openssl genrsa -out oidc.key 4096`
+
+   j. Create a new static PKCE code verifier with the code below. Save it into the `jhe-config` ConfigMap in `jhe-example.yml` under `PATIENT_AUTHORIZATION_CODE_VERIFIER`.
+
+      ```python
+      import random
+      import string
+      def generate_pkce_verifier(length=44):
+          characters = string.ascii_letters + string.digits
+          return ''.join(random.choices(characters, k=length))
+      print(generate_pkce_verifier())
+      ```
+
+   h. Use the `PATIENT_AUTHORIZATION_CODE_VERIFIER` as the code verifier input at the [Online PKCE Generator Tool](https://tonyxu-io.github.io/pkce-generator/). Save the code challenge into the `jhe-config` ConfigMap in `jhe-example.yml` under `PATIENT_AUTHORIZATION_CODE_CHALLENGE`.
+
+   l. Re-apply the application configuration and restart the application:
+      ```shell
+      kubectl apply -f jhe-example.yml
+      kubectl -n jhe delete pod -l app=jhe
+      ```
+
 ## Authenticating JupyterHub with JHE
 
 In order for users of JupyterHub to have access to JHE,

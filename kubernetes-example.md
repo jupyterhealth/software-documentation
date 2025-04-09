@@ -93,6 +93,18 @@ helm install \
   --wait
 ```
 
+### Install the Application
+
+Finally, install the application into the cluster. [jhe-example.yml](examples/jhe-example.yml) is provided as example kubernetes configuration, although you will need to substitute values appropriate for your deployment.
+
+```shell
+kubectl apply -f jhe-example.yml
+```
+
+## Register Hostname
+
+When the application is created, the cluster will create a service object for the nginx ingress controller. It will have an external IP of the form `{long_string}.elb.{region}.amazonaws.com`. Create a CNAME in your DNS provider that maps the public address of your JupyterHealth Exchange application to the value of this address.
+
 ## Create a Database
 
 This is an example configuration for an Amazon RDS PostgreSQL instance. Use values appropriate for your deployment. The VPC-related values would come from identifiers created when the cluster was created.
@@ -258,21 +270,13 @@ and run it
 kubectl apply -f job-import-seed.yml
 ```
 
-## Install the Application
-
-Finally, install the application into the cluster. [jhe-example.yml](examples/jhe-example.yml) is provided as example kubernetes configuration, although you will need to substitute values appropriate for your deployment.
-
-```shell
-kubectl apply -f jhe-example.yml
-```
-
 ## Administering JHE
 
 1. Login to your JupyterHealth Exchange app, https://jhe.example.org/admin/
 
 1. Under Django OAuth Toolkit, add application
 
-   a. Save Client id
+   a. Save the value of `Client id` into the `jhe-config` ConfigMap in `jhe-example.yml` under `OIDC_CLIENT_ID`.
 
    b. Add space-separated redirect uris for hubs
 

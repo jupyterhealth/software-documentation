@@ -13,18 +13,20 @@ project:
   # See https://mystmd.org/guide/table-of-contents
   toc:
     - file: index.md
-    - file: preliminary.md
-    - file: security.md
-    - file: examples/openmhealth-bp.ipynb
-    - file: cloud-storage-reference-app.md
-    - file: kubernetes-example.md
+    - title: Explanation
+      children:
+        - file: security.md
+        - file: cloud-storage-reference-app.md
+    - title: How-To Guides
+      children:
+        - file: examples/openmhealth-bp.ipynb
+        - file: kubernetes-example.md
 
 site:
   template: book-theme
   title: 'JupyterHealth Software'
   options:
     logo: 'jupyter.png'
-  nav: []
   actions:
     - title: Project Jupyter
       url: https://jupyter.org

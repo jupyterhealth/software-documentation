@@ -117,10 +117,10 @@ This is an example configuration for an Amazon RDS PostgreSQL instance. Use valu
 | --------------------------------------- | ---------------------------------------- |
 | Creation method                         | Standard create                          |
 | Engine type                             | PostgreSQL                               |
-| Engine version                          | 16.3-R3                                  |
+| Engine version                          | 17.4-R1                                  |
 | Templates                               | Dev/Test                                 |
 | Availability and durability, deployment | Multi-AZ DB Instance                     |
-| DB instance identifier                  | jhe-db-staging-1                         |
+| DB instance identifier                  | database-2                               |
 | Credentials management                  | Self managed, not auto generated         |
 | DB instance class                       | Burstable classes, db.t3.small           |
 | Storage type                            | General Purpose SSD (gp2)                |
@@ -128,11 +128,11 @@ This is an example configuration for an Amazon RDS PostgreSQL instance. Use valu
 | Enable storage autoscaling              | yes                                      |
 | Maximum storage threshold               | 1000 GiB                                 |
 | Compute resource                        | Don't connect to an EC2 compute resource |
-| VPC                                     | eksctl-jhe-cluster/VPC                   |
-| DB subnet group                         | create new db subnet group               |
+| VPC                                     | eksctl-jhe-example-cluster/VPC                   |
+| DB subnet group                         | use default
 | Public access                           | no                                       |
 | VPC security group                      | choose existing                          |
-| Existing VPC security groups            | default, `eks-cluster-jhe-...`           |
+| Existing VPC security groups            | default, `eks-cluster-sg-jhe-example-...`           |
 | Database authentication                 | password                                 |
 | Enable Performance insights             | yes                                      |
 | Retention period                        | 7 days (free tier)                       |
@@ -140,13 +140,13 @@ This is an example configuration for an Amazon RDS PostgreSQL instance. Use valu
 | Initial database name                   | `jhe`                                    |
 ```
 
-Note the attributes of the database, e.g.
+Note the attributes of the database, some of which are available after it has been created.
 
 ```{table} Database Attributes
 
 | Parameter       | Value                            |
 | --------------- | -------------------------------- |
-| db identifier   | `database-1`                     |
+| db identifier   | `database-2`                     |
 | endpoint        | `database-1...rds.amazonaws.com` |
 | port            | `5432`                           |
 | master username | `postgres`                       |
@@ -159,7 +159,7 @@ Note the attributes of the database, e.g.
 Launch a shell in the cluster.
 
 ```shell
-$ kubectl run postgres-test -it --rm --image=postgres:16.3 -- bash
+$ kubectl run postgres-test -it --rm --image=postgres:17.4 -- bash
 If you don't see a command prompt, try pressing enter.
 root@postgres-test:/#
 ```
@@ -167,7 +167,7 @@ root@postgres-test:/#
 Use the database endpoint, username, and secret to connect to the database you created.
 
 ```shell
-root@postgres-test:/# psql -h {endpoint} -U {master username} -d postgres
+root@postgres-test:/# psql -h {endpoint} -U {master username} -d jhe
 Password for user postgres:
 psql (16.3 (Debian 16.3-1.pgdg120+1))
 SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, compression:

@@ -103,7 +103,7 @@ spec :
     spec :
       containers :
       - name : jhe
-        image : ryanlovett/jupyterhealth-exchange:a30ad58
+        image : ryanlovett/jupyterhealth-exchange:e870031
         ports :
           - containerPort : 8000
         envFrom:

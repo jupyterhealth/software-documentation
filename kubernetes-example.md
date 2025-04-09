@@ -172,7 +172,7 @@ postgres=>
 Create a Job to migrate the database using our existing ConfigMap.
 
 ```{note}
-This job uses code from jupyterhealth-exchange software. While the project includes a `Dockerfile`, there is no official docker image for it. An example was built and pushed to `ryanlovett/jupyterhealth-exchange:a30ad58` representing the latest commit to the jupyterhealth-exchange repo at the time.
+This job uses code from jupyterhealth-exchange software. While the project includes a `Dockerfile`, there is no official docker image for it. An example was built and pushed to `ryanlovett/jupyterhealth-exchange:e870031` representing the latest commit to the jupyterhealth-exchange repo at the time.
 ```
 
 ```yaml
@@ -190,7 +190,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: jhe-manage-migrate
-        image: ryanlovett/jupyterhealth-exchange:a30ad58
+        image: ryanlovett/jupyterhealth-exchange:e870031
         command: ["python", "manage.py", "migrate"]
         envFrom:
         - configMapRef:
@@ -230,7 +230,7 @@ spec:
     spec:
       containers:
       - name: import-seed
-        image: ryanlovett/jupyterhealth-exchange:a30ad58
+        image: ryanlovett/jupyterhealth-exchange:e870031
         command: ["python", "/app/seed.py"]
         envFrom:
         - configMapRef:

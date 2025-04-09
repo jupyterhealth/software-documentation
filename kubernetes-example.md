@@ -17,7 +17,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: jhe
+  name: jhe-example
   region: us-east-2
   version: '1.30'
 
@@ -93,6 +93,18 @@ helm install \
   --wait
 ```
 
+### Install the Application
+
+Finally, install the application into the cluster. [jhe-example.yml](examples/jhe-example.yml) is provided as example kubernetes configuration, although you will need to substitute values appropriate for your deployment.
+
+```shell
+kubectl apply -f jhe-example.yml
+```
+
+## Register Hostname
+
+When the application is created, the cluster will create a service object for the nginx ingress controller. It will have an external IP of the form `{long_string}.elb.{region}.amazonaws.com`. Create a CNAME in your DNS provider that maps the public address of your JupyterHealth Exchange application to the value of this address.
+
 ## Create a Database
 
 This is an example configuration for an Amazon RDS PostgreSQL instance. Use values appropriate for your deployment. The VPC-related values would come from identifiers created when the cluster was created.
@@ -105,10 +117,10 @@ This is an example configuration for an Amazon RDS PostgreSQL instance. Use valu
 | --------------------------------------- | ---------------------------------------- |
 | Creation method                         | Standard create                          |
 | Engine type                             | PostgreSQL                               |
-| Engine version                          | 16.3-R3                                  |
+| Engine version                          | 17.4-R1                                  |
 | Templates                               | Dev/Test                                 |
 | Availability and durability, deployment | Multi-AZ DB Instance                     |
-| DB instance identifier                  | jhe-db-staging-1                         |
+| DB instance identifier                  | database-2                               |
 | Credentials management                  | Self managed, not auto generated         |
 | DB instance class                       | Burstable classes, db.t3.small           |
 | Storage type                            | General Purpose SSD (gp2)                |
@@ -116,11 +128,11 @@ This is an example configuration for an Amazon RDS PostgreSQL instance. Use valu
 | Enable storage autoscaling              | yes                                      |
 | Maximum storage threshold               | 1000 GiB                                 |
 | Compute resource                        | Don't connect to an EC2 compute resource |
-| VPC                                     | eksctl-jhe-cluster/VPC                   |
-| DB subnet group                         | create new db subnet group               |
+| VPC                                     | eksctl-jhe-example-cluster/VPC                   |
+| DB subnet group                         | use default
 | Public access                           | no                                       |
 | VPC security group                      | choose existing                          |
-| Existing VPC security groups            | default, `eks-cluster-jhe-...`           |
+| Existing VPC security groups            | default, `eks-cluster-sg-jhe-example-...`           |
 | Database authentication                 | password                                 |
 | Enable Performance insights             | yes                                      |
 | Retention period                        | 7 days (free tier)                       |
@@ -128,13 +140,13 @@ This is an example configuration for an Amazon RDS PostgreSQL instance. Use valu
 | Initial database name                   | `jhe`                                    |
 ```
 
-Note the attributes of the database, e.g.
+Note the attributes of the database, some of which are available after it has been created.
 
 ```{table} Database Attributes
 
 | Parameter       | Value                            |
 | --------------- | -------------------------------- |
-| db identifier   | `database-1`                     |
+| db identifier   | `database-2`                     |
 | endpoint        | `database-1...rds.amazonaws.com` |
 | port            | `5432`                           |
 | master username | `postgres`                       |
@@ -147,7 +159,7 @@ Note the attributes of the database, e.g.
 Launch a shell in the cluster.
 
 ```shell
-$ kubectl run postgres-test -it --rm --image=postgres:16.3 -- bash
+$ kubectl run postgres-test -it --rm --image=postgres:17.4 -- bash
 If you don't see a command prompt, try pressing enter.
 root@postgres-test:/#
 ```
@@ -155,7 +167,7 @@ root@postgres-test:/#
 Use the database endpoint, username, and secret to connect to the database you created.
 
 ```shell
-root@postgres-test:/# psql -h {endpoint} -U {master username} -d postgres
+root@postgres-test:/# psql -h {endpoint} -U {master username} -d jhe
 Password for user postgres:
 psql (16.3 (Debian 16.3-1.pgdg120+1))
 SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, compression:
@@ -172,7 +184,7 @@ postgres=>
 Create a Job to migrate the database using our existing ConfigMap.
 
 ```{note}
-This job uses code from jupyterhealth-exchange software. While the project includes a `Dockerfile`, there is no official docker image for it. An example was built and pushed to `ryanlovett/jupyterhealth-exchange:a30ad58` representing the latest commit to the jupyterhealth-exchange repo at the time.
+This job uses code from jupyterhealth-exchange software. While the project includes a `Dockerfile`, there is no official docker image for it. An example was built and pushed to `ryanlovett/jupyterhealth-exchange:e870031` representing the latest commit to the jupyterhealth-exchange repo at the time.
 ```
 
 ```yaml
@@ -190,7 +202,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: jhe-manage-migrate
-        image: ryanlovett/jupyterhealth-exchange:a30ad58
+        image: ryanlovett/jupyterhealth-exchange:e870031
         command: ["python", "manage.py", "migrate"]
         envFrom:
         - configMapRef:
@@ -230,7 +242,7 @@ spec:
     spec:
       containers:
       - name: import-seed
-        image: ryanlovett/jupyterhealth-exchange:a30ad58
+        image: ryanlovett/jupyterhealth-exchange:e870031
         command: ["python", "/app/seed.py"]
         envFrom:
         - configMapRef:
@@ -258,21 +270,13 @@ and run it
 kubectl apply -f job-import-seed.yml
 ```
 
-## Install the Application
-
-Finally, install the application into the cluster. [jhe-example.yml](examples/jhe-example.yml) is provided as example kubernetes configuration, although you will need to substitute values appropriate for your deployment.
-
-```shell
-kubectl apply -f jhe-example.yml
-```
-
 ## Administering JHE
 
 1. Login to your JupyterHealth Exchange app, https://jhe.example.org/admin/
 
 1. Under Django OAuth Toolkit, add application
 
-   a. Save Client id
+   a. Save the value of `Client id` into the `jhe-config` ConfigMap in `jhe-example.yml` under `OIDC_CLIENT_ID`.
 
    b. Add space-separated redirect uris for hubs
 
@@ -293,6 +297,32 @@ kubectl apply -f jhe-example.yml
    g. Skip authorization: yes
 
    h. Algorithm: RSA with SHA-2 256
+
+   i. Create an [RS256 private key](https://django-oauth-toolkit.readthedocs.io/en/latest/oidc.html#creating-rsa-private-key): `openssl genrsa -out oidc.key 4096`
+
+   j. Create a new static PKCE code verifier with the code below. Save it into the `jhe-config` ConfigMap in `jhe-example.yml` under `PATIENT_AUTHORIZATION_CODE_VERIFIER`.
+
+   ```python
+   import random
+   import string
+
+
+   def generate_pkce_verifier(length=44):
+       characters = string.ascii_letters + string.digits
+       return "".join(random.choices(characters, k=length))
+
+
+   print(generate_pkce_verifier())
+   ```
+
+   h. Use the `PATIENT_AUTHORIZATION_CODE_VERIFIER` as the code verifier input at the [Online PKCE Generator Tool](https://tonyxu-io.github.io/pkce-generator/). Save the code challenge into the `jhe-config` ConfigMap in `jhe-example.yml` under `PATIENT_AUTHORIZATION_CODE_CHALLENGE`.
+
+   l. Re-apply the application configuration and restart the application:
+
+   ```shell
+   kubectl apply -f jhe-example.yml
+   kubectl -n jhe delete pod -l app=jhe
+   ```
 
 ## Authenticating JupyterHub with JHE
 

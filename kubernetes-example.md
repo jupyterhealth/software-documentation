@@ -17,7 +17,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: jhe
+  name: jhe-example
   region: us-east-2
   version: '1.30'
 

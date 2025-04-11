@@ -4,13 +4,13 @@ title: Security Overview
 
 ## Introduction
 
-The JupyterHealth Pre-MVP security focuses on establishing a secure privacy-preserving transmission of patient data from:
+The application focuses on establishing a secure privacy-preserving transmission of patient data from:
 
 ```mermaid
 flowchart LR
   A[Medical Device API] --> B
   B[CommonHealth Application] --> C
-  C[CloudStorage Service] --> D
+  C[JupyterHealth Exchange] --> D
   D[Partner Data Store]
 ```
 
@@ -19,7 +19,7 @@ flowchart LR
 - CommonHealth Application will authenticate with the Medical Device API using:
   - Client ID
   - Client Secret
-- Each Partner will authenticate with the CloudStorage Service using:
+- Each Partner will authenticate with the JupyterHealth Exchange using:
   - Partner ID
   - Client ID
   - Client Secret
@@ -62,9 +62,9 @@ This will allow per-user access control, registered and enforced by SMART-on-FHI
 ## Encryption
 
 - Each Partner will generate a set of Private/Public keys that will used for encryption and decryption of patient data.
-- The Partner Public encryption key will be stored in the CloudStorage Service.
-- The CommonHealth Application will use the Partner's Public Key to encrypt the patient data before storing it in the CloudStorage Service.
-- The Partner's Private Key will be used to decrypt the patient data when retrieved from the CloudStorage Service.
+- The Partner Public encryption key will be stored in the JupyterHealth Exchange.
+- The CommonHealth Application will use the Partner's Public Key to encrypt the patient data before storing it in the JupyterHealth Exchange.
+- The Partner's Private Key will be used to decrypt the patient data when retrieved from the JupyterHealth Exchange.
 
 ## Cryptography
 
@@ -80,4 +80,6 @@ This will allow per-user access control, registered and enforced by SMART-on-FHI
 
 ## Data Flow Diagram
 
-![](assets/images/CHCS-Architecture.png)
+```{image} ../assets/images/CHCS-Architecture.png
+:alt: CHCS Architecture
+```

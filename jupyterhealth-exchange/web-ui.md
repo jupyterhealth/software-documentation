@@ -38,12 +38,12 @@ title: Web User Interface
 ## Use Case Example
 
 1. Sign up as a new user from the web UI.
-2. Create a new Organization.
-3. Add yourself to the Organization (View Organization > Users+).
-4. Create a new Study for the Organization (View Organization > Studies+).
-5. Create a new Patient for the Organization using a different email than (1) (Patients > Add Patient).
-6. Add Data Sources and Scopes to the Study (View Study > Data Sources+, Scope Requests+).
-7. Add the Patient to the Study (Patients > check box > Add Patient(s) to Study).
-8. Create an Invitation Link for the Patient (View Patient > Generate Invitation Link).
-9. Use the code in the invitation link with the Auth API to swap it for tokens.
-10. Upload Observations using the FHIR API.
+1. Create a new Organization.
+1. Add yourself to the Organization (View Organization > Users+).
+1. Create a new Study for the Organization (View Organization > Studies+).
+1. Create a new Patient for the Organization using a different email than (1) (Patients > Add Patient).
+1. Add Data Sources and Scopes to the Study (View Study > Data Sources+, Scope Requests+).
+1. Add the Patient to the Study (Patients > check box > Add Patient(s) to Study).
+1. Create an Invitation Link for the Patient (View Patient > Generate Invitation Link).
+1. Use the code in the invitation link with the Auth API to swap it for tokens.
+1. Upload Observations using the FHIR API.

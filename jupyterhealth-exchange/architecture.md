@@ -14,7 +14,9 @@ Django is a mature and well-supported web framework but was specifically chosen 
 ### DRF Serializers and Pydantic
 
 - The Django Rest Framework uses the concept of Serializers to validate schemas, whereas the FHIR validator uses Pydantic.
+
 - It is not reasonable to re-write the entire validation in the Serializer, so instead a combination of the two are used:
+
   - Top-level fields (most importantly the `id` of a record) are managed by the Serializer.
   - Nested fields (for example `code{}.coding[].system` above) are configured as a JSON field in the Serializer (so the top level field is this example is `code`) and then Pydantic is used to validate the whole schema including nested JSON.
 
@@ -111,7 +113,7 @@ erDiagram
         int study_id
         int user_id
     }
-    
+
     "observations (FHIR Observation)" ||--|| "codeable_concepts (FHIR CodeableConcept)": ""
     "observations (FHIR Observation)" ||--|{ "observation_identifiers": ""
     "observations (FHIR Observation)" ||--|| "data_sources": ""
@@ -129,7 +131,7 @@ erDiagram
         varchar system
         varchar value
     }
-    
+
     "studies (FHIR Group)" ||--|{ "study_patients": ""
     "codeable_concepts (FHIR CodeableConcept)" {
         int id
@@ -144,7 +146,7 @@ erDiagram
         enum scope_action
         int scope_code_id
         bool consented
-        timestamp consented_time       
+        timestamp consented_time
     }
     "data_sources" ||--|{ "data_source_supported_scopes": ""
     "data_sources" ||--|{ "study_data_sources": ""

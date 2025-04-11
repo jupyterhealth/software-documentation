@@ -6,7 +6,7 @@ This guide provides a comprehensive walkthrough for setting up your development 
 
 ## Step by Step
 
-1. Set up your Python environment. This project uses Django **version 5.2** which requires python  **3.10, 3.11, 3.12 or 3.13**.
+1. Set up your Python environment. This project uses Django **version 5.2** which requires python **3.10, 3.11, 3.12 or 3.13**.
    ```{note}
    If using pipenv it is recommended to run `pipenv sync` against the lock file to match package versions.
    ```
@@ -41,18 +41,20 @@ This guide provides a comprehensive walkthrough for setting up your development 
    import random
    import string
 
+
    def generate_pkce_verifier(length=44):
        characters = string.ascii_letters + string.digits
-       return ''.join(random.choices(characters, k=length))
+       return "".join(random.choices(characters, k=length))
+
 
    print(generate_pkce_verifier())
    ```
 1. Use the PKCE verifier to generate the [PKCE code challenge](https://tonyxu-io.github.io/pkce-generator).
 1. Return to the `.env` file
-    - Update `OIDC_CLIENT_ID` with the newly created app Client ID
-    - Update the `OIDC_RSA_PRIVATE_KEY` with the newly created Private Key
-    - Update `PATIENT_AUTHORIZATION_CODE_CHALLENGE` and `PATIENT_AUTHORIZATION_CODE_VERIFIER` with PKCE static values generated above
-    - Restart the python environment and Django server
+   - Update `OIDC_CLIENT_ID` with the newly created app Client ID
+   - Update the `OIDC_RSA_PRIVATE_KEY` with the newly created Private Key
+   - Update `PATIENT_AUTHORIZATION_CODE_CHALLENGE` and `PATIENT_AUTHORIZATION_CODE_VERIFIER` with PKCE static values generated above
+   - Restart the python environment and Django server
 1. Browse to http://localhost:8000/ and log in with the credentials `anna@example.com` `Jhe1234!`and you should be directed to the `/portal/organizations` path with some example Organizations is the dropdown.
 
 ```{note} Static PKCE Values
@@ -69,12 +71,14 @@ It is understood this runs against best practices; however, this is only used fo
 After logging in on Windows, users are redirected to the portal, but a blank screen persists. This issue seems related to the `oidc-client-ts` library but is actually due to incorrectly set environment variables on Windows.
 
 #### Cause
+
 On Windows systems (particularly when running Django via Visual Studio Code or Git Bash), the environment variables related to OIDC in `settings.py` may become incorrectly formatted. This causes URLs to be malformed, preventing proper authentication.
 
 #### Examples of Incorrectly Set Values
-- `OIDC_CLIENT_REDIRECT_URI`:  
+
+- `OIDC_CLIENT_REDIRECT_URI`:
   http://localhost:8000C:/Program Files/Git/auth/callback
-- `OIDC_CLIENT_AUTHORITY`:  
+- `OIDC_CLIENT_AUTHORITY`:
   http://localhost:8000O://
 
 #### Solution
@@ -82,6 +86,6 @@ On Windows systems (particularly when running Django via Visual Studio Code or G
 The solution is to explicitly hardcode the correct values to OIDC variables in your `settings.py`. This will prevent incorrect path injections and ensure proper URL formation, resolving the blank screen issue after login on Windows machines.
 
 ```python
-OIDC_CLIENT_REDIRECT_URI = 'http://localhost:8000/auth/callback'
-OIDC_CLIENT_AUTHORITY = 'http://localhost:8000/o/'
+OIDC_CLIENT_REDIRECT_URI = "http://localhost:8000/auth/callback"
+OIDC_CLIENT_AUTHORITY = "http://localhost:8000/o/"
 ```

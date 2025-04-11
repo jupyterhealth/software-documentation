@@ -7,8 +7,10 @@ JupyterHealth Exchange is a Django web application that facilitates the sharing 
 In the context of JupyterHealth, data producers are typically study participants (FHIR *Patients*) using the [CommonHealth Android App](https://play.google.com/store/apps/details?id=org.thecommonsproject.android.phr) linked to personal devices (e.g., Glucose Monitors), and data consumers are typically researchers (FHIR *Practitioners*).
 
 ```{image} ../assets/images/jupyterhealth-exchange-overview.jpg
-:alt: Diagram of application components
-:width: 800px
+---
+alt: Diagram of application components
+width: 800px
+---
 ```
 
 ## Features

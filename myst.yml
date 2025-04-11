@@ -6,17 +6,19 @@ project:
   keywords: []
   #authors: ['JupyterHealth Software Team']
   github: https://github.com/jupyterhealth/software-documentation
-  #jupyter:
-  #  lite: true
   references:
     jupyterhealth_client: https://jupyterhealth-client.readthedocs.io/en/latest
   # See https://mystmd.org/guide/table-of-contents
   toc:
     - file: index.md
-    - title: Explanation
+    - title: JupyterHealth Exchange
       children:
-        - file: security.md
-        - file: cloud-storage-reference-app.md
+        - file: jupyterhealth-exchange/overview.md
+        - file: jupyterhealth-exchange/architecture.md
+        - file: jupyterhealth-exchange/developer-setup.md
+        - file: jupyterhealth-exchange/apis.md
+        - file: jupyterhealth-exchange/security.md
+        - file: jupyterhealth-exchange/web-ui.md
     - title: How-To Guides
       children:
         - file: examples/openmhealth-bp.ipynb
@@ -27,6 +29,7 @@ site:
   title: 'JupyterHealth Software'
   options:
     logo: 'jupyter.png'
+    folders: true
   actions:
     - title: Project Jupyter
       url: https://jupyter.org

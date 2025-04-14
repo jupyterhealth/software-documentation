@@ -2,11 +2,13 @@
 title: JupyterHealth Software Documentation
 ---
 
-# Introduction
+## The Platform
 
-A JupyterHealth deployment can be characterized as a JupyterHub with the ability to integrate with a [JupyterHealth Exchange](jupyterhealth-exchange/overview) service.
+[JupyterHealth](https://jupyterhealth.org) is an open-source, modular platform that eliminates data silos by integrating real-time health data from wearables, IoT devices, mobile apps, and Electronic Health Records (EHRs) into a unified, secure, and AI-powered ecosystem.
 
-The long term goal is for an organization to be able to deploy a JupyterHub within their existing infrastructure and accessible through existing platforms.
+## The Software
+
+A JupyterHealth deployment can be characterized as a JupyterHub with the ability to integrate with a [JupyterHealth Exchange](jupyterhealth-exchange/overview) service. This documentation will help organizations understand and deploy these applications.
 
 ## Development
 

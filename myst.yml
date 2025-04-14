@@ -28,7 +28,7 @@ site:
   template: book-theme
   title: 'JupyterHealth Software'
   options:
-    logo: 'jupyter.png'
+    logo: "assets/images/rectanglelogo-jupytergreytext-healthorangetext-orangebody-greymoons-transparent.png"
     folders: true
   actions:
     - title: Project Jupyter

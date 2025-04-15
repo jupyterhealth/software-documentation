@@ -16,67 +16,39 @@ flowchart LR
 
 ## API Credentials
 
-- CommonHealth Application will authenticate with the Medical Device API using:
+- CommonHealth Application will authenticate with the Medical Device API using OAuth:
   - Client ID
   - Client Secret
-- Each Partner will authenticate with the JupyterHealth Exchange using:
-  - Partner ID
-  - Client ID
-  - Client Secret
+- Each Partner will authenticate with the JupyterHealth Exchange using OAuth:
+  - Partner Client ID
+  - Partner Client Secret
 
 ### API credentials in JupyterHub
 
-The JupyterHealth pre-MVP application is registered as a Partner application (two, actually - one 'prod' to represent the pre-MVP itself, and one 'testing' for testing configurations).
+JupyterHub is registered as an OAuth Client with the JupyterHealth Exchange.
+When a user logs in to JupyterHub, they login via their account in the Exchange.
+Upon completion of OAuth, an **access token** is issued to JupyterHub,
+which is encrypted and stored in the `auth_state` for the user in the JupyterHub database.
 
-There are two partner applications registered:
+- Access to JupyterHub is granted only to members of the "JupyterHub Users" organization.
+- When a user starts their session in JupyterHub,
+  their access token for JupyterHealth Exchange is available
+  in the environment as `$JHE_TOKEN`.
 
-- 'prod' represents the pre-MVP
-- 'testing' for testing out functionality
+### SMART-on-FHIR credentials in JupyterHub
 
-These credentials are stored in AWS SecretManager:
-
-- `ch-cloud-creds-{name}` contains the partner id, client id/secret, etc. required to access the CommonHealth Cloud API
-- `ch-cloud-storage-{name}` contains the state of the CH Cloud "storage delegate".
-  This is the local storage of:
-  - decryption keys for patient data
-  - patient id/uuid mapping
-
-The JupyterHub user 'role' is granted read access to `ch-cloud-creds-{name}` and read/write access to `ch-cloud-storage-{name}`.
+Users authenticated with JupyterHub can also gain credentials via SMART App Launch with our demonstration Provider (Medplum).
+SMART App Launch is handled as a Public Client, authenticated via Client ID, PKCE and Redirect URL, without a Client Secret.
+When a user logs in via SMART App Launch, they have both a SMART token for talking to the healthcare provider and a JHE for talking to the Exchange.
+In the future, both should be able to use the same token (or at least exchange the SMART token for an appropriately limited JHE token).
 
 #### Pre-MVP considerations
 
-In the pre-MVP, from the perspective of CommonHealth cloud and data access, all JupyterHub users are equivalent and indistinguishable and act collectively _as_ the pre-MVP.
-That is, all JupyterHub users have:
+In the demonstration, all JupyterHealth Exchange users are equivalent permissions-wise.
+Users are authenticated as themselves and only have access to patient data associated with studies run by their Organization.
+However, currently all JHE users have full permission to manage Organizations, so effectively **all authenticated users have full access to all data in Exchange**.
 
-- read access to the client id/secret to access the API in order to:
-  - create new deep links to register users
-  - fetch encrypted patient data
-- read/write access to the decryption key for decrypting patient data
-- read/write access to the patient id mapping to identify patients and store new patient id mappings
-
-Following the pre-MVP, users will login to JupyterHub with SMART-on-FHIR as an OAuth provider,
-and will authenticate directly _as themselves_ via scoped access tokens,
-rather than always acting as the partner application.
-This will allow per-user access control, registered and enforced by SMART-on-FHIR, outside JupyterHub.
-
-## Encryption
-
-- Each Partner will generate a set of Private/Public keys that will used for encryption and decryption of patient data.
-- The Partner Public encryption key will be stored in the JupyterHealth Exchange.
-- The CommonHealth Application will use the Partner's Public Key to encrypt the patient data before storing it in the JupyterHealth Exchange.
-- The Partner's Private Key will be used to decrypt the patient data when retrieved from the JupyterHealth Exchange.
-
-## Cryptography
-
-- Google Tink is utilized for client-side as well as server-side cryptography.
-
-- The following primitives are required:
-
-  - DataGroup encryption key pair: HybridEncryption using the following algorithms: ECIES_P256_HKDF_HMAC_SHA256_AES128_GCM
-
-  - EncryptedRecord DEK: AEAD using the following algorithms: AES256_GCM
-
-  - Signing key(s) for TrustedPartners: ECDSA_P256
+Following the pre-MVP, appropriate access controls will be [implemented](https://github.com/the-commons-project/jupyterhealth-exchange/issues/7) in the Exchange.
 
 ## Data Flow Diagram
 

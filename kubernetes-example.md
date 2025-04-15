@@ -109,7 +109,7 @@ When the application is created, the cluster will create a service object for th
 kubectl get service nginx-ingress-ingress-nginx-controller -o jsonpath="{.status.loadBalancer.ingress[0].hostname}"
 ```
 
-In this kind of deployment, it will have an external IP of the form `{long_string}.elb.{region}.amazonaws.com`. Create a CNAME in your DNS provider that maps the public address of your JupyterHealth Exchange application to the value of this address.
+In this kind of deployment, it will have a hostname of the form `{long_string}.elb.{region}.amazonaws.com`. Create a CNAME in your DNS provider that maps the public address of your JupyterHealth Exchange application to the value of this address.
 
 ## Create a Database
 

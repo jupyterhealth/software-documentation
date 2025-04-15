@@ -103,7 +103,13 @@ kubectl apply -f jhe-example.yml
 
 ## Register Hostname
 
-When the application is created, the cluster will create a service object for the nginx ingress controller. It will have an external IP of the form `{long_string}.elb.{region}.amazonaws.com`. Create a CNAME in your DNS provider that maps the public address of your JupyterHealth Exchange application to the value of this address.
+When the application is created, the cluster will create a service object for the nginx ingress controller.
+
+```shell
+kubectl get service nginx-ingress-ingress-nginx-controller -o jsonpath="{.status.loadBalancer.ingress[0].hostname}"
+```
+
+In this kind of deployment, it will have a hostname of the form `{long_string}.elb.{region}.amazonaws.com`. Create a CNAME in your DNS provider that maps the public address of your JupyterHealth Exchange application to the value of this address.
 
 ## Create a Database
 

@@ -384,17 +384,25 @@ by adding/removing users to the authorized groups.
 With the above configuration, when a user logs in to the Hub,
 two environment variables are set when a user starts their server:
 
-```shell
-$JHE_URL  # the URL of the Exchange
-$JHE_TOKEN  # the user's access token for the Exchange
-```
+`JHE_URL`
+: the URL of the Exchange
+
+`JHE_TOKEN`
+: the user's access token for the Exchange
 
 You can use these to make API requests to the Exchange.
 There is also the [jupyterhealth-client](xref:jupyterhealth_client) package,
 which you can add to your user image:
 
-```shell
+```shell-session
 pip install --pre jupyterhealth-client
 ```
 
 And then you can use the [JupyterHealthClient](xref:jupyterhealth_client#jupyterhealth_client.JupyterHealthClient) class to fetch patient data.
+
+## Update JupyterHealth Exchange
+
+If you need to periodically update the application:
+
+1. Create a new @migrate-database job. Configure it to use the docker image that contains the updated application. It is safe to perform this step with the existing service still running.
+1. After this is complete, update the version of the docker image running in the cluster. For example you can update `jhe-example.yml` and then redeploy by following the @install-application step again.

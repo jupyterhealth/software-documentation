@@ -72,7 +72,7 @@ controller:
 
 Then run the following:
 
-```shell
+```shell-session
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 helm install nginx-ingress ingress-nginx/ingress-nginx -f ingress-nginx.yml
@@ -80,7 +80,7 @@ helm install nginx-ingress ingress-nginx/ingress-nginx -f ingress-nginx.yml
 
 ### Install certmanager
 
-```shell
+```shell-session
 helm repo add jetstack https://charts.jetstack.io
 helm repo update
 helm install \
@@ -93,11 +93,13 @@ helm install \
   --wait
 ```
 
+(install-application)=
+
 ### Install the Application
 
 Finally, install the application into the cluster. [jhe-example.yml](examples/jhe-example.yml) is provided as example kubernetes configuration, although you will need to substitute values appropriate for your deployment.
 
-```shell
+```shell-session
 kubectl apply -f jhe-example.yml
 ```
 
@@ -105,7 +107,7 @@ kubectl apply -f jhe-example.yml
 
 When the application is created, the cluster will create a service object for the nginx ingress controller.
 
-```shell
+```shell-session
 kubectl get service nginx-ingress-ingress-nginx-controller -o jsonpath="{.status.loadBalancer.ingress[0].hostname}"
 ```
 
@@ -164,7 +166,7 @@ Note the attributes of the database, some of which are available after it has be
 
 Launch a shell in the cluster.
 
-```shell
+```shell-session
 $ kubectl run postgres-test -it --rm --image=postgres:17.4 -- bash
 If you don't see a command prompt, try pressing enter.
 root@postgres-test:/#
@@ -172,7 +174,7 @@ root@postgres-test:/#
 
 Use the database endpoint, username, and secret to connect to the database you created.
 
-```shell
+```shell-session
 root@postgres-test:/# psql -h {endpoint} -U {master username} -d jhe
 Password for user postgres:
 psql (16.3 (Debian 16.3-1.pgdg120+1))
@@ -217,7 +219,7 @@ spec:
 
 Run the job.
 
-```shell
+```shell-session
 kubectl apply -f job-manage-migrate.yml
 ```
 
@@ -227,7 +229,7 @@ This requires the [seed.sql](https://github.com/the-commons-project/jupyterhealt
 
 Injest them as ConfigMaps by running the following commands from within the working directory of [jupyterhealth-exchange](https://github.com/the-commons-project/jupyterhealth-exchange).
 
-```shell
+```shell-session
 kubectl -n jhe create configmap db-seed-sql --from-file=db/seed.sql
 kubectl -n jhe create configmap jhe-scripts-seed.py --from-file=jhe/scripts/seed
 .py
@@ -272,7 +274,7 @@ spec:
 
 and run it
 
-```shell
+```shell-session
 kubectl apply -f job-import-seed.yml
 ```
 
@@ -325,7 +327,7 @@ kubectl apply -f job-import-seed.yml
 
    l. Re-apply the application configuration and restart the application:
 
-   ```shell
+   ```shell-session
    kubectl apply -f jhe-example.yml
    kubectl -n jhe delete pod -l app=jhe
    ```

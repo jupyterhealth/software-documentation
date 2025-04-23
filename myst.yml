@@ -21,6 +21,7 @@ project:
         - file: jupyterhealth-exchange/web-ui.md
     - title: How-To Guides
       children:
+        - file: examples/tutorial-cgm.ipynb
         - file: examples/openmhealth-bp.ipynb
         - file: kubernetes-example.md
 

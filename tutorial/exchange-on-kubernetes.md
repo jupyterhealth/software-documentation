@@ -1,7 +1,7 @@
 ---
 title: 'Example: Deploying JupyterHealth Exchange on Kubernetes'
 downloads:
-  - file: ./examples/jhe-example.yml
+  - file: ./examples/jhe-example.yaml
     title: Example kubernetes resources
 ---
 
@@ -341,7 +341,7 @@ the simplest way is to use JHE as the OAuth provider for logging into JupyterHub
 To do that, configure.
 Below is the configuration to login to JupyterHub with JHE as OAuth provider:
 
-```{literalinclude} examples/hub-jhe-auth.yaml
+```{literalinclude} ./examples/hub-jhe-auth.yaml
 ```
 
 You have 3 choices for _authorizing_ JHE users to access the Hub:
@@ -376,7 +376,7 @@ by adding/removing users to the authorized groups.
 
 1. configure JupyterHub to populate group membership based on JHE organization membership:
 
-   ```{literalinclude} examples/hub-jhe-access-groups.yaml
+   ```{literalinclude} ./examples/hub-jhe-access-groups.yaml
    ```
 
 ### Accessing JHE from the Hub

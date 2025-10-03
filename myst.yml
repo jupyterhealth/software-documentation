@@ -11,23 +11,27 @@ project:
   # See https://mystmd.org/guide/table-of-contents
   toc:
     - file: index.md
-    - title: JupyterHealth Exchange
+    # Note: this toc should reflect _navigation_, not document type
+    # document types are a placeholder for now
+    - title: Tutorials
       children:
-        - file: jupyterhealth-exchange/overview.md
-        - file: jupyterhealth-exchange/architecture.md
-        - file: jupyterhealth-exchange/developer-setup.md
-        - file: jupyterhealth-exchange/apis.md
-        - file: jupyterhealth-exchange/security.md
-        - file: jupyterhealth-exchange/web-ui.md
+        - pattern: tutorial/*.{md,ipynb}
     - title: How-To Guides
       children:
-        - file: examples/tutorial-cgm.ipynb
-        - file: examples/openmhealth-bp.ipynb
-        - file: kubernetes-example.md
+        - pattern: howto/*
+    - title: Explanation
+      children:
+        - pattern: explanation/*
+    - title: Reference
+      children:
+        - pattern: reference/*
+    - title: Contributing
+      children:
+        - pattern: contributing/*
 
 site:
   template: book-theme
-  title: 'JupyterHealth Software'
+  title: JupyterHealth Software
   options:
     logo: "assets/images/rectanglelogo-jupytergreytext-healthorangetext-orangebody-greymoons-transparent.png"
     folders: true

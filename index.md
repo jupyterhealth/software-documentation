@@ -8,7 +8,7 @@ title: JupyterHealth Software Documentation
 
 ## The Software
 
-A JupyterHealth deployment can be characterized as a JupyterHub with the ability to integrate with a [JupyterHealth Exchange](jupyterhealth-exchange/overview) service. This documentation will help organizations understand and deploy these applications.
+A JupyterHealth deployment can be characterized as a JupyterHub with the ability to integrate with a JupyterHealth Exchange service. This documentation will help organizations understand and deploy these applications.
 
 ## Development
 

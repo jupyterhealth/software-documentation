@@ -20,7 +20,7 @@ jobs:
       - name: Install
         run: npm ci
       - name: Check links
-        run: myst build --check-links --html
+        run: npm run myst build --check-links --html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

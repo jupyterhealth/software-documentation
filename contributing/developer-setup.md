@@ -77,9 +77,9 @@ On Windows systems (particularly when running Django via Visual Studio Code or G
 #### Examples of Incorrectly Set Values
 
 - `OIDC_CLIENT_REDIRECT_URI`:
-  http://localhost:8000C:/Program Files/Git/auth/callback
+  `http://localhost:8000C:/Program Files/Git/auth/callback`
 - `OIDC_CLIENT_AUTHORITY`:
-  http://localhost:8000O://
+  `http://localhost:8000O://`
 
 #### Solution
 

@@ -28,7 +28,13 @@ project:
     - title: Contributing
       children:
         - pattern: contributing/*
-
+  error_rules:
+    # check-links error ignores
+    - rule: link-resolves
+      severity: ignore
+      keys:
+        - "http://localhost:8000/"
+        - "http://localhost:8000/admin"
 site:
   template: book-theme
   title: JupyterHealth Software

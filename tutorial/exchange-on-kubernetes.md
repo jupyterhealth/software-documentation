@@ -5,7 +5,7 @@ downloads:
     title: Example kubernetes resources
 ---
 
-This page documents how to deploy the [jupyterhealth-exchange](https://github.com/the-commons-project/jupyterhealth-exchange) application onto a kubernetes cluster running on AWS. In this case, the associated JupyterHub happened to also be running on AWS, but in a different AWS account.
+This page documents how to deploy the [jupyterhealth-exchange](https://github.com/jupyterhealth/jupyterhealth-exchange) application onto a kubernetes cluster running on AWS. In this case, the associated JupyterHub happened to also be running on AWS, but in a different AWS account.
 
 ## Create the Kubernetes Cluster
 
@@ -97,7 +97,7 @@ helm install \
 
 ### Install the Application
 
-Finally, install the application into the cluster. [jhe-example.yml](examples/jhe-example.yml) is provided as example kubernetes configuration, although you will need to substitute values appropriate for your deployment.
+Finally, install the application into the cluster. [jhe-example.yaml](./examples/jhe-example.yaml) is provided as example kubernetes configuration, although you will need to substitute values appropriate for your deployment.
 
 ```shell-session
 kubectl apply -f jhe-example.yml
@@ -227,9 +227,9 @@ kubectl apply -f job-manage-migrate.yml
 
 ### Seed the Database
 
-This requires the [seed.sql](https://github.com/the-commons-project/jupyterhealth-exchange/blob/main/db/seed.sql) file from the [jupyterhealth-exchange repository](https://github.com/the-commons-project/jupyterhealth-exchange), and a new python script, `jhe/scripts/seed.py` to import it. `seed.py` is currently available in a [pull request to jupyterhealth-exchange](https://github.com/the-commons-project/jupyterhealth-exchange/pull/37/files).
+**((OUTDATED))**
 
-Injest them as ConfigMaps by running the following commands from within the working directory of [jupyterhealth-exchange](https://github.com/the-commons-project/jupyterhealth-exchange).
+Seed the database (needs update):
 
 ```shell-session
 kubectl -n jhe create configmap db-seed-sql --from-file=db/seed.sql
@@ -282,7 +282,7 @@ kubectl apply -f job-import-seed.yml
 
 ## Administering JHE
 
-1. Login to your JupyterHealth Exchange app, https://jhe.example.org/admin/
+1. Login to your JupyterHealth Exchange app, `https://jhe.example.org/admin/`
 
 1. Under Django OAuth Toolkit, add application
 
@@ -290,11 +290,11 @@ kubectl apply -f job-import-seed.yml
 
    b. Add space-separated redirect uris for hubs
 
-   - http://localhost:8000/auth/callback
-   - https://jupyterhub.example.org/hub/oauth_callback
-   - https://jupyterhub.example.org/services/smart/oauth_callback
-   - https://jupyterhub.example.org/user-redirect/smart/oauth_callback
-   - https://jhe.example.org/auth/callback
+   - `http://localhost:8000/auth/callback`
+   - `https://jupyterhub.example.org/hub/oauth_callback`
+   - `https://jupyterhub.example.org/services/smart/oauth_callback`
+   - `https://jupyterhub.example.org/user-redirect/smart/oauth_callback`
+   - `https://jhe.example.org/auth/callback`
 
    c. Client type: Public
 

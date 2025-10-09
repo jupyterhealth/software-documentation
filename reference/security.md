@@ -48,7 +48,7 @@ In the demonstration, all JupyterHealth Exchange users are equivalent permission
 Users are authenticated as themselves and only have access to patient data associated with studies run by their Organization.
 However, currently all JHE users have full permission to manage Organizations, so effectively **all authenticated users have full access to all data in Exchange**.
 
-Following the pre-MVP, appropriate access controls will be [implemented](https://github.com/the-commons-project/jupyterhealth-exchange/issues/7) in the Exchange.
+Following the pre-MVP, appropriate access controls will be [implemented](https://github.com/jupyterhealth/jupyterhealth-exchange/issues/7) in the Exchange.
 
 ## Data Flow Diagram
 

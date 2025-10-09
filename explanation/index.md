@@ -1,6 +1,6 @@
 # Explanations
 
-Here we will have [explanations](https://diataxis.fr/explanations/) for learning about JupyterHealth.
+Here we will have [explanations](https://diataxis.fr/explanation/) for learning about JupyterHealth.
 
 > Explanation is a discursive treatment of a subject, that permits reflection. Explanation is understanding-oriented.
 

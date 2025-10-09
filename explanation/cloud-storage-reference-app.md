@@ -318,9 +318,6 @@ Information on the previous CHCS service utilized for the Preliminary Blood Pres
 
 - [Tech Design Doc](https://docs.google.com/document/d/1jyS6A78BfAVTRzmwBRAim5MyQUOUHa_T7rm9tbzWLaE/edit?usp=sharing)
 - [Example Requests and Responses](https://docs.google.com/document/d/1Q9cFnwGLdWdcwGE8p6O9TS7LwKzYeseY0UAuZxJ2xw0/edit?usp=sharing)
-- [CommonHealth-CloudStorage README](https://github.com/the-commons-project/CommonHealth-CloudStorage/tree/main)
-- [chcs-partner-client README](https://github.com/the-commons-project/chcs-partner-client)
-- [chcs-partner-client-docker README](https://github.com/the-commons-project/chcs-partner-client-docker)
 
 ## Previous CHCS Flow
 

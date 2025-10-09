@@ -2,7 +2,7 @@
 title: Overview
 ---
 
-JupyterHealth Exchange is a Django web application that facilitates the sharing of user-consented medical data with authorized consumers through a [web UI](web-ui), [REST, and FHIR APIs](apis).
+JupyterHealth Exchange is a Django web application that facilitates the sharing of user-consented medical data with authorized consumers through a web UI, REST, and FHIR APIs.
 
 In the context of JupyterHealth, data producers are typically study participants (FHIR *Patients*) using the [CommonHealth Android App](https://play.google.com/store/apps/details?id=org.thecommonsproject.android.phr) linked to personal devices (e.g., Glucose Monitors), and data consumers are typically researchers (FHIR *Practitioners*).
 

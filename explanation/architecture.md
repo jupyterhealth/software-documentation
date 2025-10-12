@@ -159,7 +159,34 @@ graph TB
 
 **Workflow**:
 
-```mermaid
+:::{div}
+:class: dark:hidden
+
+```{mermaid}
+%%{init: {'theme':'default'}}%%
+sequenceDiagram
+    participant R as Researcher
+    participant J as Jupyter Notebook
+    participant JHE as JupyterHealth Exchange
+    participant OAuth as OAuth Provider
+
+    R->>J: Start SMART on FHIR auth
+    J->>OAuth: Redirect to authorization endpoint
+    OAuth->>R: Login prompt
+    R->>OAuth: Authenticate
+    OAuth->>J: Authorization code
+    J->>OAuth: Exchange code for token
+    OAuth->>J: Access token
+    J->>JHE: FHIR API request with token
+    JHE->>J: Return consented data
+```
+
+:::
+
+:::{div}
+:class: hidden dark:block
+
+```{mermaid}
 %%{init: {'theme':'dark'}}%%
 sequenceDiagram
     participant R as Researcher
@@ -177,6 +204,8 @@ sequenceDiagram
     J->>JHE: FHIR API request with token
     JHE->>J: Return consented data
 ```
+
+:::
 
 **Configuration**:
 - Set client ID and secret in `jupyter_server_config.py`

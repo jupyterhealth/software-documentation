@@ -4,13 +4,17 @@ Here we will have [explanations](https://diataxis.fr/explanation/) for learning 
 
 > Explanation is a discursive treatment of a subject, that permits reflection. Explanation is understanding-oriented.
 
-We hope to have the following documents:
+## Available Documents
 
-- JupyterHealth: A conceptual overview
-- Data flow: Acquisition → Exchange → Analysis
-- Consent and Identity Management
-- Security Overview (HIPAA, GDPR considerations)
-- Interoperability with FHIR, OMOP, Open mHealth
-- JupyterHealth RBAC and Governance
-- Architecture of JupyterHealth components, and how they work together
-- Access control design of the Exchange
+- [JupyterHealth Exchange: A Conceptual Overview](./exchange-overview.md)
+- [System Architecture](./architecture.md)
+- [Data Flow: Acquisition → Exchange → Analysis](./data-flow.md)
+- [Understanding Consent Management](./consent-management.md)
+- [Security Overview: Privacy and Compliance](./security-overview.md)
+- [Role-Based Access Control and Governance](./rbac-governance.md)
+- [FHIR Interoperability](./fhir-interoperability.md)
+- [Open mHealth & IEEE 1752 Interoperability](./openmhealth-interoperability.md)
+
+```{note}
+**Access Control Design**: The access control architecture of JupyterHealth Exchange is comprehensively covered across multiple documents. See [Role-Based Access Control and Governance](./rbac-governance.md) for practitioner roles and permissions, [Understanding Consent Management](./consent-management.md) for consent-based authorization, and [Security Overview](./security-overview.md) for the complete authorization enforcement flow.
+```

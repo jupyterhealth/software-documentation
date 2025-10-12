@@ -21,7 +21,15 @@ project:
         - pattern: howto/*
     - title: Explanation
       children:
-        - pattern: explanation/*
+        - file: explanation/index.md
+        - file: explanation/exchange-overview.md
+        - file: explanation/fhir-interoperability.md
+        - file: explanation/openmhealth-interoperability.md
+        - file: explanation/data-flow.md
+        - file: explanation/consent-management.md
+        - file: explanation/security-overview.md
+        - file: explanation/rbac-governance.md
+        - file: explanation/architecture.md
     - title: Reference
       children:
         - pattern: reference/*

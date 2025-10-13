@@ -24,7 +24,7 @@ JupyterHealth Exchange addresses these challenges through **scope-based consent*
 
 Consent in JHE operates through a three-level hierarchy that connects patients to studies through specific data permissions:
 
-:::{div}
+:::\{div}
 :class: dark:hidden
 
 ```{mermaid}
@@ -47,7 +47,7 @@ graph TB
 
 :::
 
-:::{div}
+:::\{div}
 :class: hidden dark:block
 
 ```{mermaid}
@@ -103,15 +103,15 @@ Scopes represent specific types of health data. JHE uses **CodeableConcept** to 
 
 ### Common Scope Examples
 
-| Scope Text | Coding System | Code | Description |
-|------------|--------------|------|-------------|
-| Blood glucose | Open mHealth | `omh:blood-glucose:3.0` | Glucose meter readings |
-| Heart rate | Open mHealth | `omh:heart-rate:2.0` | HR from wearables/monitors |
-| Blood pressure | Open mHealth | `omh:blood-pressure:4.0` | Systolic/diastolic readings |
-| Physical activity | Open mHealth | `omh:physical-activity:2.1` | Exercise and movement data |
-| Step count | Open mHealth | `omh:step-count:3.0` | Daily step totals |
-| Body weight | Open mHealth | `omh:body-weight:2.0` | Scale measurements |
-| Sleep duration | Open mHealth | `omh:sleep-duration:2.0` | Hours slept per night |
+| Scope Text        | Coding System | Code                        | Description                 |
+| ----------------- | ------------- | --------------------------- | --------------------------- |
+| Blood glucose     | Open mHealth  | `omh:blood-glucose:3.0`     | Glucose meter readings      |
+| Heart rate        | Open mHealth  | `omh:heart-rate:2.0`        | HR from wearables/monitors  |
+| Blood pressure    | Open mHealth  | `omh:blood-pressure:4.0`    | Systolic/diastolic readings |
+| Physical activity | Open mHealth  | `omh:physical-activity:2.1` | Exercise and movement data  |
+| Step count        | Open mHealth  | `omh:step-count:3.0`        | Daily step totals           |
+| Body weight       | Open mHealth  | `omh:body-weight:2.0`       | Scale measurements          |
+| Sleep duration    | Open mHealth  | `omh:sleep-duration:2.0`    | Hours slept per night       |
 
 ### Study Scope Requests
 
@@ -123,7 +123,7 @@ Patients see these requests and decide which to approve.
 
 Here's what happens when a patient enrolls in a study:
 
-:::{div}
+:::\{div}
 :class: dark:hidden
 
 ```{mermaid}
@@ -149,7 +149,7 @@ sequenceDiagram
 
 :::
 
-:::{div}
+:::\{div}
 :class: hidden dark:block
 
 ```{mermaid}
@@ -183,6 +183,7 @@ JHE distinguishes between:
 - **Active consent**: Scope permissions that have been explicitly granted or denied
 
 This distinction helps patient interfaces show:
+
 - "You have 3 pending consent requests" (action required)
 - "You are sharing 5 data types with this study" (informational)
 
@@ -231,6 +232,7 @@ The system verifies the practitioner is authorized for the patient's organizatio
 For efficient access control, JHE can query all scopes a patient has consented to across all studies:
 
 The system can efficiently query all data types a patient has consented to share across all their study enrollments. This consolidated view is used when:
+
 - Displaying patient dashboards ("You are sharing 7 data types")
 - Validating bulk data uploads
 - Filtering FHIR API responses
@@ -244,12 +246,13 @@ Patients can change their consent decisions at any time through the CommonHealth
 When patients want to grant or revoke consent, they use the CommonHealth Android app:
 
 **User Experience**:
+
 1. Patient opens the app and navigates to study consent requests
-2. App displays a consent screen showing:
+1. App displays a consent screen showing:
    - Study name and organization
    - List of requested data types (blood glucose, heart rate, etc.) with icons
    - Accept or Decline buttons
-3. Patient taps their choice
+1. Patient taps their choice
 
 **Behind the Scenes (API Call)**:
 The app then makes a POST request to JHE:
@@ -290,9 +293,10 @@ This supports in-clinic enrollment workflows where research coordinators help pa
 Revoking consent has immediate effect:
 
 1. **Setting `consented=False`**: Patient explicitly declines to share a data type
-2. **Deleting consent records**: Using `DELETE /api/Patient/{id}/consents` removes consent entirely
+1. **Deleting consent records**: Using `DELETE /api/Patient/{id}/consents` removes consent entirely
 
 After revocation:
+
 - **No new observations** of that type will be accepted for that patient/study combination
 - **Existing observations** remain in the database (data retention for research integrity)
 - **Future queries** will exclude the revoked data type from results
@@ -308,6 +312,7 @@ For full data deletion (GDPR "right to be forgotten"), the patient must be remov
 Every consent change is timestamped, creating an immutable audit trail:
 
 Each consent record includes the study enrollment, data type, consent status (granted/denied), and an immutable timestamp. This supports:
+
 - **Compliance audits**: Proving data was collected with valid consent
 - **Temporal queries**: "What was the patient's consent status on 2024-03-15?"
 - **Research integrity**: Documenting when each data point was authorized for collection
@@ -333,14 +338,17 @@ Even though Alice declined to share sleep data with the Diabetes study, she can 
 ### Data Sharing Implications
 
 When Alice uploads a blood glucose reading:
+
 - **Diabetes Management Study**: ✓ Receives the observation (consented)
 - **Cardiac Monitoring Study**: ✗ Does not receive it (no blood glucose consent)
 
 When Alice uploads a heart rate measurement:
+
 - **Diabetes Management Study**: ✗ Does not receive it (no heart rate consent)
 - **Cardiac Monitoring Study**: ✓ Receives the observation (consented)
 
 When Alice uploads sleep data:
+
 - **Diabetes Management Study**: ✗ Does not receive it (declined)
 - **Cardiac Monitoring Study**: ✓ Receives the observation (consented)
 
@@ -351,6 +359,7 @@ Each consent record includes a `scope_actions` field following [SMART on FHIR sc
 Each consent record can include scope actions (following SMART on FHIR syntax) specifying which operations are allowed. For example, "rs" means read and search operations are permitted.
 
 **Scope actions**:
+
 - `r`: **Read** - Retrieve individual observation by ID
 - `s`: **Search** - Query multiple observations
 - `rs`: **Read + Search** (default) - Both operations allowed
@@ -392,43 +401,45 @@ Recording declined consent (rather than just omitting it) provides:
 A research coordinator enrolls a patient during an office visit:
 
 1. Coordinator creates patient account in JHE
-2. Coordinator enrolls patient in study
-3. Coordinator reviews scope requests with patient
-4. Coordinator updates consent on patient's behalf (requires `member` or `manager` role)
-5. Patient receives invitation link for future self-service consent management
+1. Coordinator enrolls patient in study
+1. Coordinator reviews scope requests with patient
+1. Coordinator updates consent on patient's behalf (requires `member` or `manager` role)
+1. Patient receives invitation link for future self-service consent management
 
 ### Use Case 2: Remote Enrollment
 
 A patient receives an email invitation:
 
 1. Patient clicks invitation link
-2. Link authenticates patient to CommonHealth app
-3. App fetches pending consent requests from JHE
-4. Patient reviews study details and scope requests
-5. Patient grants/denies each scope individually
-6. App uploads consent decisions to JHE
-7. Patient connects data sources (Fitbit, Apple Health, etc.)
+1. Link authenticates patient to CommonHealth app
+1. App fetches pending consent requests from JHE
+1. Patient reviews study details and scope requests
+1. Patient grants/denies each scope individually
+1. App uploads consent decisions to JHE
+1. Patient connects data sources (Fitbit, Apple Health, etc.)
 
 ### Use Case 3: Consent Revocation
 
 Patient initially consented but wants to stop sharing data:
 
 1. Patient contacts research coordinator or uses JHE web interface (if available)
-2. Consent is revoked by setting `consented=false` via `PATCH /api/Patient/{id}/consents`
-3. Future data uploads for that scope are rejected for this study
-4. Other studies' access to that data type (if any) remains unchanged
-5. Previously collected data remains in the database for research integrity
+1. Consent is revoked by setting `consented=false` via `PATCH /api/Patient/{id}/consents`
+1. Future data uploads for that scope are rejected for this study
+1. Other studies' access to that data type (if any) remains unchanged
+1. Previously collected data remains in the database for research integrity
 
 ### Use Case 4: Data Lifecycle Management
 
 Managing patient data throughout a study lifecycle:
 
 **What Works Today**:
+
 1. **Consent always enforced**: Data uploads and queries check consent regardless of study age
-2. **Patient can revoke consent**: Using `PATCH /api/Patient/{id}/consents` to set `consented=false` (existing data remains for research integrity)
-3. **Patient removal from organization**: When a patient is removed from ALL organizations, observations are deleted (supports GDPR "right to be forgotten")
+1. **Patient can revoke consent**: Using `PATCH /api/Patient/{id}/consents` to set `consented=false` (existing data remains for research integrity)
+1. **Patient removal from organization**: When a patient is removed from ALL organizations, observations are deleted (supports GDPR "right to be forgotten")
 
 **What's Not Yet Implemented**:
+
 - **Study status tracking**: No "active/completed/archived" states for studies
 - **Automated retention policies**: No scheduled archival or deletion based on organization policies
 - **Study completion workflows**: No formal process to mark a study as concluded
@@ -444,13 +455,12 @@ Currently, studies remain "active" indefinitely. Data lifecycle management requi
 Consent enforcement works alongside other security mechanisms:
 
 1. **Authentication**: Prove identity (OAuth 2.0)
-2. **Organization membership**: Prove affiliation (PatientOrganization)
-3. **Study enrollment**: Prove participation (StudyPatient)
-4. **Scope consent**: Prove data sharing permission (StudyPatientScopeConsent)
-5. **Role-based access**: Prove practitioner authorization (PractitionerOrganization)
+1. **Organization membership**: Prove affiliation (PatientOrganization)
+1. **Study enrollment**: Prove participation (StudyPatient)
+1. **Scope consent**: Prove data sharing permission (StudyPatientScopeConsent)
+1. **Role-based access**: Prove practitioner authorization (PractitionerOrganization)
 
 All layers must pass for data access.
-
 
 ## Related Documentation
 

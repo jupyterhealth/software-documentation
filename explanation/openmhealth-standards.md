@@ -10,12 +10,14 @@ While FHIR provides the structural foundation for JupyterHealth Exchange, Open m
 Personal health devices and wearables collect valuable data, but each manufacturer uses different formats:
 
 **Proprietary Formats**:
+
 - Fitbit uses its own JSON structure
 - Dexcom CGM has manufacturer-specific formats
 - Oura Ring has custom data structures
 - Most consumer wearables export in vendor-specific formats
 
 **The Challenge**:
+
 - Researchers must write separate parsing code for each device
 - Data from different devices can't be easily compared
 - Switching devices breaks existing analysis pipelines
@@ -28,11 +30,12 @@ Most consumer wearable manufacturers (Apple, Fitbit, Oura, etc.) do not natively
 
 **The Cost**:
 A researcher studying diabetes with glucose monitors might need to:
+
 1. Write a parser for Dexcom data
-2. Write a different parser for Abbott FreeStyle data
-3. Write yet another parser for Medtronic data
-4. Normalize timestamps, units, and field names across all three
-5. Maintain all parsers as manufacturers update their formats
+1. Write a different parser for Abbott FreeStyle data
+1. Write yet another parser for Medtronic data
+1. Normalize timestamps, units, and field names across all three
+1. Maintain all parsers as manufacturers update their formats
 
 This data wrangling can consume more time than actual analysis.
 
@@ -45,6 +48,7 @@ This data wrangling can consume more time than actual analysis.
 **Core Mission**: Make sense of patient-generated health data
 
 **Key Goals**:
+
 - Standardize health data formats across devices and platforms
 - Enable easier integration with healthcare systems
 - Support clinical trials and research
@@ -54,6 +58,7 @@ This data wrangling can consume more time than actual analysis.
 ### Adoption and Support
 
 Open mHealth is used by:
+
 - **6,000+ developers** and health organizations
 - **Research institutions**: Cornell, Stanford School of Medicine, UCSF
 - **Healthcare organizations**: Kaiser Permanente
@@ -69,6 +74,7 @@ While IEEE 1752 evolved from Open mHealth, JHE uses the IEEE standardized versio
 ```
 
 ### Header (Metadata)
+
 The header contains metadata about the data point using IEEE 1752 standard:
 
 ```json
@@ -91,6 +97,7 @@ The header contains metadata about the data point using IEEE 1752 standard:
 ```
 
 **Key Header Fields**:
+
 - `uuid`: Unique identifier using RFC 4122 UUID format (required)
 - `schema_id`: Which schema this data follows - includes namespace, name, and version (required)
 - `source_creation_date_time`: When the data was created at the original source device (required)
@@ -98,6 +105,7 @@ The header contains metadata about the data point using IEEE 1752 standard:
 - `external_datasheets`: References to device manufacturer or study documentation (optional)
 
 ### Body (Actual Health Data)
+
 The body contains the actual measurement, structured according to the specific schema:
 
 ```json
@@ -117,6 +125,7 @@ The body contains the actual measurement, structured according to the specific s
 ```
 
 **Key Body Characteristics**:
+
 - Schema-specific fields (blood pressure has systolic/diastolic)
 - Consistent units (UCUM standard: mmHg, kg, etc.)
 - Timestamps with timezone information
@@ -127,92 +136,113 @@ The body contains the actual measurement, structured according to the specific s
 JupyterHealth Exchange includes validation for several Open mHealth schemas:
 
 ### Blood Pressure (`omh:blood-pressure:4.0`)
+
 Measures arterial blood pressure.
 
 **Fields**:
+
 - `systolic_blood_pressure`: Upper pressure value (mmHg)
 - `diastolic_blood_pressure`: Lower pressure value (mmHg)
 - `effective_time_frame`: When measured
 - `position_during_measurement`: Optional (sitting, standing, lying down)
 
 **Example Use Cases**:
+
 - Hypertension studies
 - Medication efficacy trials
 - Home blood pressure monitoring programs
 
 ### Blood Glucose (`omh:blood-glucose:4.0`)
+
 Measures blood sugar levels.
 
 **Fields**:
+
 - `blood_glucose`: Glucose value (mg/dL or mmol/L)
 - `effective_time_frame`: When measured
 - `temporal_relationship_to_meal`: Before/after meal
 - `temporal_relationship_to_sleep`: Before/after sleep
 
 **Example Use Cases**:
+
 - Diabetes management research
 - CGM (Continuous Glucose Monitor) data collection
 - Dietary intervention studies
 
 ### Heart Rate (`omh:heart-rate:2.0`)
+
 Measures cardiac rhythm.
 
 **Fields**:
+
 - `heart_rate`: Beats per minute (bpm)
 - `effective_time_frame`: When measured
 - `temporal_relationship_to_physical_activity`: At rest, during activity, after activity
 
 **Example Use Cases**:
+
 - Cardiovascular health studies
 - Exercise intervention research
 - Sleep quality analysis
 
 ### Physical Activity (`omh:physical-activity:2.0`)
+
 Records exercise and movement.
 
 **Fields**:
+
 - `activity_name`: Type of activity (walking, running, cycling, etc.)
 - `distance`: Distance covered (with unit)
 - `effective_time_frame`: Duration of activity
 - `kcal_burned`: Energy expenditure
 
 **Example Use Cases**:
+
 - Activity intervention studies
 - Weight management programs
 - Rehabilitation tracking
 
 ### Step Count (`omh:step-count:3.0`)
+
 Daily or periodic step counts.
 
 **Fields**:
+
 - `step_count`: Number of steps
 - `effective_time_frame`: Time period covered
 
 **Example Use Cases**:
+
 - Physical activity tracking
 - Sedentary behavior studies
 - Post-surgical recovery monitoring
 
 ### Body Weight (`omh:body-weight:2.0`)
+
 Body mass measurements.
 
 **Fields**:
+
 - `body_weight`: Weight value (kg, lb, etc.)
 - `effective_time_frame`: When measured
 
 **Example Use Cases**:
+
 - Weight loss program tracking
 - Bariatric surgery outcomes
 - Nutrition intervention studies
 
 ### Sleep Duration (`omh:sleep-duration:3.0`)
+
 Sleep period length.
 
 **Fields**:
+
 - `sleep_duration`: Duration (hours, minutes)
 - `effective_time_frame`: Sleep period timespan
 
 **Example Use Cases**:
+
 - Sleep disorder research
 - Circadian rhythm studies
 - Mental health correlations
@@ -224,6 +254,7 @@ JHE integrates Open mHealth within the FHIR framework through a clever hybrid ap
 ### The Integration Pattern
 
 **FHIR Observation Structure** (the envelope):
+
 ```json
 {
   "resourceType": "Observation",
@@ -250,6 +281,7 @@ Stored in Base64-encoded format within the `valueAttachment.data` field.
 ### Why This Hybrid Approach?
 
 **FHIR Provides**:
+
 - Healthcare system compatibility
 - Standardized resource structure (who, what, when)
 - References to patients and devices
@@ -257,6 +289,7 @@ Stored in Base64-encoded format within the `valueAttachment.data` field.
 - Integration with EHR systems
 
 **Open mHealth Provides**:
+
 - Wearable-specific data structures
 - Rich device data formats
 - Field-level standardization (units, timestamps)
@@ -264,6 +297,7 @@ Stored in Base64-encoded format within the `valueAttachment.data` field.
 - Device community adoption
 
 **Together They Enable**:
+
 - Device data in healthcare systems
 - Standardized wearable data queries
 - Cross-device data normalization
@@ -276,18 +310,21 @@ JHE validates data at multiple levels to ensure quality and consistency:
 ### Three-Tier Validation
 
 **Tier 1: FHIR Structure Validation**
+
 - Validates the FHIR Observation resource structure
 - Ensures required fields are present (status, code, subject)
 - Checks resource references (Patient exists, Device exists)
 - Performed by: `fhir.resources` Python library
 
 **Tier 2: Open mHealth Outer Schema**
+
 - Validates the header-body structure
 - Ensures both header and body are present
 - Checks for required metadata fields
 - Performed by: JSON Schema validator
 
 **Tier 3: Open mHealth Specific Schema**
+
 - Validates against the specific schema (e.g., blood-pressure:4.0)
 - Ensures correct fields for that data type
 - Validates units and value ranges
@@ -298,12 +335,12 @@ JHE validates data at multiple levels to ensure quality and consistency:
 When a blood pressure observation is uploaded:
 
 1. **FHIR Validation**: Is it a valid Observation resource?
-2. **Patient Check**: Does the referenced patient exist?
-3. **Device Check**: Does the referenced device exist?
-4. **Consent Check**: Has patient consented to share blood pressure data?
-5. **Outer Schema**: Does it have a valid header and body?
-6. **Blood Pressure Schema**: Does the body match blood-pressure:4.0 schema?
-7. **Store**: Save to database if all checks pass
+1. **Patient Check**: Does the referenced patient exist?
+1. **Device Check**: Does the referenced device exist?
+1. **Consent Check**: Has patient consented to share blood pressure data?
+1. **Outer Schema**: Does it have a valid header and body?
+1. **Blood Pressure Schema**: Does the body match blood-pressure:4.0 schema?
+1. **Store**: Save to database if all checks pass
 
 If any validation fails, the entire upload is rejected with a specific error message.
 
@@ -312,6 +349,7 @@ If any validation fails, the entire upload is rejected with a specific error mes
 ### For Researchers
 
 **Device Agnostic Analysis**:
+
 - Write analysis code once, works with any Open mHealth-compatible device
 - Compare data across different device types
 - Share analysis code with other researchers
@@ -321,12 +359,14 @@ Researchers can write device-agnostic analysis code that extracts values from th
 ### For Device Manufacturers and App Developers
 
 **Clear Integration Path**:
+
 - Well-documented schemas
 - JSON Schema validators available
 - Example implementations
 - Active developer community
 
 **Broader Reach**:
+
 - One integration works with many research platforms
 - Reduced support burden (standardized questions)
 - Easier to compete with established players
@@ -334,6 +374,7 @@ Researchers can write device-agnostic analysis code that extracts values from th
 ### For Patients
 
 **Device Choice Freedom**:
+
 - Switch devices without losing data compatibility
 - Use multiple devices simultaneously
 - Confidence that data will be usable in future studies
@@ -341,6 +382,7 @@ Researchers can write device-agnostic analysis code that extracts values from th
 ### For Healthcare Systems
 
 **Research Integration**:
+
 - Research data can flow into clinical systems (via FHIR)
 - Clinical data can inform research studies
 - Standardized formats enable automated processing
@@ -348,7 +390,9 @@ Researchers can write device-agnostic analysis code that extracts values from th
 ## Real-World Scenarios
 
 ### Scenario 1: Multi-Device Study
+
 A researcher studying metabolic health wants participants to use:
+
 - Dexcom G7 for glucose
 - Oura Ring for sleep
 - Apple Watch for activity
@@ -358,6 +402,7 @@ A researcher studying metabolic health wants participants to use:
 **With IEEE 1752 in JHE**: The CommonHealth app (or similar data aggregator) transforms all three proprietary formats into standardized IEEE 1752 JSON before uploading to JHE. Single analysis pipeline processes all data types regardless of source device.
 
 ### Scenario 2: Device Failure Mid-Study
+
 A participant's blood pressure monitor breaks mid-study. They switch from an iHealth BP5 to a Withings device.
 
 **Without Standards**: Data discontinuity. May need to analyze pre-switch and post-switch data separately.
@@ -365,6 +410,7 @@ A participant's blood pressure monitor breaks mid-study. They switch from an iHe
 **With IEEE 1752 in JHE**: Seamless transition. Both devices' data is transformed to `omh:blood-pressure:4.0` schema by the data collection app. Analysis pipeline doesn't change.
 
 ### Scenario 3: Cross-Study Meta-Analysis
+
 Three different institutions run diabetes studies, each using different CGM devices.
 
 **Without Standards**: Months of data harmonization work to combine datasets.
@@ -380,11 +426,12 @@ JHE is designed to be extensible for new data types:
 To support a new Open mHealth schema:
 
 1. **Add Schema File**: Place the JSON schema in `data/omh/json-schemas/`
-2. **Register Schema**: Add schema reference to validation system
-3. **Create CodeableConcept**: Add data type to database
-4. **Test**: Upload sample data and verify validation
+1. **Register Schema**: Add schema reference to validation system
+1. **Create CodeableConcept**: Add data type to database
+1. **Test**: Upload sample data and verify validation
 
 **Example**: Adding oxygen saturation support:
+
 - Schema: `omh:oxygen-saturation:2.0`
 - File: `schema-omh_oxygen_saturation-2-0.json`
 - CodeableConcept: `{"system": "https://w3id.org/openmhealth", "code": "omh:oxygen-saturation:2.0"}`
@@ -410,22 +457,26 @@ While custom schemas reduce interoperability, they enable bleeding-edge research
 ### Available Resources
 
 **Schema Repository**:
+
 - All schemas: [github.com/openmhealth/schemas](https://github.com/openmhealth/schemas)
 - Documentation: [openmhealth.org/documentation](https://www.openmhealth.org/documentation/)
 - JSON Schema validators
 
 **Data Visualization**:
+
 - Open mHealth provides visualization libraries
 - Pre-built charts for common data types
 - Customizable for specific needs
 
 **Sample Data**:
+
 - Example data for each schema
 - Testing and development support
 
 ### Integration Libraries
 
 Libraries exist for multiple languages:
+
 - **JavaScript**: Parse and validate Open mHealth data in web apps
 - **Python**: Analysis and visualization (JupyterHealth Client uses this)
 - **Java/Android**: Native mobile integration
@@ -435,23 +486,23 @@ Libraries exist for multiple languages:
 
 ### Open mHealth vs. Proprietary Formats
 
-| Aspect | Open mHealth | Proprietary |
-|--------|--------------|-------------|
+| Aspect           | Open mHealth                | Proprietary           |
+| ---------------- | --------------------------- | --------------------- |
 | Interoperability | High - works across devices | Low - vendor specific |
-| Documentation | Public, comprehensive | Often limited |
-| Validation | JSON Schema available | Varies by vendor |
-| Community | Open source, 6000+ devs | Vendor controlled |
-| Cost | Free, open standard | May require licensing |
+| Documentation    | Public, comprehensive       | Often limited         |
+| Validation       | JSON Schema available       | Varies by vendor      |
+| Community        | Open source, 6000+ devs     | Vendor controlled     |
+| Cost             | Free, open standard         | May require licensing |
 
 ### Open mHealth vs. FHIR Observation
 
-| Aspect | Open mHealth | FHIR Observation |
-|--------|--------------|------------------|
-| Purpose | Device data format | Clinical observation record |
-| Granularity | Very detailed for wearables | Flexible for many uses |
-| Adoption | Wearable/device community | Healthcare systems |
-| Validation | JSON Schema | FHIR validators |
-| Best For | Patient-generated data | Clinical and device data |
+| Aspect      | Open mHealth                | FHIR Observation            |
+| ----------- | --------------------------- | --------------------------- |
+| Purpose     | Device data format          | Clinical observation record |
+| Granularity | Very detailed for wearables | Flexible for many uses      |
+| Adoption    | Wearable/device community   | Healthcare systems          |
+| Validation  | JSON Schema                 | FHIR validators             |
+| Best For    | Patient-generated data      | Clinical and device data    |
 
 **JHE's Approach**: Use both together. FHIR for structure and healthcare compatibility, Open mHealth for device data richness.
 
@@ -460,6 +511,7 @@ Libraries exist for multiple languages:
 ### Emerging Data Types
 
 The Open mHealth community continues to develop schemas for new device types:
+
 - Environmental sensors (air quality, noise)
 - Mental health indicators (stress, mood)
 - Advanced biometrics (hydration, blood oxygen variability)
@@ -468,6 +520,7 @@ The Open mHealth community continues to develop schemas for new device types:
 ### FHIR and Open mHealth Convergence
 
 The FHIR and Open mHealth communities are collaborating on:
+
 - FHIR profiles referencing Open mHealth schemas
 - Implementation guides for wearable data
 - Standards convergence where appropriate
@@ -475,6 +528,7 @@ The FHIR and Open mHealth communities are collaborating on:
 ### Research Opportunities with Standardized Data
 
 Consistent data formats enable advanced research:
+
 - Training ML models across multiple studies
 - Transfer learning between device types
 - Federated learning while preserving privacy
@@ -483,16 +537,19 @@ Consistent data formats enable advanced research:
 ## Learn More
 
 **Open mHealth Resources**:
+
 - [Open mHealth Website](https://www.openmhealth.org/)
 - [Schema Documentation](https://www.openmhealth.org/documentation/)
 - [GitHub Repository](https://github.com/openmhealth/schemas)
 
 **Related JupyterHealth Exchange Documentation**:
+
 - [Why FHIR? Interoperability Explained](./fhir-interoperability.md) - Understanding the FHIR side
 - [API Reference](../reference/exchange-apis.md) - How to upload Open mHealth data
 - [Architecture](../reference/exchange-architecture.md) - Technical implementation details
 
 **Standards Organizations**:
+
 - [HL7 FHIR](https://www.hl7.org/fhir/) - Healthcare data standards
 - [IEEE 1752.1](https://standards.ieee.org/standard/1752_1-2023.html) - Mobile health data standard
 
@@ -501,6 +558,7 @@ Consistent data formats enable advanced research:
 Open mHealth provides the crucial missing piece for wearable data interoperability: standardized schemas that normalize data across different device manufacturers. By combining Open mHealth's device-focused standards with FHIR's healthcare system compatibility, JupyterHealth Exchange creates a comprehensive solution for research data exchange.
 
 **Key Takeaways**:
+
 - Open mHealth standardizes device data formats across manufacturers
 - JHE stores Open mHealth JSON within FHIR Observation resources
 - Three-tier validation ensures data quality and schema compliance

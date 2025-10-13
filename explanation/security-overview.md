@@ -25,11 +25,13 @@ However, once uploaded to JHE and accessed by research organizations, **HIPAA ma
 ## Data Classification
 
 **Before Upload to JHE** (in CommonHealth app):
+
 - Patient-controlled personal health information
 - Subject to app store privacy policies
 - Not PHI under HIPAA (consumer-directed exchange)
 
 **After Upload to JHE** (in research platform):
+
 - Organizational custody and control
 - May become PHI if organization is a covered entity/business associate
 - Subject to study consent and data use agreements
@@ -44,6 +46,7 @@ However, once uploaded to JHE and accessed by research organizations, **HIPAA ma
 JHE implements technical, administrative, and physical safeguards that **support** HIPAA compliance when required:
 
 **Technical Safeguards**:
+
 - **Encryption at rest**: Database encryption for all PHI storage
 - **Encryption in transit**: TLS 1.2+ for all API communications
 - **Access controls**: Role-based access with organization-level scoping
@@ -51,11 +54,13 @@ JHE implements technical, administrative, and physical safeguards that **support
 - **Unique user identification**: OAuth 2.0 authentication with individual credentials
 
 **Administrative Safeguards**:
+
 - **Access management**: Organization and study-based authorization
 - **Audit controls**: Timestamped consent changes and data access logs
 - **Security incident procedures**: Logging for breach detection
 
 **Physical Safeguards**:
+
 - Cloud infrastructure compatible with HIPAA-compliant hosting (typically AWS, Azure, or similar)
 - Encrypted backups and disaster recovery procedures
 
@@ -73,10 +78,12 @@ JHE implements technical, administrative, and physical safeguards that **support
 For European patients and research participants, JHE supports GDPR requirements:
 
 **Lawful Basis for Processing**:
+
 - **Consent**: Primary basis - explicit, granular, per-study consent
 - **Scientific research**: Secondary basis - legitimate interest for approved research
 
 **Data Subject Rights**:
+
 - **Right to access**: Patients can view their own data and consent status
 - **Right to rectification**: Patient records can be updated via API
 - **Right to erasure ("right to be forgotten")**: Patient removal from all organizations triggers data deletion
@@ -84,6 +91,7 @@ For European patients and research participants, JHE supports GDPR requirements:
 - **Right to withdraw consent**: Patients can revoke consent at any time
 
 **Data Protection Principles**:
+
 - **Purpose limitation**: Consent is study-specific, not global
 - **Data minimization**: Only consented data types are accessible per study
 - **Storage limitation**: No automated retention policies yet (manual management required)
@@ -96,8 +104,8 @@ For European patients and research participants, JHE supports GDPR requirements:
 JHE has three distinct user types with different authorization models:
 
 1. **Patient**: Self-access to own data and consent management. Patients always have full control over their own records without requiring roles.
-2. **Practitioner**: Organization-scoped access with hierarchical roles (Viewer, Member, Manager)
-3. **Super Admin**: System administration with full access (logged and audited)
+1. **Practitioner**: Organization-scoped access with hierarchical roles (Viewer, Member, Manager)
+1. **Super Admin**: System administration with full access (logged and audited)
 
 For detailed information on roles, permissions, governance best practices, and API examples, see [Role-Based Access and Governance](rbac-governance.md).
 
@@ -106,32 +114,34 @@ For detailed information on roles, permissions, governance best practices, and A
 JHE enforces authorization through multiple layers:
 
 1. **Authentication**: Valid OAuth 2.0 token required
-2. **User Type Identification**: Patient, Practitioner, or Super Admin
-3. **Organization Membership**: Practitioners must belong to organization; patients must be enrolled
-4. **Study Enrollment**: Patient must be enrolled in the specific study
-5. **Consent Verification**: Patient must have consented to share the data type with that study
-6. **Role Permission Check**: Viewer (read-only), Member (patient management), Manager (full admin)
+1. **User Type Identification**: Patient, Practitioner, or Super Admin
+1. **Organization Membership**: Practitioners must belong to organization; patients must be enrolled
+1. **Study Enrollment**: Patient must be enrolled in the specific study
+1. **Consent Verification**: Patient must have consented to share the data type with that study
+1. **Role Permission Check**: Viewer (read-only), Member (patient management), Manager (full admin)
 
 ### OAuth 2.0 Flow
 
 JHE uses OAuth 2.0 for authentication:
 
 1. **Client authenticates** via OAuth provider (e.g., CommonHealth app)
-2. **Authorization code** returned to client
-3. **Access token** obtained via token exchange
-4. **API requests** include `Authorization: Bearer {token}` header
-5. **Token validation** verifies user identity and type
+1. **Authorization code** returned to client
+1. **Access token** obtained via token exchange
+1. **API requests** include `Authorization: Bearer {token}` header
+1. **Token validation** verifies user identity and type
 
 ## Data Protection Mechanisms
 
 ### Encryption
 
 **At Rest**:
+
 - Database encryption via PostgreSQL encryption features
 - Encrypted backups stored in secure cloud storage
 - Environment variables for secrets (never committed to code)
 
 **In Transit**:
+
 - TLS 1.2+ required for all API endpoints
 - Certificate pinning in mobile applications
 - HTTPS-only policy enforced
@@ -139,6 +149,7 @@ JHE uses OAuth 2.0 for authentication:
 ### Consent as Authorization
 
 Consent is not just a regulatory checkbox - it's the **primary authorization mechanism**. Every FHIR query checks whether the patient has consented to share the requested data type with the specific study before returning observations:
+
 - No consent record → No data access
 - Consent revoked → Future queries blocked
 - Consent given → Data accessible to authorized practitioners in that study
@@ -150,11 +161,13 @@ All consent-related actions are logged:
 **Consent Changes**: Each consent decision is recorded with an immutable timestamp, creating a permanent audit trail of when consent was granted or revoked.
 
 **Who Changed What**:
+
 - Patient consent changes: OAuth token identifies the patient
 - Practitioner consent changes: OAuth token identifies the practitioner
 - Timestamps preserve historical consent state
 
 **Data Access**:
+
 - FHIR API queries are logged (user, study, patient, data types)
 - Observation uploads are logged with data source and timestamp
 - Failed authorization attempts are logged for security monitoring
@@ -188,11 +201,13 @@ Patients can view their consent status through the API, which returns all studie
 ### What Researchers Can Access
 
 **With Patient Consent**:
+
 - Observations matching consented data types
 - Only for patients enrolled in their study
 - Only within their organization
 
 **Cannot Access**:
+
 - Data from other organizations
 - Data types not consented
 - Patients not enrolled in their studies
@@ -203,6 +218,7 @@ Patients can view their consent status through the API, which returns all studie
 Consent is enforced at **query time**, not upload time. When data is uploaded from the CommonHealth app, it's stored regardless of current consent status. However, when researchers query data, the system checks active consent and only returns observations for which the patient has granted permission.
 
 This design ensures:
+
 - Data is never lost if consent is temporarily revoked
 - Researchers cannot access revoked data types
 - Patients retain control over data sharing
@@ -212,12 +228,14 @@ This design ensures:
 ### What JHE Provides
 
 **Built-in Logging Infrastructure**:
+
 - Django logging framework configured in `jhe/settings.py`
 - Authorization failures raise `PermissionDenied` exceptions that can be logged
 - Consent changes include `consented_time` timestamps for audit trails
 - OAuth 2.0 authentication events logged by Django framework
 
 **Authorization Checks**:
+
 - Multi-layer access control enforced before data access
 - Failed consent checks return HTTP 403 Forbidden
 - Practitioner role validation at organization level
@@ -232,6 +250,7 @@ This design ensures:
 Organizations deploying JHE should implement:
 
 **Application Monitoring**:
+
 - Configure log aggregation (CloudWatch, ELK stack, Splunk, etc.)
 - Monitor HTTP 401/403 response rates for unusual patterns
 - Track failed authentication attempts
@@ -239,12 +258,14 @@ Organizations deploying JHE should implement:
 - Review consent change patterns periodically
 
 **Infrastructure Monitoring**:
+
 - Database query performance and anomaly detection
 - Network traffic analysis
 - Failed login attempt tracking
 - Resource utilization metrics
 
 **Incident Response Planning**:
+
 - Document breach notification procedures (HIPAA: 60 days, GDPR: 72 hours)
 - Establish credential revocation processes
 - Create patient/authority notification templates
@@ -256,17 +277,20 @@ Organizations deploying JHE should implement:
 ### Current Limitations
 
 **No Data Retention Policies**:
+
 - Studies remain "active" indefinitely
 - No automated data deletion after study completion
 - Requires manual removal of patients or studies
 
 **No Built-in Monitoring or Alerting**:
+
 - Django logging framework configured but no alerting system included
 - No anomaly detection for unusual access patterns
 - No real-time notifications for security events
 - Organizations must implement their own monitoring solution
 
 **Limited Audit Logging (HIPAA Compliance Gap)**:
+
 - Consent changes include timestamps (`consented_time`)
 - Authorization failures raise exceptions but minimal logging details
 - **No per-observation access logging** ("who viewed which data when")
@@ -287,6 +311,7 @@ JHE does not currently provide this functionality. Organizations requiring HIPAA
 ## Conclusion
 
 JHE implements security and privacy controls through:
+
 - **Granular consent** as the primary authorization mechanism
 - **Multi-layer access controls** at organization, study, and data type levels
 - **Encryption and authentication** protecting data at rest and in transit

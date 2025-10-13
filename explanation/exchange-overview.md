@@ -19,6 +19,7 @@ width: 800px
 Healthcare data today is fragmented across proprietary systems. Wearables, medical devices, and apps each collect valuable health information, but this data remains locked in vendor-specific formats and isolated databases. Researchers struggle to access real-time patient data, and patients have limited control over sharing their own health information.
 
 Traditional healthcare operates on:
+
 - **Proprietary systems** with vendor lock-in
 - **Siloed data** that can't easily be shared between systems
 - **All-or-nothing consent** where patients must share everything or nothing
@@ -29,12 +30,14 @@ Traditional healthcare operates on:
 JupyterHealth Exchange provides a secure, open-source middleware platform that enables:
 
 **For Patients**:
+
 - Granular control over what data to share
 - Scope-level consent (e.g., share blood glucose but not weight)
 - Study-specific consent (different permissions for different research projects)
 - Ability to revoke consent at any time
 
 **For Researchers and Practitioners**:
+
 - Real-time access to consented patient data
 - Standardized data formats (FHIR R5, Open mHealth)
 - REST and FHIR APIs for programmatic access
@@ -42,6 +45,7 @@ JupyterHealth Exchange provides a secure, open-source middleware platform that e
 - Integration with analysis tools (JupyterHub, Python notebooks)
 
 **For Institutions**:
+
 - HIPAA-compliant framework for data management
 - Hierarchical organization structure (institution → department → lab)
 - Audit trails for data access
@@ -52,6 +56,7 @@ JupyterHealth Exchange provides a secure, open-source middleware platform that e
 JupyterHealth Exchange is a key component of the [Berkeley Agile Metabolic Health initiative](https://cdss.berkeley.edu/news/berkeley-launches-agile-metabolic-health-and-open-platforms-initiative), a collaboration between UC Berkeley, UCSF, Project Jupyter, 2i2c, and The Commons Project. The initiative aims to transform diabetes and metabolic health treatment by creating an open-source, data-driven healthcare platform.
 
 The goal is to enable:
+
 - **Personalized medicine** based on individual patient data rather than population averages
 - **Faster medical innovation** through open data sharing and collaboration
 - **Lower healthcare costs** by reducing inefficiencies in data collection
@@ -60,28 +65,36 @@ The goal is to enable:
 ## Who Should Use JupyterHealth Exchange?
 
 ### Research Institutions
+
 Conducting clinical trials or observational studies that require:
+
 - Real-time wearable data collection
 - Patient consent management
 - FHIR-compliant data storage
 - Integration with analysis pipelines
 
 ### Healthcare Providers
+
 Running patient monitoring programs that need:
+
 - Remote patient monitoring capabilities
 - Integration with personal health devices
 - Secure data sharing with researchers
 - Compliance with healthcare regulations
 
 ### Individual Researchers
+
 Working on studies involving:
+
 - Diabetes and metabolic health
 - Cardiovascular monitoring
 - Sleep and activity tracking
 - Personalized health interventions
 
 ### Platform Developers
+
 Building on the JupyterHealth ecosystem to:
+
 - Develop custom data collection apps
 - Create analysis dashboards and visualizations
 - Integrate new data sources or wearables
@@ -90,21 +103,25 @@ Building on the JupyterHealth ecosystem to:
 ## What Makes JupyterHealth Exchange Different?
 
 ### Granular Consent Management
+
 Unlike all-or-nothing consent models, patients can choose exactly which types of data to share with specific studies. This scope-level consent respects patient autonomy while enabling research.
 
 ### Built on Healthcare Standards
+
 - **FHIR R5** for interoperability with healthcare systems
 - **Open mHealth (IEEE 1752)** schemas for normalized device data
 - **OAuth 2.0/OIDC** for secure authentication
 - **SMART on FHIR** OAuth provider for research applications
 
 ### Lightweight and Accessible
+
 - Vanilla JavaScript SPA (no complex build tools required)
 - Single container deployment option
 - Minimal dependencies
 - Serves as a reference implementation for others to build upon
 
 ### Open Source and Community-Driven
+
 - Developed under the JupyterHub community
 - Apache 2.0 license
 - Active development on GitHub
@@ -115,7 +132,9 @@ Unlike all-or-nothing consent models, patients can choose exactly which types of
 JupyterHealth Exchange provides three main interfaces:
 
 ### Web User Interface
+
 A single-page application for practitioners to:
+
 - Create and manage organizations and studies
 - Invite and enroll patients
 - Configure consent requests
@@ -123,7 +142,9 @@ A single-page application for practitioners to:
 - Generate patient invitation links
 
 ### Admin REST API
+
 A comprehensive API for programmatic management:
+
 - Organization hierarchy management
 - Study creation and configuration
 - Patient enrollment workflows
@@ -131,7 +152,9 @@ A comprehensive API for programmatic management:
 - Data source configuration
 
 ### FHIR API
+
 Standards-based API for healthcare interoperability:
+
 - Patient resource queries
 - Observation resource queries (health data)
 - FHIR Bundle support for batch operations
@@ -155,6 +178,7 @@ For a deeper understanding of these architectural decisions, see [Architecture](
 **Current State**: Proof of Concept
 
 JupyterHealth Exchange is actively developed and suitable for:
+
 - Research prototypes
 - Pilot studies
 - Development and testing
@@ -173,11 +197,13 @@ Ready to explore JupyterHealth Exchange?
 ## Learn More
 
 **External Resources**:
+
 - [JupyterHealth Website](https://jupyterhealth.org/)
 - [GitHub Repository](https://github.com/jupyterhealth/jupyterhealth-exchange)
 - [Berkeley Agile Metabolic Health Initiative](https://cdss.berkeley.edu/news/berkeley-launches-agile-metabolic-health-and-open-platforms-initiative)
 
 **Explanation Documentation**: For deeper understanding of JupyterHealth Exchange, see:
+
 - [Consent Management](consent-management.md) - How patient consent controls data access
 - [Role-Based Access and Governance](rbac-governance.md) - User roles and permissions
 - [System Architecture](architecture.md) - Component architecture and deployment

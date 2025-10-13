@@ -51,6 +51,7 @@ graph LR
 ```
 
 **Key Points**:
+
 - **Device Manufacturers**: Patients' health devices sync data to manufacturer cloud APIs (glucose meters, CGMs, fitness trackers, smart rings)
 - **CommonHealth App**: Retrieves data from manufacturers, transforms to IEEE 1752 standard, wraps in FHIR, uploads to JHE
 - **JupyterHealth Exchange**: Manages patient consent, stores observations, provides research access via FHIR R5 APIs
@@ -68,10 +69,10 @@ graph LR
 CommonHealth serves as the data collection and consent management client for patients:
 
 1. **Device Integration**: Connects to personal health devices and manufacturer APIs (glucose meters, continuous glucose monitors, fitness trackers, smart rings)
-2. **Data Standardization**: Normalizes device data to Open mHealth (IEEE 1752) format
-3. **FHIR Compatibility**: Packages standardized data as FHIR Observations for upload to JHE
-4. **Consent Management**: Patient interface for enrolling in studies and managing data sharing consent
-5. **Secure Communication**: Encrypted uploads to JHE via REST API
+1. **Data Standardization**: Normalizes device data to Open mHealth (IEEE 1752) format
+1. **FHIR Compatibility**: Packages standardized data as FHIR Observations for upload to JHE
+1. **Consent Management**: Patient interface for enrolling in studies and managing data sharing consent
+1. **Secure Communication**: Encrypted uploads to JHE via REST API
 
 **Data Flow Example**:
 
@@ -88,6 +89,7 @@ Device Data → OMH Format → FHIR Observation → JupyterHealth Exchange
 **Purpose**: Central data exchange hub managing patient data, consent, and research access
 
 **Key Responsibilities**:
+
 - Patient and practitioner authentication (OAuth 2.0)
 - Organization and study management
 - Consent management (granular, per-study, per-data-type)
@@ -119,6 +121,7 @@ graph TB
 ```
 
 **Core Models**:
+
 - `JHEUser`: Base user model (extends Django AbstractUser)
 - `Patient`: Patient profile with FHIR Patient resource
 - `Practitioner`: Researcher/clinician profile
@@ -130,6 +133,7 @@ graph TB
 - `PractitionerOrganization`: Many-to-many with role (viewer/member/manager)
 
 **Key Features**:
+
 - FHIR R5 compliance for Observation, Patient, Condition resources
 - Multi-tenant organization structure
 - Consent-as-authorization (no consent = no access)
@@ -137,6 +141,7 @@ graph TB
 - RESTful API with Django REST Framework
 
 **API Endpoints**:
+
 - `/api/Patient` - Patient CRUD
 - `/api/Practitioner` - Practitioner CRUD
 - `/api/Organization` - Organization management
@@ -152,6 +157,7 @@ graph TB
 **Purpose**: Enable researchers to authenticate with JHE from Jupyter notebooks
 
 **Key Responsibilities**:
+
 - OAuth 2.0 client configuration for SMART on FHIR
 - Token acquisition and refresh
 - Jupyter server integration
@@ -159,7 +165,7 @@ graph TB
 
 **Workflow**:
 
-:::{div}
+:::\{div}
 :class: dark:hidden
 
 ```{mermaid}
@@ -183,7 +189,7 @@ sequenceDiagram
 
 :::
 
-:::{div}
+:::\{div}
 :class: hidden dark:block
 
 ```{mermaid}
@@ -208,11 +214,13 @@ sequenceDiagram
 :::
 
 **Configuration**:
+
 - Set client ID and secret in `jupyter_server_config.py`
 - Configure FHIR scopes (patient/*.read, observation/*.read)
 - Set authorization and token endpoints
 
 **Use Cases**:
+
 - Data analysis on consented research data
 - Machine learning model training
 - Statistical analysis of study cohorts
@@ -244,25 +252,25 @@ graph LR
 
 **Infrastructure Details**:
 
-| Component | Technology | Configuration |
-|-----------|-----------|---------------|
-| **Platform** | Fly.io | Primary region: Newark (ewr) |
+| Component       | Technology       | Configuration                                        |
+| --------------- | ---------------- | ---------------------------------------------------- |
+| **Platform**    | Fly.io           | Primary region: Newark (ewr)                         |
 | **Application** | Docker container | Gunicorn with 2 workers, WhiteNoise for static files |
-| **Compute** | Fly.io VM | 1GB RAM, 1 shared vCPU |
-| **Database** | Fly Postgres | Managed PostgreSQL with automated backups |
-| **HTTPS** | Fly Proxy | Automatic TLS certificates, forced HTTPS |
-| **Scaling** | Auto-scaling | Min 1 machine, auto-stop/start on traffic |
-| **Deployment** | GitHub Actions | Automated deploy on push to main branch |
+| **Compute**     | Fly.io VM        | 1GB RAM, 1 shared vCPU                               |
+| **Database**    | Fly Postgres     | Managed PostgreSQL with automated backups            |
+| **HTTPS**       | Fly Proxy        | Automatic TLS certificates, forced HTTPS             |
+| **Scaling**     | Auto-scaling     | Min 1 machine, auto-stop/start on traffic            |
+| **Deployment**  | GitHub Actions   | Automated deploy on push to main branch              |
 
 **Deployment Workflow**:
 
 1. Code pushed to GitHub main branch
-2. GitHub Actions workflow triggered
-3. `.env` file created from GitHub repository secrets
-4. Docker image built with embedded `.env` file
-5. Image deployed to Fly.io
-6. Database migrations run automatically (`python manage.py migrate`)
-7. New container started with zero downtime
+1. GitHub Actions workflow triggered
+1. `.env` file created from GitHub repository secrets
+1. Docker image built with embedded `.env` file
+1. Image deployed to Fly.io
+1. Database migrations run automatically (`python manage.py migrate`)
+1. New container started with zero downtime
 
 **Environment Configuration**:
 
@@ -286,27 +294,31 @@ The Dockerfile and gunicorn configuration support any container runtime or cloud
 
 ### Technology Stack Summary
 
-| Component | Language | Framework | Database | Key Libraries |
-|-----------|----------|-----------|----------|---------------|
-| CommonHealth (PHR-Android) | Kotlin | Android SDK | Room + SQLCipher | HAPI FHIR, AppAuth |
-| JupyterHealth Exchange | Python | Django 5.2 | PostgreSQL | fhir.resources, DRF |
-| Jupyter Extension | Python | Jupyter | N/A | requests-oauthlib |
+| Component                  | Language | Framework   | Database         | Key Libraries       |
+| -------------------------- | -------- | ----------- | ---------------- | ------------------- |
+| CommonHealth (PHR-Android) | Kotlin   | Android SDK | Room + SQLCipher | HAPI FHIR, AppAuth  |
+| JupyterHealth Exchange     | Python   | Django 5.2  | PostgreSQL       | fhir.resources, DRF |
+| Jupyter Extension          | Python   | Jupyter     | N/A              | requests-oauthlib   |
 
 ### External Dependencies
 
 **FHIR Libraries**:
+
 - **Python**: `fhir.resources` - FHIR R4/R5 models and validation
 - **Kotlin**: HAPI FHIR - Java FHIR implementation for Android (supports DSTU2, R4, R5)
 
 **OAuth/Authentication**:
+
 - Django OAuth Toolkit (JHE server-side)
 - AppAuth (Android OAuth 2.0/OIDC client)
 
 **Database**:
+
 - PostgreSQL 14+ (JHE)
 - Room with SQLCipher encryption (CommonHealth Android app)
 
 **Standards Compliance**:
+
 - FHIR R4/R5 (HL7)
 - SMART on FHIR
 - SMART Health Cards
@@ -320,13 +332,15 @@ The Dockerfile and gunicorn configuration support any container runtime or cloud
 JupyterHealth uses FHIR as the primary data exchange format:
 
 **FHIR Version**:
+
 - **FHIR R5**: JupyterHealth Exchange uses FHIR R5 exclusively
 
 **FHIR Resources Implemented in JHE**:
+
 - `Patient`: Patient demographics, identifiers, contact information
 - `Observation`: Health measurements and device data (primary data resource)
 
-JHE focuses specifically on device-generated observations rather than comprehensive EHR data. 
+JHE focuses specifically on device-generated observations rather than comprehensive EHR data.
 
 ## Learn More
 

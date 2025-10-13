@@ -24,7 +24,7 @@ project:
         - file: explanation/index.md
         - file: explanation/exchange-overview.md
         - file: explanation/fhir-interoperability.md
-        - file: explanation/openmhealth-interoperability.md
+        - file: explanation/openmhealth-standards.md
         - file: explanation/data-flow.md
         - file: explanation/consent-management.md
         - file: explanation/security-overview.md

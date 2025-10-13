@@ -465,6 +465,6 @@ All layers must pass for data access.
 ## Related Documentation
 
 - [Data Flow](./data-flow.md) - See how consent fits into the data pipeline
-- [RBAC and Governance](./rbac.md) - Understand practitioner access control
-- [Access Control Design](./access-control-design.md) - Deep dive into authorization architecture
+- [RBAC and Governance](./rbac-governance.md) - Understand practitioner access control
+- [Security Overview](./security-overview.md) - Deep dive into authorization architecture
 - [FHIR Interoperability](./fhir-interoperability.md) - How consent integrates with FHIR APIs

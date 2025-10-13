@@ -478,14 +478,14 @@ Using standards enables ecosystem growth.
 **Related Documentation**:
 
 - [Why FHIR? Interoperability Explained](./fhir-interoperability.md) - Deep dive on FHIR
-- [IEEE 1752 Data Standards](./openmhealth-interoperability.md) - Device data schemas
+- [IEEE 1752 Data Standards](./openmhealth-standards.md) - Device data schemas
 - [Understanding Consent Management](./consent-management.md) - How consent works
 - [API Reference](../reference/exchange-apis.md) - Technical API details
 
 **External Resources**:
 
 - [FHIR Observation Resource](https://www.hl7.org/fhir/observation.html)
-- [IEEE 1752 Standard](https://standards.ieee.org/standard/1752_1-2023.html)
+- [IEEE 1752 Standard](https://standards.ieee.org/ieee/1752.1/6982/)
 - [OAuth 2.0 Specification](https://oauth.net/2/)
 
 ## Summary

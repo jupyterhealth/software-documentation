@@ -551,7 +551,7 @@ Consistent data formats enable advanced research:
 **Standards Organizations**:
 
 - [HL7 FHIR](https://www.hl7.org/fhir/) - Healthcare data standards
-- [IEEE 1752.1](https://standards.ieee.org/standard/1752_1-2023.html) - Mobile health data standard
+- [IEEE 1752.1](https://standards.ieee.org/ieee/1752.1/6982/) - Mobile health data standard
 
 ## Summary
 

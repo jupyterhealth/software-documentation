@@ -348,7 +348,7 @@ This hybrid approach gives JHE:
 - Wearable data normalization (Open mHealth)
 - Best of both ecosystems
 
-Learn more in [Open mHealth Data Standards](./openmhealth-interoperability.md).
+Learn more in [Open mHealth Data Standards](./openmhealth-standards.md).
 
 ## Real-World Impact
 
@@ -388,7 +388,7 @@ A developer wants to build a patient-facing dashboard showing their contributed 
 
 **Related JupyterHealth Exchange Documentation**:
 
-- [Interoperability: Open mHealth and Data Standards](./data-standards.md)
+- [Interoperability: Open mHealth and Data Standards](./openmhealth-standards.md)
 - [Architecture](../reference/exchange-architecture.md) - Technical implementation details
 - [API Reference](../reference/exchange-apis.md) - FHIR API endpoints
 - [Data Models](../reference/exchange-architecture.md#data-model) - How FHIR maps to Django models

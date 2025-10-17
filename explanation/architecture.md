@@ -54,8 +54,7 @@ graph LR
 
 - **Device Manufacturers**: Patients' health devices sync data to manufacturer cloud APIs (glucose meters, CGMs, fitness trackers, smart rings)
 - **CommonHealth App**: Retrieves data from manufacturers, transforms to IEEE 1752 standard, wraps in FHIR, uploads to JHE
-- **JupyterHealth Exchange**: Manages patient consent, stores observations, provides research and clinical access via FHIR APIs
-- **Research Organizations**: Create studies, enroll patients, manage consent
+- **JupyterHealth Exchange**: Manage organizations, practitioners, patients, studies, and consents
 - **Researchers**: Query JHE FHIR API from Jupyter notebooks to analyze consented data
 
 ## Component Architecture

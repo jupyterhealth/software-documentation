@@ -5,7 +5,7 @@ description: Learn how JupyterHealth Exchange implements granular patient consen
 
 # Understanding Consent Management
 
-Patient consent is the cornerstone of ethical health data research. JupyterHealth Exchange implements a sophisticated consent management system that gives patients fine-grained control over what data they share, with whom, and for what purposes.
+Patient consent is the cornerstone of ethical use of health data, be it for research or care. JupyterHealth Exchange implements a sophisticated consent management system that gives patients fine-grained control over what data they share, with whom, and for what purposes.
 
 This document explains the consent model, how it works in practice, and why it's designed the way it is.
 

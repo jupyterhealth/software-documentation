@@ -143,6 +143,7 @@ graph TB
 **API Endpoints**:
 
 **Admin API:**
+
 - `users` - Practitioner management
 - `organizations` - Organization management
 - `patients` - Patient management
@@ -151,6 +152,7 @@ graph TB
 - `data_sources` - Data Source management
 
 **FHIR API:**
+
 - `base` - batch upload
 - `Observation` - Observation search and create
 - `Patient` - Patient search and create
@@ -239,14 +241,14 @@ For local development and testing, JupyterHealth Exchange can be run using Djang
 **Setup Steps**:
 
 1. Set up Python environment (Python >= 3.10)
-2. Install dependencies: `pipenv sync` (or `pip install -r requirements.txt`)
-3. Create PostgreSQL database
-4. Copy `dot_env_example.txt` to `.env` and update database credentials
-5. Load environment: `pipenv shell`
-6. Run migrations: `python manage.py migrate`
-7. Seed database: `python manage.py seed`
-8. Start server: `python manage.py runserver`
-9. Access at http://localhost:8000 with credentials `mary@example.com` / `Jhe1234!`
+1. Install dependencies: `pipenv sync` (or `pip install -r requirements.txt`)
+1. Create PostgreSQL database
+1. Copy `dot_env_example.txt` to `.env` and update database credentials
+1. Load environment: `pipenv shell`
+1. Run migrations: `python manage.py migrate`
+1. Seed database: `python manage.py seed`
+1. Start server: `python manage.py runserver`
+1. Access at http://localhost:8000 with credentials `mary@example.com` / `Jhe1234!`
 
 **Note**: The Django development server should only be used for local development, not production deployments.
 

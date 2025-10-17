@@ -5,7 +5,7 @@ description: Learn how JupyterHealth Exchange is designed.
 
 # JupyterHealth System Architecture
 
-JupyterHealth is a modular ecosystem of interconnected components that enable patients to collect, control, and share their health data with researchers or clinicians. This document explains the architecture of each component and how they work together to support patient-centered health data exchange.
+JupyterHealth is a modular ecosystem of interconnected components that enable patients to collect, control, and share their health data with researchers or clinicians. Users of JupyterHealth might include researchers or clinicians (or even patients) looking to combine patient-generated data with clinical data. This document explains the architecture of each component and how they work together to support patient-centered health data exchange.
 
 ## System Overview
 

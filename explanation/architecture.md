@@ -5,7 +5,7 @@ description: Learn how JupyterHealth Exchange is designed.
 
 # JupyterHealth System Architecture
 
-JupyterHealth is a distributed ecosystem of interconnected components that enable patients to collect, control, and share their health data with research organizations. This document explains the architecture of each component and how they work together to support patient-centered health data exchange.
+JupyterHealth is a modular ecosystem of interconnected components that enable patients to collect, control, and share their health data with researchers or clinicians. This document explains the architecture of each component and how they work together to support patient-centered health data exchange.
 
 ## System Overview
 
@@ -54,7 +54,7 @@ graph LR
 
 - **Device Manufacturers**: Patients' health devices sync data to manufacturer cloud APIs (glucose meters, CGMs, fitness trackers, smart rings)
 - **CommonHealth App**: Retrieves data from manufacturers, transforms to IEEE 1752 standard, wraps in FHIR, uploads to JHE
-- **JupyterHealth Exchange**: Manages patient consent, stores observations, provides research access via FHIR R5 APIs
+- **JupyterHealth Exchange**: Manages patient consent, stores observations, provides research and clinical access via FHIR APIs
 - **Research Organizations**: Create studies, enroll patients, manage consent
 - **Researchers**: Query JHE FHIR API from Jupyter notebooks to analyze consented data
 
@@ -66,9 +66,9 @@ graph LR
 
 **Role in System**:
 
-CommonHealth serves as the data collection and consent management client for patients:
+CommonHealth serves as a data collection and consent management client for patients:
 
-1. **Device Integration**: Connects to personal health devices and manufacturer APIs (glucose meters, continuous glucose monitors, fitness trackers, smart rings)
+1. **Device Integration**: Connects to personal health devices and manufacturer APIs (glucose meters, continuous glucose monitors, fitness trackers, smart rings) as well as FHIR based APIs for clinical and insurance data
 1. **Data Standardization**: Normalizes device data to Open mHealth (IEEE 1752) format
 1. **FHIR Compatibility**: Packages standardized data as FHIR Observations for upload to JHE
 1. **Consent Management**: Patient interface for enrolling in studies and managing data sharing consent
@@ -80,20 +80,20 @@ CommonHealth serves as the data collection and consent management client for pat
 Device Data → OMH Format → FHIR Observation → JupyterHealth Exchange
 ```
 
-*Note: CommonHealth is a proprietary application developed by The Commons Project Foundation. For technical integration details, contact The Commons Project.*
+*Note: CommonHealth is developed by The Commons Project Foundation. For technical integration details, contact The Commons Project.*
 
 ### 2. JupyterHealth Exchange (Backend API)
 
-**Technology**: Django 5.2, Django REST Framework, PostgreSQL
+**Technology**: Django, Django REST Framework, PostgreSQL
 
 **Purpose**: Central data exchange hub managing patient data, consent, and research access
 
 **Key Responsibilities**:
 
-- Patient and practitioner authentication (OAuth 2.0)
+- Patient and practitioner management and authentication (OAuth 2.0)
 - Organization and study management
 - Consent management (granular, per-study, per-data-type)
-- FHIR R5 API for data upload and retrieval
+- FHIR API for data upload and retrieval
 - Role-based access control (Viewer, Member, Manager)
 - Authorization enforcement (consent checks)
 
@@ -134,7 +134,7 @@ graph TB
 
 **Key Features**:
 
-- FHIR R5 compliance for Observation, Patient, Condition resources
+- FHIR compliance for Observation and Patient resources
 - Multi-tenant organization structure
 - Consent-as-authorization (no consent = no access)
 - Study-level data scoping
@@ -142,13 +142,18 @@ graph TB
 
 **API Endpoints**:
 
-- `/api/Patient` - Patient CRUD
-- `/api/Practitioner` - Practitioner CRUD
-- `/api/Organization` - Organization management
-- `/api/Study` - Study management
-- `/api/Observation` - FHIR Observation resources
-- `/api/Patient/{id}/consents` - Consent management
-- `/fhir/` - FHIR-compliant endpoints
+**Admin API:**
+- `users` - Practitioner management
+- `organizations` - Organization management
+- `patients` - Patient management
+- `studies` - Study management
+- `observations` - Observation management
+- `data_sources` - Data Source management
+
+**FHIR API:**
+- `base` - batch upload
+- `Observation` - Observation search and create
+- `Patient` - Patient search and create
 
 ### 3. Jupyter-SMART-on-FHIR Extension
 
@@ -226,6 +231,24 @@ sequenceDiagram
 - Statistical analysis of study cohorts
 
 ## Deployment Architecture
+
+### Local Development Deployment
+
+For local development and testing, JupyterHealth Exchange can be run using Django's built-in development server:
+
+**Setup Steps**:
+
+1. Set up Python environment (Python >= 3.10)
+2. Install dependencies: `pipenv sync` (or `pip install -r requirements.txt`)
+3. Create PostgreSQL database
+4. Copy `dot_env_example.txt` to `.env` and update database credentials
+5. Load environment: `pipenv shell`
+6. Run migrations: `python manage.py migrate`
+7. Seed database: `python manage.py seed`
+8. Start server: `python manage.py runserver`
+9. Access at http://localhost:8000 with credentials `mary@example.com` / `Jhe1234!`
+
+**Note**: The Django development server should only be used for local development, not production deployments.
 
 ### Production Deployment (Fly.io)
 
@@ -333,7 +356,7 @@ JupyterHealth uses FHIR as the primary data exchange format:
 
 **FHIR Version**:
 
-- **FHIR R5**: JupyterHealth Exchange uses FHIR R5 exclusively
+- **FHIR**: JupyterHealth Exchange uses FHIR exclusively
 
 **FHIR Resources Implemented in JHE**:
 

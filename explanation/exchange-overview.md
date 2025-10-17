@@ -89,6 +89,7 @@ Working on studies involving:
 - Diabetes and metabolic health
 - Cardiovascular monitoring
 - Sleep and activity tracking
+- Digital biomarker development
 - Personalized health interventions
 
 ### Platform Developers

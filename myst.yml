@@ -41,6 +41,7 @@ project:
     - rule: link-resolves
       severity: ignore
       keys:
+        - "http://localhost:8000"
         - "http://localhost:8000/"
         - "http://localhost:8000/admin"
 site:

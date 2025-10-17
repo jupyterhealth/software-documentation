@@ -7,4 +7,5 @@ build:
   commands:
     - npm ci
     - mkdir -p $READTHEDOCS_OUTPUT/html/
-    - BASE_URL="/$READTHEDOCS_LANGUAGE/$READTHEDOCS_VERSION" npm run myst -- build --html --output-folder "$READTHEDOCS_OUTPUT/html"
+    - BASE_URL="/$READTHEDOCS_LANGUAGE/$READTHEDOCS_VERSION" npm run myst -- build --html
+    - cp -r _build/html/* $READTHEDOCS_OUTPUT/html/

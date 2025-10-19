@@ -1,24 +1,22 @@
-# How-To guides
+# How-To Guides
 
-here we should have [how-to guides](https://diataxis.fr/how-to-guides/) for specific operations.
+Here we have [how-to guides](https://diataxis.fr/how-to-guides/) for specific operations.
 
 > How-to guides are directions that guide the reader through a problem or towards a result. How-to guides are goal-oriented.
 
 Note: [the difference between how-to and tutorial](https://diataxis.fr/tutorials-how-to/)
 
-How-to documents we plan to have:
+## For JupyterHealth Exchange Admins and Deployment
 
-For JupyterHealth Exchange deployers/admins:
+- [Configuring JupyterHealth for HIPAA-Compliant Storage](admins-deployers/configuring-hipaa-storage.md)
+- [Add a Data Source, Data Type to the Exchange](admins-deployers/add-data-source-type.md)
+- [Connecting JupyterHealth to a New Wearable API](admins-deployers/connecting-new-wearable-api.md)
+- [Upgrading JupyterHealth](admins-deployers/upgrading-jupyterhealth.md)
+- [Troubleshooting Common Ingestion Errors](admins-deployers/troubleshooting-ingestion-errors.md)
 
-- Configuring JupyterHealth for HIPAA-compliant storage
-- Connecting JupyterHealth to a new wearable API
-- Troubleshooting common ingestion errors
-- Upgrading JupyterHealth
-- Add a data source, data type to the Exchange
+## For Clinicians and Researchers
 
-For practitioners:
-
-- Using the JupyterHealth REST API
-- create a study
-- add a patient
-- fetch data from the exchange
+- [Study Management](practitioners/study-management.md)
+- [Patient Management](practitioners/patient-management.md)
+- [Fetching and Exporting Data](practitioners/fetching-exporting-data.md)
+- [Using the JupyterHealth REST API](practitioners/using-rest-api.md)

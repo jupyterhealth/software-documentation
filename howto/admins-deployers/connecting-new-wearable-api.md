@@ -3,36 +3,42 @@
 This guide shows you how to integrate a new wearable device or health data source into JupyterHealth Exchange.
 
 ### Getting Started
+
 - [Overview](#overview)
 - [Prerequisites](#prerequisites)
 
 ### Exchange Configuration
+
 - [Add DataSource to Exchange](#add-datasource-to-exchange)
 - [Map Device Data to OMH Schemas](#map-device-data-to-omh-schemas)
 
 ### Extended Setup
+
 - [If Device Supports New Data Types](#if-device-supports-new-data-types)
 - [Link DataSource to Studies](#link-datasource-to-studies)
 
 ### Mobile App Integration
+
 - [Implement Mobile App Integration](#implement-mobile-app-integration)
 
 ### Testing and Troubleshooting
+
 - [Test Integration](#test-integration)
 - [Troubleshooting](#troubleshooting)
 
 ### Reference
+
 - [Related Documentation](#related-documentation)
 
----
+______________________________________________________________________
 
 ## Overview
 
 JupyterHealth Exchange receives health data from mobile applications (like CommonHealth Android) that connect to wearable devices. Adding a new wearable involves:
 
 1. Creating a DataSource entry in the Exchange
-2. Mapping device data types to Open mHealth (OMH) schemas
-3. Implementing device integration in the mobile app
+1. Mapping device data types to Open mHealth (OMH) schemas
+1. Implementing device integration in the mobile app
 
 ## Prerequisites
 
@@ -85,15 +91,18 @@ Reference: `jupyterhealth-exchange/core/permissions.py`
 For each data type the device supports, create a `DataSourceSupportedScope` link.
 
 Via Django admin:
+
 ```
 https://your-jhe-instance.com/admin/core/datasourcesupportedscope/add/
 ```
 
 Fields:
+
 - **Data source**: Select your newly created DataSource
 - **Scope code**: Select the CodeableConcept (e.g., "omh:blood-pressure:4.0")
 
 Via Django shell:
+
 ```python
 python manage.py shell
 
@@ -122,6 +131,7 @@ ls jupyterhealth-exchange/data/omh/json-schemas/data/
 ```
 
 Common schemas:
+
 - `schema-omh_blood-pressure_4-0.json`
 - `schema-omh_blood-glucose_4-0.json`
 - `schema-omh_heart-rate_2-0.json`
@@ -152,6 +162,7 @@ Example: Blood pressure schema at `data/omh/json-schemas/data/schema-omh_blood-p
 Document the mapping from device API format to OMH format:
 
 **Device API Response (Fitbit example):**
+
 ```json
 {
   "bp": [{
@@ -163,6 +174,7 @@ Document the mapping from device API format to OMH format:
 ```
 
 **OMH Format (for JHE):**
+
 ```json
 {
   "header": {
@@ -204,6 +216,7 @@ Reference: Example data at `jupyterhealth-exchange/data/omh/examples/data-points
 If your wearable device supports data types that don't yet exist in JupyterHealth Exchange (e.g., `sleep-duration`, `body-weight`, `physical-activity`), you'll need to add those data types first before linking them to your DataSource.
 
 **See**: [Add a Data Source, Data Type to the Exchange](add-data-source-type.md) for complete instructions on:
+
 - Downloading OMH schemas
 - Creating CodeableConcept entries
 - Adding example data files
@@ -230,8 +243,8 @@ curl -X POST https://your-jhe-instance.com/api/v1/studies/10001/data_sources \
 ### Via Django Admin
 
 1. Navigate to Study detail page
-2. Scroll to "Study data sources" section
-3. Add inline: Select DataSource and save
+1. Scroll to "Study data sources" section
+1. Add inline: Select DataSource and save
 
 Reference: `jupyterhealth-exchange/core/views/study.py`
 

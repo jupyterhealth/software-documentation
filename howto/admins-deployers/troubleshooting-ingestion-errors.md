@@ -3,9 +3,11 @@
 This guide shows you how to diagnose and fix common data ingestion errors in JupyterHealth Exchange.
 
 ### Getting Started
+
 - [Prerequisites](#prerequisites)
 
 ### Common Errors
+
 - [Missing Consent Errors](#missing-consent-errors)
 - [Invalid Patient Reference](#invalid-patient-reference)
 - [Missing Authorization](#missing-authorization)
@@ -16,12 +18,14 @@ This guide shows you how to diagnose and fix common data ingestion errors in Jup
 - [Missing Code/CodeableConcept](#missing-code-codeableconcept)
 
 ### Advanced Debugging
+
 - [Debugging Techniques](#debugging-techniques)
 
 ### Reference
+
 - [Related Documentation](#related-documentation)
 
----
+______________________________________________________________________
 
 ## Prerequisites
 
@@ -63,6 +67,7 @@ curl https://your-jhe-instance.com/api/v1/patients/10001/consents \
 ```
 
 Check the response:
+
 - `consolidatedConsentedScopes`: Lists all data types patient has consented to
 - `studies`: Shows consent status per study
 - `studiesPendingConsent`: Studies awaiting patient response
@@ -244,7 +249,7 @@ Ensure the authenticated patient user matches the subject:
 ```python
 # In your API client, verify token belongs to correct patient
 decoded_token = jwt.decode(access_token, verify=False)
-subject_id = decoded_token['sub']  # Should match patient's jhe_user_id
+subject_id = decoded_token["sub"]  # Should match patient's jhe_user_id
 
 print(f"Token subject: {subject_id}")
 print(f"Patient jhe_user_id: {patient.jhe_user_id}")
@@ -305,10 +310,7 @@ import uuid
 unique_id = str(uuid.uuid4())
 
 observation = {
-    "identifier": [{
-        "system": "https://commonhealth.org",
-        "value": unique_id
-    }]
+    "identifier": [{"system": "https://commonhealth.org", "value": unique_id}]
 }
 ```
 
@@ -318,7 +320,7 @@ Implement idempotent uploads by checking for existence:
 
 ```python
 async def upload_observation_idempotent(obs_data):
-    identifier_value = obs_data['identifier'][0]['value']
+    identifier_value = obs_data["identifier"][0]["value"]
 
     # Check if already uploaded
     response = await check_observation_exists(identifier_value)
@@ -386,6 +388,7 @@ Update your observation to reference an existing DataSource:
 ```
 
 Common DataSource IDs (from seed data):
+
 - `70001`: iHealth
 - `70002`: Dexcom
 - `70003`: CareX
@@ -443,7 +446,7 @@ with open(schema_path) as f:
 data = {
     "effective_time_frame": {"date_time": "2024-05-02T14:21:00Z"},
     "systolic_blood_pressure": {"value": 122, "unit": "mmHg"},
-    "diastolic_blood_pressure": {"value": 77, "unit": "mmHg"}
+    "diastolic_blood_pressure": {"value": 77, "unit": "mmHg"},
 }
 
 try:
@@ -464,6 +467,7 @@ cat jupyterhealth-exchange/data/omh/examples/data-points/omh_blood-pressure_4-0.
 #### Step 4: Fix Common Issues
 
 **Missing required fields:**
+
 ```json
 {
   "body": {
@@ -475,6 +479,7 @@ cat jupyterhealth-exchange/data/omh/examples/data-points/omh_blood-pressure_4-0.
 ```
 
 **Invalid units:**
+
 ```json
 {
   "systolic_blood_pressure": {
@@ -485,6 +490,7 @@ cat jupyterhealth-exchange/data/omh/examples/data-points/omh_blood-pressure_4-0.
 ```
 
 **Invalid timestamp format:**
+
 ```json
 {
   "effective_time_frame": {
@@ -527,25 +533,21 @@ import base64
 omh_data = {
     "header": {
         "uuid": "550e8400-e29b-41d4-a716-446655440000",
-        "schema_id": {
-            "namespace": "omh",
-            "name": "blood-pressure",
-            "version": "4.0"
-        },
-        "creation_date_time": "2024-10-25T21:13:31.438Z"
+        "schema_id": {"namespace": "omh", "name": "blood-pressure", "version": "4.0"},
+        "creation_date_time": "2024-10-25T21:13:31.438Z",
     },
     "body": {
         "effective_time_frame": {"date_time": "2024-05-02T14:21:00Z"},
         "systolic_blood_pressure": {"value": 122, "unit": "mmHg"},
-        "diastolic_blood_pressure": {"value": 77, "unit": "mmHg"}
-    }
+        "diastolic_blood_pressure": {"value": 77, "unit": "mmHg"},
+    },
 }
 
 # Convert to JSON string
 json_string = json.dumps(omh_data)
 
 # Encode as base64
-encoded = base64.b64encode(json_string.encode('utf-8')).decode('utf-8')
+encoded = base64.b64encode(json_string.encode("utf-8")).decode("utf-8")
 
 print(f"Encoded data: {encoded}")
 ```
@@ -556,7 +558,7 @@ Test that your encoded data can be decoded:
 
 ```python
 # Decode to verify
-decoded = base64.b64decode(encoded).decode('utf-8')
+decoded = base64.b64decode(encoded).decode("utf-8")
 decoded_data = json.loads(decoded)
 
 print(f"Decoded successfully: {decoded_data['body']}")
@@ -565,6 +567,7 @@ print(f"Decoded successfully: {decoded_data['body']}")
 #### Step 3: Check for Common Mistakes
 
 **Missing encoding:**
+
 ```json
 // WRONG - raw JSON
 {
@@ -584,13 +587,14 @@ print(f"Decoded successfully: {decoded_data['body']}")
 ```
 
 **Double encoding:**
+
 ```python
 # WRONG - encoding twice
-encoded_once = base64.b64encode(json_string.encode('utf-8'))
+encoded_once = base64.b64encode(json_string.encode("utf-8"))
 encoded_twice = base64.b64encode(encoded_once)  # Don't do this!
 
 # CORRECT - encode once
-encoded = base64.b64encode(json_string.encode('utf-8')).decode('utf-8')
+encoded = base64.b64encode(json_string.encode("utf-8")).decode("utf-8")
 ```
 
 ## Missing Code/CodeableConcept
@@ -630,6 +634,7 @@ for cc in CodeableConcept.objects.filter(coding_system="https://w3id.org/openmhe
 ```
 
 Expected output:
+
 ```
 Available data types:
   omh:blood-glucose:4.0: Blood Glucose
@@ -708,16 +713,15 @@ import logging
 
 # Enable query logging
 logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger('django.db.backends')
+logger = logging.getLogger("django.db.backends")
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler())
 
 # Run query
 from core.models import Patient
+
 patients = Patient.for_practitioner_organization_study(
-    practitioner_user_id=1,
-    organization_id=1,
-    study_id=1
+    practitioner_user_id=1, organization_id=1, study_id=1
 )
 
 # SQL will be printed to console

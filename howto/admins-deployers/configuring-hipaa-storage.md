@@ -5,28 +5,34 @@ This guide shows you how to configure JupyterHealth Exchange for HIPAA-compliant
 > **Note**: This guide includes instructions for AWS RDS, Google Cloud SQL, Azure Database for PostgreSQL, and self-hosted deployments. Before proceeding, verify command syntax and feature availability in your cloud provider's current documentation (links provided in each section).
 
 ### Initial Setup
+
 - [Prerequisites](#prerequisites)
 
 ### Database Configuration
+
 - [Configure Database Encryption](#configure-database-encryption)
 
 ### Application Security
+
 - [Configure HTTPS for All Connections](#configure-https-for-all-connections)
 - [Configure Secure Session Management](#configure-secure-session-management)
 - [Configure OAuth2 Security](#configure-oauth2-security)
 
 ### Monitoring and Compliance
+
 - [Configure Audit Logging](#configure-audit-logging)
 - [Verify HIPAA Compliance](#verify-hipaa-compliance)
 
 ### Operations
+
 - [Backup and Disaster Recovery](#backup-and-disaster-recovery)
 - [Additional Security Measures](#additional-security-measures)
 
 ### Reference
+
 - [Related Documentation](#related-documentation)
 
----
+______________________________________________________________________
 
 ## Prerequisites
 
@@ -48,6 +54,7 @@ PostgreSQL handles encryption at the storage level. Configure your PostgreSQL se
 #### Before You Start
 
 Verify current CLI syntax and features in your cloud provider's documentation:
+
 - **AWS**: [RDS Encryption Documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.Encryption.html)
 - **Google Cloud**: [Cloud SQL Encryption (CMEK)](https://cloud.google.com/sql/docs/postgres/cmek)
 - **Azure**: [Azure Database for PostgreSQL Security](https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-security)
@@ -73,6 +80,7 @@ aws rds create-db-instance \
 ```
 
 Verify encryption:
+
 ```bash
 aws rds describe-db-instances \
   --db-instance-identifier jhe-production \
@@ -108,6 +116,7 @@ gcloud sql instances create jhe-production \
 ```
 
 Create database and user:
+
 ```bash
 # Create database
 gcloud sql databases create jhe_production \
@@ -120,6 +129,7 @@ gcloud sql users create jheuser \
 ```
 
 Verify encryption:
+
 ```bash
 gcloud sql instances describe jhe-production \
   --format="value(diskEncryptionConfiguration)"
@@ -160,6 +170,7 @@ az postgres flexible-server update \
 ```
 
 Create database:
+
 ```bash
 az postgres flexible-server db create \
   --resource-group jhe-rg \
@@ -168,6 +179,7 @@ az postgres flexible-server db create \
 ```
 
 Verify encryption:
+
 ```bash
 az postgres flexible-server show \
   --resource-group jhe-rg \
@@ -222,11 +234,13 @@ aws rds modify-db-instance \
 ```
 
 Download RDS CA certificate:
+
 ```bash
 wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
 ```
 
 Update `.env`:
+
 ```bash
 DB_SSL_MODE="verify-full"
 DB_SSL_ROOT_CERT="/path/to/global-bundle.pem"
@@ -243,6 +257,7 @@ gcloud sql instances patch jhe-production \
 ```
 
 Download server CA certificate:
+
 ```bash
 gcloud sql ssl-certs describe server-ca \
   --instance=jhe-production \
@@ -250,6 +265,7 @@ gcloud sql ssl-certs describe server-ca \
 ```
 
 Create client certificate (for mutual TLS):
+
 ```bash
 gcloud sql ssl-certs create client-cert \
   --instance=jhe-production \
@@ -262,6 +278,7 @@ gcloud sql ssl-certs describe client-cert \
 ```
 
 Update `.env`:
+
 ```bash
 DB_SSL_MODE="verify-full"
 DB_SSL_ROOT_CERT="/path/to/server-ca.pem"
@@ -282,6 +299,7 @@ wget https://www.digicert.com/CACerts/BaltimoreCyberTrustRoot.crt.pem
 ```
 
 Verify SSL is required:
+
 ```bash
 az postgres flexible-server parameter show \
   --resource-group jhe-rg \
@@ -291,6 +309,7 @@ az postgres flexible-server parameter show \
 ```
 
 Update `.env`:
+
 ```bash
 DB_SSL_MODE="verify-full"
 DB_SSL_ROOT_CERT="/path/to/DigiCertGlobalRootCA.crt.pem"
@@ -362,6 +381,7 @@ server {
 ```
 
 Enable the configuration:
+
 ```bash
 sudo ln -s /etc/nginx/sites-available/jhe /etc/nginx/sites-enabled/
 sudo nginx -t
@@ -390,6 +410,7 @@ openssl rand -base64 32
 ```
 
 Add to `.env`:
+
 ```bash
 SECRET_KEY="your-generated-secret-key-here"
 ```
@@ -403,7 +424,7 @@ In `jhe/settings.py`, these security settings are already configured:
 ```python
 SESSION_COOKIE_SECURE = True  # Only send cookies over HTTPS
 SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access
-SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection
+SESSION_COOKIE_SAMESITE = "Lax"  # CSRF protection
 CSRF_COOKIE_SECURE = True
 ```
 
@@ -422,12 +443,12 @@ openssl genrsa -out oauth2_private.pem 4096
 Convert to JWKS format and add to Django admin:
 
 1. Navigate to `/admin/oauth2_provider/application/`
-2. Create new application with:
+1. Create new application with:
    - Client type: `Public`
    - Authorization grant type: `Authorization code`
    - Algorithm: `RS256`
    - Skip authorization: `Checked`
-3. Paste the RSA private key in the appropriate field
+1. Paste the RSA private key in the appropriate field
 
 Reference: See `jupyterhealth-exchange/README.md` for detailed OIDC setup
 
@@ -447,6 +468,7 @@ echo "PATIENT_AUTHORIZATION_CODE_CHALLENGE=$CODE_CHALLENGE"
 ```
 
 Add to `.env`:
+
 ```bash
 PATIENT_AUTHORIZATION_CODE_VERIFIER="generated-verifier-here"
 PATIENT_AUTHORIZATION_CODE_CHALLENGE="generated-challenge-here"
@@ -469,13 +491,13 @@ For production, configure log aggregation:
 
 ```python
 # In jhe/settings.py, add:
-LOGGING['handlers']['file'] = {
-    'level': 'INFO',
-    'class': 'logging.handlers.RotatingFileHandler',
-    'filename': '/var/log/jhe/application.log',
-    'maxBytes': 1024 * 1024 * 100,  # 100MB
-    'backupCount': 10,
-    'formatter': 'verbose',
+LOGGING["handlers"]["file"] = {
+    "level": "INFO",
+    "class": "logging.handlers.RotatingFileHandler",
+    "filename": "/var/log/jhe/application.log",
+    "maxBytes": 1024 * 1024 * 100,  # 100MB
+    "backupCount": 10,
+    "formatter": "verbose",
 }
 ```
 
@@ -523,6 +545,7 @@ aws rds modify-db-instance \
 ```
 
 View logs in CloudWatch:
+
 ```bash
 aws logs tail /aws/rds/instance/jhe-production/postgresql --follow
 ```
@@ -541,6 +564,7 @@ gcloud logging read "resource.type=cloudsql_database AND resource.labels.databas
 ```
 
 Export logs to BigQuery for long-term retention:
+
 ```bash
 # Create log sink
 gcloud logging sinks create jhe-audit-logs \
@@ -584,6 +608,7 @@ az monitor diagnostic-settings create \
 ```
 
 Query logs:
+
 ```bash
 az monitor log-analytics query \
   --workspace jhe-logs \
@@ -730,6 +755,7 @@ ls -lh $BACKUP_FILE
 ```
 
 Schedule with cron:
+
 ```bash
 0 2 * * * /opt/scripts/backup-jhe.sh
 ```
@@ -852,11 +878,13 @@ az postgres flexible-server firewall-rule list \
 ### 2. Enable Database Connection Limits
 
 In `postgresql.conf`:
+
 ```
 max_connections = 100
 ```
 
 In `.env`:
+
 ```bash
 DB_CONN_MAX_AGE=600  # 10 minutes
 ```

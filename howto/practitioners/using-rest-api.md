@@ -3,36 +3,42 @@
 This guide shows you how to authenticate and interact with the JupyterHealth Exchange REST API. This is foundational reference documentation used by other practitioner guides.
 
 ### Introduction
+
 - [Prerequisites](#prerequisites)
 - [API Overview](#api-overview)
 
 ### Authentication
+
 - [Discover OAuth2 Endpoints](#discover-oauth2-endpoints)
 - [Practitioner Authentication (Authorization Code Flow)](#practitioner-authentication-authorization-code-flow)
 - [Patient Authentication (Deep Link Flow)](#patient-authentication-deep-link-flow)
 - [Making Authenticated Requests](#making-authenticated-requests)
 
 ### API Fundamentals
+
 - [Pagination](#pagination)
 - [Filtering](#filtering)
 - [Error Handling](#error-handling)
 - [Data Formats](#data-formats)
 
 ### Common Operations
+
 - [Organizations and Studies](#organizations-and-studies)
 - [Patients and Consent](#patients-and-consent)
 - [Observations](#observations)
 - [Data Sources](#data-sources)
 
 ### Advanced Topics
+
 - [Rate Limiting and Performance](#rate-limiting-and-performance)
 - [Client Libraries](#client-libraries)
 - [API Documentation](#api-documentation)
 
 ### Reference
+
 - [Related Documentation](#related-documentation)
 
----
+______________________________________________________________________
 
 ## Introduction
 
@@ -50,6 +56,7 @@ JupyterHealth Exchange provides two API styles. Other practitioner guides refere
 #### Admin REST API (`/api/v1/`)
 
 Traditional REST API for administrative operations:
+
 - User management
 - Organization management
 - Patient management
@@ -63,6 +70,7 @@ Base URL: `https://your-jhe-instance.com/api/v1/`
 #### FHIR API (`/fhir/r5/`)
 
 FHIR-compliant API for health data operations:
+
 - Observation search and retrieval
 - Patient search
 - Batch observation uploads
@@ -73,7 +81,7 @@ Base URL: `https://your-jhe-instance.com/fhir/r5/`
 
 Reference: `jupyterhealth-exchange/jhe/urls.py` and `jupyterhealth-exchange/core/urls.py`
 
----
+______________________________________________________________________
 
 ## Authentication
 
@@ -89,6 +97,7 @@ curl https://your-jhe-instance.com/o/.well-known/openid-configuration
 ```
 
 Response includes:
+
 ```json
 {
   "authorization_endpoint": "https://your-jhe-instance.com/o/authorize/",
@@ -108,12 +117,16 @@ import base64
 import secrets
 
 # Generate code verifier
-code_verifier = base64.urlsafe_b64encode(secrets.token_bytes(32)).decode('utf-8').rstrip('=')
+code_verifier = (
+    base64.urlsafe_b64encode(secrets.token_bytes(32)).decode("utf-8").rstrip("=")
+)
 
 # Generate code challenge
-code_challenge = base64.urlsafe_b64encode(
-    hashlib.sha256(code_verifier.encode('utf-8')).digest()
-).decode('utf-8').rstrip('=')
+code_challenge = (
+    base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode("utf-8")).digest())
+    .decode("utf-8")
+    .rstrip("=")
+)
 
 print(f"Code Verifier: {code_verifier}")
 print(f"Code Challenge: {code_challenge}")
@@ -146,6 +159,7 @@ curl -X POST https://your-jhe-instance.com/o/token/ \
 ```
 
 Response:
+
 ```json
 {
   "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -171,6 +185,7 @@ curl -X POST https://your-jhe-instance.com/o/token/ \
 ```
 
 Response:
+
 ```json
 {
   "access_token": "newAccessToken...",
@@ -195,6 +210,7 @@ curl https://your-jhe-instance.com/api/v1/patients/10001/invitation_link \
 ```
 
 Response:
+
 ```json
 {
   "invitationLink": "https://play.google.com/store/apps/details?id=org.thecommonsproject.android.phr.dev&referrer=cloud_sharing=jhe.yourdomain.com|LhS05iR1rOnpS4JWfP6GeVUIhaRcRh"
@@ -240,6 +256,7 @@ curl https://your-jhe-instance.com/api/v1/users/profile \
 ```
 
 Response:
+
 ```json
 {
   "id": 1,
@@ -260,7 +277,7 @@ Response:
 }
 ```
 
----
+______________________________________________________________________
 
 ## API Fundamentals
 
@@ -275,6 +292,7 @@ curl https://your-jhe-instance.com/api/v1/patients?organization_id=1 \
 ```
 
 Response:
+
 ```json
 {
   "count": 150,
@@ -285,6 +303,7 @@ Response:
 ```
 
 Specify pagination:
+
 ```bash
 # Get 50 items, starting from offset 100
 curl "https://your-jhe-instance.com/api/v1/patients?organization_id=1&limit=50&offset=100" \
@@ -312,15 +331,19 @@ curl "https://your-jhe-instance.com/api/v1/observations?organization_id=1&study_
 #### Authentication Errors
 
 **401 Unauthorized** - Token expired or invalid
+
 ```json
 {"detail": "Authentication credentials were not provided."}
 ```
+
 **Solution**: Refresh access token or re-authenticate.
 
 **403 Forbidden** - Insufficient permissions
+
 ```json
 {"detail": "You do not have permission to perform this action."}
 ```
+
 **Solution**: Verify user role and permissions for the resource.
 
 #### Common HTTP Status Codes
@@ -373,6 +396,7 @@ Reference: `jupyterhealth-exchange/jhe/settings.py`
 #### Response Formats
 
 **Admin API responses** (simple JSON):
+
 ```json
 {
   "count": 150,
@@ -383,6 +407,7 @@ Reference: `jupyterhealth-exchange/jhe/settings.py`
 ```
 
 **FHIR API responses** (FHIR Bundles):
+
 ```json
 {
   "resourceType": "Bundle",
@@ -394,7 +419,7 @@ Reference: `jupyterhealth-exchange/jhe/settings.py`
 }
 ```
 
----
+______________________________________________________________________
 
 ## Common Operations
 
@@ -408,6 +433,7 @@ curl https://your-jhe-instance.com/api/v1/organizations \
 ```
 
 Response:
+
 ```json
 [
   {
@@ -435,6 +461,7 @@ curl "https://your-jhe-instance.com/api/v1/studies?organization_id=1" \
 ```
 
 Response:
+
 ```json
 {
   "count": 5,
@@ -480,6 +507,7 @@ curl "https://your-jhe-instance.com/api/v1/patients?organization_id=1&study_id=1
 ```
 
 Response:
+
 ```json
 {
   "count": 25,
@@ -511,6 +539,7 @@ curl https://your-jhe-instance.com/api/v1/patients/10001/consents \
 ```
 
 Response:
+
 ```json
 {
   "patient": {
@@ -559,12 +588,14 @@ Reference: `jupyterhealth-exchange/core/views/patient.py`
 #### Get Observations for Patient
 
 Admin API:
+
 ```bash
 curl "https://your-jhe-instance.com/api/v1/observations?organization_id=1&study_id=10001&patient_id=10001" \
   -H "Authorization: Bearer $PRACTITIONER_TOKEN"
 ```
 
 Response:
+
 ```json
 {
   "count": 350,
@@ -590,12 +621,14 @@ Response:
 Reference: `jupyterhealth-exchange/core/views/observation.py`
 
 FHIR API (recommended for interoperability):
+
 ```bash
 curl "https://your-jhe-instance.com/fhir/r5/Observation?patient._has:Group:member:_id=10001&patient=10001&code=https://w3id.org/openmhealth|omh:blood-glucose:4.0" \
   -H "Authorization: Bearer $PRACTITIONER_TOKEN"
 ```
 
 Response:
+
 ```json
 {
   "resourceType": "Bundle",
@@ -635,6 +668,7 @@ curl "https://your-jhe-instance.com/fhir/r5/Patient?_has:Group:member:_id=10001"
 ```
 
 Response:
+
 ```json
 {
   "resourceType": "Bundle",
@@ -682,6 +716,7 @@ curl https://your-jhe-instance.com/api/v1/data_sources \
 ```
 
 Response:
+
 ```json
 [
   {
@@ -704,13 +739,14 @@ Response:
 ]
 ```
 
----
+______________________________________________________________________
 
 ## Rate Limiting and Performance
 
 ### Best Practices
 
 1. **Use pagination** for large datasets:
+
    ```bash
    # Efficient: paginated requests
    curl "https://your-jhe-instance.com/api/v1/observations?limit=100&offset=0"
@@ -719,9 +755,11 @@ Response:
    curl "https://your-jhe-instance.com/api/v1/observations?limit=10000"
    ```
 
-2. **Cache access tokens** until expiry (10 hours default):
+1. **Cache access tokens** until expiry (10 hours default):
+
    ```python
    import time
+
 
    class TokenManager:
        def __init__(self):
@@ -735,22 +773,24 @@ Response:
 
        def refresh(self):
            response = oauth_token_request()
-           self.token = response['access_token']
-           self.expires_at = time.time() + response['expires_in'] - 60  # 60s buffer
+           self.token = response["access_token"]
+           self.expires_at = time.time() + response["expires_in"] - 60  # 60s buffer
    ```
 
-3. **Batch observation uploads** using FHIR Bundles:
+1. **Batch observation uploads** using FHIR Bundles:
+
    ```python
    # Efficient: one request with 100 observations
    bundle = create_fhir_bundle(observations)
-   post('/fhir/r5/', bundle)
+   post("/fhir/r5/", bundle)
 
    # Inefficient: 100 individual requests
    for obs in observations:
-       post('/fhir/r5/Observation', obs)
+       post("/fhir/r5/Observation", obs)
    ```
 
-4. **Filter at the API level**, not in client code:
+1. **Filter at the API level**, not in client code:
+
    ```bash
    # Efficient: server-side filtering
    curl "https://your-jhe-instance.com/api/v1/patients?organization_id=1&study_id=10001"
@@ -771,30 +811,22 @@ from urllib3.util.retry import Retry
 session = requests.Session()
 
 # Retry configuration
-retry = Retry(
-    total=3,
-    backoff_factor=0.3,
-    status_forcelist=[500, 502, 503, 504]
-)
+retry = Retry(total=3, backoff_factor=0.3, status_forcelist=[500, 502, 503, 504])
 
 # Connection pooling
-adapter = HTTPAdapter(
-    pool_connections=10,
-    pool_maxsize=20,
-    max_retries=retry
-)
+adapter = HTTPAdapter(pool_connections=10, pool_maxsize=20, max_retries=retry)
 
-session.mount('https://', adapter)
-session.mount('http://', adapter)
+session.mount("https://", adapter)
+session.mount("http://", adapter)
 
 # Use session for all requests
 response = session.get(
-    'https://your-jhe-instance.com/api/v1/patients',
-    headers={'Authorization': f'Bearer {token}'}
+    "https://your-jhe-instance.com/api/v1/patients",
+    headers={"Authorization": f"Bearer {token}"},
 )
 ```
 
----
+______________________________________________________________________
 
 ## API Documentation
 
@@ -822,7 +854,7 @@ https://your-jhe-instance.com/api/v1/schema/redoc/
 
 Reference: `jupyterhealth-exchange/jhe/settings.py`
 
----
+______________________________________________________________________
 
 ## Client Libraries
 
@@ -833,9 +865,10 @@ import requests
 import json
 from datetime import datetime, timedelta
 
+
 class JHEClient:
     def __init__(self, base_url, client_id, client_secret=None):
-        self.base_url = base_url.rstrip('/')
+        self.base_url = base_url.rstrip("/")
         self.client_id = client_id
         self.client_secret = client_secret
         self.access_token = None
@@ -846,20 +879,20 @@ class JHEClient:
         # Step 1: Get authorization code (simplified - normally via browser)
         # Step 2: Exchange for token
         response = requests.post(
-            f'{self.base_url}/o/token/',
+            f"{self.base_url}/o/token/",
             data={
-                'grant_type': 'password',
-                'username': username,
-                'password': password,
-                'client_id': self.client_id,
-                'scope': 'read write'
-            }
+                "grant_type": "password",
+                "username": username,
+                "password": password,
+                "client_id": self.client_id,
+                "scope": "read write",
+            },
         )
         response.raise_for_status()
 
         data = response.json()
-        self.access_token = data['access_token']
-        self.token_expires = datetime.now() + timedelta(seconds=data['expires_in'])
+        self.access_token = data["access_token"]
+        self.token_expires = datetime.now() + timedelta(seconds=data["expires_in"])
 
         return self.access_token
 
@@ -868,20 +901,20 @@ class JHEClient:
             raise Exception("Not authenticated or token expired")
 
         return {
-            'Authorization': f'Bearer {self.access_token}',
-            'Content-Type': 'application/json'
+            "Authorization": f"Bearer {self.access_token}",
+            "Content-Type": "application/json",
         }
 
     def get_patients(self, organization_id, study_id=None):
         """Get patients for organization/study"""
-        params = {'organization_id': organization_id}
+        params = {"organization_id": organization_id}
         if study_id:
-            params['study_id'] = study_id
+            params["study_id"] = study_id
 
         response = requests.get(
-            f'{self.base_url}/api/v1/patients',
+            f"{self.base_url}/api/v1/patients",
             headers=self._get_headers(),
-            params=params
+            params=params,
         )
         response.raise_for_status()
         return response.json()
@@ -889,23 +922,24 @@ class JHEClient:
     def get_observations(self, organization_id, study_id, patient_id):
         """Get observations for patient"""
         response = requests.get(
-            f'{self.base_url}/api/v1/observations',
+            f"{self.base_url}/api/v1/observations",
             headers=self._get_headers(),
             params={
-                'organization_id': organization_id,
-                'study_id': study_id,
-                'patient_id': patient_id
-            }
+                "organization_id": organization_id,
+                "study_id": study_id,
+                "patient_id": patient_id,
+            },
         )
         response.raise_for_status()
         return response.json()
 
+
 # Usage
-client = JHEClient('https://jhe.yourdomain.com', 'your_client_id')
-client.authenticate('practitioner@example.com', 'password')
+client = JHEClient("https://jhe.yourdomain.com", "your_client_id")
+client.authenticate("practitioner@example.com", "password")
 
 patients = client.get_patients(organization_id=1, study_id=10001)
-for patient in patients['results']:
+for patient in patients["results"]:
     print(f"{patient['nameGiven']} {patient['nameFamily']}")
 ```
 
@@ -972,7 +1006,7 @@ const patients = await client.getPatients(1, 10001);
 console.log(`Found ${patients.count} patients`);
 ```
 
----
+______________________________________________________________________
 
 ## Related Documentation
 

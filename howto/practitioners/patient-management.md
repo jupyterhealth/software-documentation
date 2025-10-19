@@ -3,10 +3,12 @@
 This guide shows you how to manage patients in JupyterHealth Exchange using either the web-based **Console** (Method 1) or the **REST API** (Method 2).
 
 ### Introduction
+
 - [Prerequisites](#prerequisites)
 - [Patient Attributes](#understanding-patient-attributes)
 
 ### Core Patient Operations
+
 - [Add New Patient](#add-new-patient)
 - [Add Existing Patient to Organization](#add-existing-patient-to-organization)
 - [Enroll Patient in Study](#enroll-patient-in-study)
@@ -17,16 +19,19 @@ This guide shows you how to manage patients in JupyterHealth Exchange using eith
 - [View Patient's Data](#view-patients-data)
 
 ### Advanced Topics
+
 - [Bulk Patient Import](#bulk-patient-import)
 - [Common Issues](#common-issues)
 - [Best Practices](#best-practices)
 - [Example: Complete Patient Onboarding via REST API](#example-complete-patient-onboarding-via-rest-api)
 
 ### Reference
+
 - [Choosing Between Console and REST API](#choosing-between-jupyterhealth-exchange-console-and-rest-api)
 - [Related Documentation](#related-documentation)
 
----
+______________________________________________________________________
+
 ## Introduction
 
 ### Prerequisites
@@ -34,22 +39,23 @@ This guide shows you how to manage patients in JupyterHealth Exchange using eith
 **Note**: The JupyterHealth Exchange Console is a web-based Single Page Application (SPA) that provides a user-friendly interface for managing patients, studies, and health data.
 
 **For Console Access:**
+
 - Practitioner account with login credentials
 - Member or manager role in an organization
 - Patient's demographic information
 
 **For REST API Access:**
+
 - OAuth2 access token
 - Member or manager role in an organization
 - HTTP client (curl, Python, JavaScript, etc.)
 
 Choose the method that best fits your workflow.
 
-
-
 ### Understanding Patient Attributes
 
 In JupyterHealth Exchange, patients:
+
 - Have a user account for authentication
 - Belong to one or more organizations
 - Can be enrolled in multiple studies
@@ -58,7 +64,8 @@ In JupyterHealth Exchange, patients:
 
 Reference: `jupyterhealth-exchange/core/models.py`
 
----
+______________________________________________________________________
+
 ## Add New Patient
 
 ### Method 1: Using JupyterHealth Exchange Console
@@ -75,11 +82,13 @@ The JupyterHealth Exchange Console provides a web-based interface for practition
 #### Step 1: Access the Console
 
 1. Navigate to the JupyterHealth Exchange web portal:
+
    ```
    https://your-jhe-instance.com/portal/
    ```
 
-2. Log in with your practitioner credentials
+1. Log in with your practitioner credentials
+
    - Enter your email address
    - Enter your password
    - You'll be authenticated via OAuth2/OIDC
@@ -88,8 +97,8 @@ The JupyterHealth Exchange Console provides a web-based interface for practition
 #### Step 2: Navigate to Patients
 
 1. In the console navigation, click the **Patients** tab
-2. At the top left, select your **Organization** from the dropdown
-3. Optionally, filter by **Study** using the second dropdown (or select "All Studies")
+1. At the top left, select your **Organization** from the dropdown
+1. Optionally, filter by **Study** using the second dropdown (or select "All Studies")
 
 You'll see a table of existing patients in the selected organization/study.
 
@@ -97,9 +106,10 @@ You'll see a table of existing patients in the selected organization/study.
 
 1. Click the **"Add Patient..."** button (green button, top left area)
 
-2. A modal dialog opens titled "Create Patient"
+1. A modal dialog opens titled "Create Patient"
 
-3. **Option 1: Check if patient already exists**
+1. **Option 1: Check if patient already exists**
+
    - Enter the patient's email in the "Patient E-mail" field
    - Click **"Lookup"** button
    - If patient exists in another organization:
@@ -108,7 +118,8 @@ You'll see a table of existing patients in the selected organization/study.
    - If patient doesn't exist:
      - Continue with patient creation below
 
-4. **Create new patient** by filling in the form:
+1. **Create new patient** by filling in the form:
+
    - **E-mail** (required): `john.smith@example.com`
      - This will be the patient's login email
      - Automatically filled if you used lookup
@@ -118,19 +129,19 @@ You'll see a table of existing patients in the selected organization/study.
    - **DOB** (required): `1980-01-01` (YYYY-MM-DD format)
    - **Cell**: `555-1234` (optional phone number)
 
-5. Click **"Create"** button
+1. Click **"Create"** button
 
-6. The patient is created and added to the selected organization
+1. The patient is created and added to the selected organization
 
-7. The modal closes and the patient appears in the patient table
+1. The modal closes and the patient appears in the patient table
 
 #### Step 4: View Patient Details
 
 After creating the patient, you can view their full details:
 
 1. Find the patient in the table
-2. Click the **"eye" icon** (View/Read button) in the leftmost column
-3. A modal opens showing:
+1. Click the **"eye" icon** (View/Read button) in the leftmost column
+1. A modal opens showing:
    - Patient ID and demographic information
    - **Organizations**: List of organizations this patient belongs to
    - **Studies Pending Response**: Studies awaiting patient consent
@@ -142,22 +153,25 @@ After creating the patient, you can view their full details:
 
 1. With the patient details modal open (from Step 4):
 
-2. Scroll down to the **"Generate Invitation Link"** section
+1. Scroll down to the **"Generate Invitation Link"** section
 
-3. **Configure email option**:
+1. **Configure email option**:
+
    - Check **"Send link by email"** to automatically email the link to the patient
    - Or uncheck it to manually copy and send the link yourself
 
-4. Click the **"Generate Invitation Link"** button (green)
+1. Click the **"Generate Invitation Link"** button (green)
 
-5. The invitation link appears in the text area.
+1. The invitation link appears in the text area.
 
-6. Send Link to Patient
+1. Send Link to Patient
    Option A: Email sent automatically
+
    - If "Send link by email" was checked, the patient receives an email with the invitation link
    - Email template includes instructions for installing the CommonHealth app
 
    Option B: Copy link manually
+
    - Click **"Copy to Clipboard"** button
    - Send the link to the patient via:
      - Email
@@ -167,31 +181,34 @@ After creating the patient, you can view their full details:
      - In-person instruction
 
 **Link Components**:
+
 - App package ID: Links to CommonHealth app in app store
 - Exchange hostname: Your JupyterHealth Exchange instance
 - Authorization code: One-time code for patient authentication
   Example:
-   ```
-   https://play.google.com/store/apps/details?id=org.thecommonsproject.android.phr.dev&referrer=cloud_sharing=jhe.yourdomain.com|LhS05iR1rOnpS4JWfP6GeVUIhaRcRh
-   ```
+  ```
+  https://play.google.com/store/apps/details?id=org.thecommonsproject.android.phr.dev&referrer=cloud_sharing=jhe.yourdomain.com|LhS05iR1rOnpS4JWfP6GeVUIhaRcRh
+  ```
 
 #### Step 6: Enroll Patient in Study (Optional)
 
 To enroll the patient in a study:
 
 **Method A: During patient viewing**
+
 1. Select the study from the "Study" dropdown at the top of the Patients page
-2. Find your patient in the table
-3. Check the checkbox next to the patient
-4. Click **"Add Patient(s) to Study..."** button (blue button)
-5. Patient is enrolled in the selected study
+1. Find your patient in the table
+1. Check the checkbox next to the patient
+1. Click **"Add Patient(s) to Study..."** button (blue button)
+1. Patient is enrolled in the selected study
 
 **Method B: Bulk enrollment**
+
 1. Select multiple patients using checkboxes
-2. Click **"Add Patient(s) to Study..."** button
-3. Select the target study from the modal
-4. Click confirm
-5. All selected patients are enrolled
+1. Click **"Add Patient(s) to Study..."** button
+1. Select the target study from the modal
+1. Click confirm
+1. All selected patients are enrolled
 
 **Note**: Patient and study must be in the same organization.
 
@@ -200,12 +217,12 @@ To enroll the patient in a study:
 After completing the above steps, verify the patient is properly configured:
 
 1. Click the **"eye" icon** to view patient details
-2. Check that:
+1. Check that:
    - ✅ Patient belongs to correct organization(s)
    - ✅ Patient is enrolled in desired study (appears in "Studies Pending Response")
    - ✅ Invitation link has been generated and sent
-3. Patient should receive the invitation email (if email option was selected)
-4. Patient can now install the CommonHealth app and authenticate
+1. Patient should receive the invitation email (if email option was selected)
+1. Patient can now install the CommonHealth app and authenticate
 
 #### Console Tips
 
@@ -217,7 +234,6 @@ After completing the above steps, verify the patient is properly configured:
   - Pencil icon = Edit patient information
   - Trash icon = Delete patient from organization
 - **Keyboard shortcuts**: Press Enter in page input field to jump to that page
-
 
 ### Method 2: Using REST API
 
@@ -254,6 +270,7 @@ curl -X POST https://your-jhe-instance.com/api/v1/patients \
 ```
 
 **Fields**:
+
 - `telecomEmail` (required): Patient's email address (used for authentication)
 - `nameFamily` (required): Last name
 - `nameGiven` (required): First name
@@ -262,6 +279,7 @@ curl -X POST https://your-jhe-instance.com/api/v1/patients \
 - `organizationId` (required): Your organization ID
 
 Response:
+
 ```json
 {
   "id": 10001,
@@ -290,6 +308,7 @@ curl https://your-jhe-instance.com/api/v1/patients/10001/invitation_link \
 ```
 
 Response:
+
 ```json
 {
   "invitationLink": "https://play.google.com/store/apps/details?id=org.thecommonsproject.android.phr.dev&referrer=cloud_sharing=jhe.yourdomain.com|LhS05iR1rOnpS4JWfP6GeVUIhaRcRh"
@@ -297,6 +316,7 @@ Response:
 ```
 
 **Link Components**:
+
 - App package ID: `org.thecommonsproject.android.phr.dev`
 - Exchange hostname: `jhe.yourdomain.com`
 - Authorization code: `LhS05iR1rOnpS4JWfP6GeVUIhaRcRh`
@@ -319,6 +339,7 @@ Reference: `jupyterhealth-exchange/core/views/patient.py`
 ##### Option 2: Manual Distribution
 
 Send the invitation link via:
+
 - Email
 - SMS
 - Patient portal
@@ -326,6 +347,7 @@ Send the invitation link via:
 - In-person instruction
 
 **Example email template**:
+
 ```
 Subject: Join [Study Name] - Connect Your Health Data
 
@@ -344,7 +366,7 @@ Thank you,
 [Your Organization Name]
 ```
 
----
+______________________________________________________________________
 
 ## Add Existing Patient to Organization
 
@@ -353,14 +375,14 @@ If a patient already exists in the Exchange but not in your organization, you ca
 ### Method 1: Using JupyterHealth Exchange Console
 
 1. Navigate to **Patients** tab
-2. Click **"Add Patient..."** button
-3. In the modal, enter the patient's email in the "Patient E-mail" field
-4. Click **"Lookup"** button
-5. If the patient exists in another organization:
+1. Click **"Add Patient..."** button
+1. In the modal, enter the patient's email in the "Patient E-mail" field
+1. Click **"Lookup"** button
+1. If the patient exists in another organization:
    - Patient details will appear
    - An alert shows: "This Patient already exists. Click the Update button below to add this Patient to the Organization"
-6. Click **"Update"** button
-7. Patient is added to your organization
+1. Click **"Update"** button
+1. Patient is added to your organization
 
 ### Method 2: Using REST API
 
@@ -372,6 +394,7 @@ curl "https://your-jhe-instance.com/api/v1/patients/global_lookup?email=john.smi
 ```
 
 Response:
+
 ```json
 [
   {
@@ -396,6 +419,7 @@ curl -X PATCH "https://your-jhe-instance.com/api/v1/patients/10001/global_add_or
 ```
 
 Response:
+
 ```json
 {
   "id": 10001,
@@ -407,7 +431,7 @@ Response:
 
 Reference: `jupyterhealth-exchange/core/views/patient.py`
 
----
+______________________________________________________________________
 
 ## Enroll Patient in Study
 
@@ -416,12 +440,12 @@ You can enroll patients in studies using either the Console or REST API.
 ### Method 1: Using JupyterHealth Exchange Console
 
 1. Navigate to **Patients** tab
-2. Select your **Organization** from the dropdown
-3. Select the **Study** from the dropdown (not "All Studies")
-4. Check the checkbox(es) next to the patient(s) you want to enroll
-5. Click **"Add Patient(s) to Study..."** button (blue button)
-6. Confirm the enrollment
-7. Patient(s) are enrolled in the selected study
+1. Select your **Organization** from the dropdown
+1. Select the **Study** from the dropdown (not "All Studies")
+1. Check the checkbox(es) next to the patient(s) you want to enroll
+1. Click **"Add Patient(s) to Study..."** button (blue button)
+1. Confirm the enrollment
+1. Patient(s) are enrolled in the selected study
 
 **Bulk enrollment**: You can select multiple patients and enroll them all at once.
 
@@ -437,6 +461,7 @@ curl "https://your-jhe-instance.com/api/v1/studies?organization_id=1" \
 ```
 
 Response:
+
 ```json
 {
   "results": [
@@ -479,7 +504,7 @@ curl "https://your-jhe-instance.com/api/v1/patients?organization_id=1&study_id=1
 
 Response should include the newly enrolled patient.
 
----
+______________________________________________________________________
 
 ## Manage Patient Consent
 
@@ -488,8 +513,8 @@ Patient consent can be viewed through the Console. To grant or revoke consent on
 ### Method 1: View Patient Consent Using JupyterHealth Exchange Console
 
 1. Navigate to **Patients** tab
-2. Find the patient and click the **"eye" icon** (View button)
-3. In the patient details modal, scroll down to view:
+1. Find the patient and click the **"eye" icon** (View button)
+1. In the patient details modal, scroll down to view:
    - **Studies Pending Response**: Studies awaiting patient's consent decision
      - Shows which data types (scopes) are pending
    - **Studies Responded To**: Studies with consent decisions
@@ -506,6 +531,7 @@ curl https://your-jhe-instance.com/api/v1/patients/10001/consents \
 ```
 
 Response:
+
 ```json
 {
   "patient": {
@@ -556,6 +582,7 @@ Response:
 ```
 
 **Key Fields**:
+
 - `consolidatedConsentedScopes`: All data types patient has consented to (across all studies)
 - `studiesPendingConsent`: Studies awaiting patient's consent decision
 - `studies`: Studies patient has consented to or declined
@@ -567,11 +594,13 @@ Reference: `jupyterhealth-exchange/core/views/patient.py`
 Practitioners with **member** or **manager** roles can grant consent on behalf of patients using the REST API.
 
 **Important Notes:**
+
 - Patients typically grant consent themselves via their mobile app
 - Practitioners should only grant consent with explicit patient authorization
 - This functionality is **not yet available in the Console UI** - must use REST API
 
 **Prerequisites:**
+
 - OAuth2 access token with practitioner authentication
 - Member or manager role in the patient's organization (viewer role cannot grant consent)
 - Patient must be enrolled in the study
@@ -599,6 +628,7 @@ Reference: `jupyterhealth-exchange/core/views/patient.py` and authorization chec
 Practitioners with **member** or **manager** roles can revoke consent on behalf of patients using the REST API.
 
 **Important Notes:**
+
 - Patients typically revoke consent themselves via their mobile app
 - Practitioners should only revoke consent with explicit patient authorization
 - This functionality is **not yet available in the Console UI** - must use REST API
@@ -623,7 +653,7 @@ curl -X POST https://your-jhe-instance.com/api/v1/patients/10001/consents \
 
 **Effect**: Patient's existing data remains in the Exchange, but no new data of this type will be collected from the patient's devices.
 
----
+______________________________________________________________________
 
 ## Update Patient Information
 
@@ -632,16 +662,16 @@ You can update patient demographics using either the Console or REST API.
 ### Method 1: Using JupyterHealth Exchange Console
 
 1. Navigate to **Patients** tab
-2. Find the patient in the table
-3. Click the **"pencil" icon** (Edit/Update button)
-4. In the modal, update the demographic fields:
+1. Find the patient in the table
+1. Click the **"pencil" icon** (Edit/Update button)
+1. In the modal, update the demographic fields:
    - External Identifier
    - Family Name
    - Given Name
    - DOB
    - Cell phone
-5. Click **"Update"** button
-6. Patient information is updated
+1. Click **"Update"** button
+1. Patient information is updated
 
 **Note**: Email address is read-only in the Console and cannot be changed through the UI. Changing email requires REST API access.
 
@@ -658,6 +688,7 @@ curl -X PATCH https://your-jhe-instance.com/api/v1/patients/10001 \
 ```
 
 **Updatable Fields**:
+
 - `nameFamily`
 - `nameGiven`
 - `birthDate`
@@ -667,7 +698,7 @@ curl -X PATCH https://your-jhe-instance.com/api/v1/patients/10001 \
 
 **Note**: Email address is used for authentication. Changing it requires patient to re-authenticate.
 
----
+______________________________________________________________________
 
 ## Remove Patient from Study
 
@@ -676,12 +707,12 @@ You can remove patients from studies using either the Console or REST API.
 ### Method 1: Using JupyterHealth Exchange Console
 
 1. Navigate to **Patients** tab
-2. Select the **Organization** from the dropdown
-3. Select the **Study** from the dropdown (the study you want to remove patients from)
-4. Check the checkbox(es) next to the patient(s) you want to remove
-5. Click **"Remove Patient(s) from Study"** button (orange/warning button)
-6. Confirm the removal
-7. Patient(s) are removed from the study
+1. Select the **Organization** from the dropdown
+1. Select the **Study** from the dropdown (the study you want to remove patients from)
+1. Check the checkbox(es) next to the patient(s) you want to remove
+1. Click **"Remove Patient(s) from Study"** button (orange/warning button)
+1. Confirm the removal
+1. Patient(s) are removed from the study
 
 **Bulk removal**: You can select multiple patients and remove them all at once.
 
@@ -697,13 +728,14 @@ curl -X DELETE https://your-jhe-instance.com/api/v1/studies/10001/patients \
 ```
 
 **Effect**:
+
 - Removes patient from study
 - Deletes consent records for this study
 - Existing observation data remains (not deleted)
 
 Reference: `jupyterhealth-exchange/core/views/study.py`
 
----
+______________________________________________________________________
 
 ## Remove Patient from Organization
 
@@ -712,15 +744,16 @@ You can remove patients from organizations using either the Console or REST API.
 ### Method 1: Using JupyterHealth Exchange Console
 
 1. Navigate to **Patients** tab
-2. Select the **Organization** from the dropdown
-3. Ensure "All Studies" is selected (to see all patients in organization)
-4. Find the patient in the table
-5. Click the **"trash" icon** (Delete button)
-6. A confirmation modal appears: "Are you sure you want to delete this entire record?"
-7. Click **"Delete"** button to confirm
-8. Patient is removed from the selected organization
+1. Select the **Organization** from the dropdown
+1. Ensure "All Studies" is selected (to see all patients in organization)
+1. Find the patient in the table
+1. Click the **"trash" icon** (Delete button)
+1. A confirmation modal appears: "Are you sure you want to delete this entire record?"
+1. Click **"Delete"** button to confirm
+1. Patient is removed from the selected organization
 
 **Warning**:
+
 - This removes the patient from the selected organization
 - Patient is also removed from all studies in that organization
 - If the patient has no other organizations, this will delete all observations and the patient record entirely
@@ -733,6 +766,7 @@ curl -X DELETE "https://your-jhe-instance.com/api/v1/patients/10001?organization
 ```
 
 **Effect**:
+
 - Removes patient from organization
 - Removes from all studies in that organization
 - Deletes all consent records for organization's studies
@@ -740,7 +774,7 @@ curl -X DELETE "https://your-jhe-instance.com/api/v1/patients/10001?organization
 
 Reference: `jupyterhealth-exchange/core/views/patient.py`
 
----
+______________________________________________________________________
 
 ## View Patient's Data
 
@@ -749,23 +783,24 @@ You can view patient data using either the Console or REST API.
 ### Method 1: Using JupyterHealth Exchange Console
 
 1. Navigate to **Observations** tab in the Console
-2. Select the **Organization** from the dropdown
-3. Select the **Study** from the dropdown (optional)
-4. Use filters to narrow the data:
+1. Select the **Organization** from the dropdown
+1. Select the **Study** from the dropdown (optional)
+1. Use filters to narrow the data:
    - **Patient**: Select specific patient or view all
    - **Data Type**: Filter by codeable concept (e.g., blood-glucose, steps)
    - **Date Range**: Filter by time period
-5. The observations table displays:
+1. The observations table displays:
    - Observation ID
    - Patient name
    - Data type (codeable concept)
    - Data source (device/wearable)
    - Status
    - Created date/time
-6. Click on an observation row to view full details including OMH data payload
-7. Use pagination controls to navigate large datasets
+1. Click on an observation row to view full details including OMH data payload
+1. Use pagination controls to navigate large datasets
 
 **Tips**:
+
 - Export data via REST API for analysis (see below)
 - Use date filters to focus on specific time periods
 - Filter by data source to see data from specific devices
@@ -780,6 +815,7 @@ curl "https://your-jhe-instance.com/api/v1/observations?organization_id=1&study_
 ```
 
 Response:
+
 ```json
 {
   "count": 250,
@@ -813,7 +849,8 @@ Returns FHIR Bundle with all authorized observations for the patient.
 
 Reference: See "[Fetching and Exporting Data](fetching-exporting-data.md)" guide for details.
 
----
+______________________________________________________________________
+
 ## Bulk Patient Import
 
 For importing multiple patients at once, use the REST API with a script:
@@ -826,12 +863,13 @@ BASE_URL = "https://your-jhe-instance.com"
 ACCESS_TOKEN = "your-access-token"
 ORGANIZATION_ID = 1
 
+
 def create_patient(email, family_name, given_name, birth_date, phone=None):
     response = requests.post(
         f"{BASE_URL}/api/v1/patients",
         headers={
             "Authorization": f"Bearer {ACCESS_TOKEN}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         },
         json={
             "telecomEmail": email,
@@ -839,8 +877,8 @@ def create_patient(email, family_name, given_name, birth_date, phone=None):
             "nameGiven": given_name,
             "birthDate": birth_date,
             "telecomPhone": phone,
-            "organizationId": ORGANIZATION_ID
-        }
+            "organizationId": ORGANIZATION_ID,
+        },
     )
 
     if response.status_code == 201:
@@ -851,10 +889,11 @@ def create_patient(email, family_name, given_name, birth_date, phone=None):
         print(f"Error creating {given_name} {family_name}: {response.text}")
         return None
 
+
 def generate_invitation(patient_id):
     response = requests.get(
         f"{BASE_URL}/api/v1/patients/{patient_id}/invitation_link?send_email=true",
-        headers={"Authorization": f"Bearer {ACCESS_TOKEN}"}
+        headers={"Authorization": f"Bearer {ACCESS_TOKEN}"},
     )
 
     if response.status_code == 200:
@@ -863,31 +902,35 @@ def generate_invitation(patient_id):
     else:
         print(f"  Error generating invitation: {response.text}")
 
+
 # Read from CSV
-with open('patients.csv', 'r') as f:
+with open("patients.csv", "r") as f:
     reader = csv.DictReader(f)
     for row in reader:
         patient = create_patient(
-            email=row['email'],
-            family_name=row['last_name'],
-            given_name=row['first_name'],
-            birth_date=row['dob'],
-            phone=row.get('phone')
+            email=row["email"],
+            family_name=row["last_name"],
+            given_name=row["first_name"],
+            birth_date=row["dob"],
+            phone=row.get("phone"),
         )
 
         if patient:
-            generate_invitation(patient['id'])
+            generate_invitation(patient["id"])
 
 print("Bulk import complete!")
 ```
 
 **CSV Format** (`patients.csv`):
+
 ```csv
 email,last_name,first_name,dob,phone
 john.smith@example.com,Smith,John,1980-01-01,555-1234
 jane.doe@example.com,Doe,Jane,1975-05-15,555-5678
 ```
----
+
+______________________________________________________________________
+
 ## Common Issues
 
 ### Patient Already Exists
@@ -935,16 +978,21 @@ Reference: `jupyterhealth-exchange/core/views/study.py`
 **Issue**: Patient clicks link but app doesn't open or connection fails.
 
 **Common Causes**:
+
 1. **Link expired**: Authorization codes expire after 2 weeks
+
    - Solution: Generate new invitation link
 
-2. **Wrong app package**: Link targets wrong environment (dev vs prod)
+1. **Wrong app package**: Link targets wrong environment (dev vs prod)
+
    - Solution: Verify `CH_INVITATION_LINK_PREFIX` in `.env`
 
-3. **App not installed**: Patient doesn't have CommonHealth app
+1. **App not installed**: Patient doesn't have CommonHealth app
+
    - Solution: Link should redirect to app store first
 
-4. **Network issue**: Can't reach Exchange server
+1. **Network issue**: Can't reach Exchange server
+
    - Solution: Verify Exchange URL is accessible
 
 Reference: `jupyterhealth-exchange/jhe/settings.py` and `jupyterhealth-exchange/core/models.py`
@@ -966,38 +1014,40 @@ Your role must be `manager` or `member`, not `viewer`.
 
 Reference: `jupyterhealth-exchange/core/permissions.py` and view permission check at `jupyterhealth-exchange/core/views/patient.py`
 
----
+______________________________________________________________________
+
 ## Best Practices
 
 ### Patient Onboarding
 
 1. **Verify information**: Double-check email address and demographics before creating patient
-2. **Immediate invitation**: Generate and send invitation link right after creating patient
-3. **Follow-up**: Contact patients who don't connect within 48 hours
-4. **Test first**: Create a test patient account to verify the onboarding flow
+1. **Immediate invitation**: Generate and send invitation link right after creating patient
+1. **Follow-up**: Contact patients who don't connect within 48 hours
+1. **Test first**: Create a test patient account to verify the onboarding flow
 
 ### Consent Management
 
 1. **Clear communication**: Explain what data will be collected and why
-2. **Study-specific consent**: Patients consent per study, not globally
-3. **Allow withdrawal**: Make it easy for patients to revoke consent
-4. **Document consent**: Keep records of when patients consented
+1. **Study-specific consent**: Patients consent per study, not globally
+1. **Allow withdrawal**: Make it easy for patients to revoke consent
+1. **Document consent**: Keep records of when patients consented
 
 ### Data Privacy
 
 1. **Minimum necessary**: Only collect data types required for your study
-2. **Role-based access**: Ensure only authorized practitioners can view patient data
-3. **Audit access**: Regularly review who has accessed patient records
-4. **De-identify for analysis**: Use de-identified datasets when possible
+1. **Role-based access**: Ensure only authorized practitioners can view patient data
+1. **Audit access**: Regularly review who has accessed patient records
+1. **De-identify for analysis**: Use de-identified datasets when possible
 
 ### Communication
 
 1. **Multi-channel**: Provide invitation links via multiple channels (email, SMS, portal)
-2. **Technical support**: Have a help desk for patients with connection issues
-3. **Status updates**: Regularly check which patients are actively uploading data
-4. **Engagement**: Reach out to patients who stop uploading data
+1. **Technical support**: Have a help desk for patients with connection issues
+1. **Status updates**: Regularly check which patients are actively uploading data
+1. **Engagement**: Reach out to patients who stop uploading data
 
----
+______________________________________________________________________
+
 ## Example: Complete Patient Onboarding via REST API
 
 ```bash
@@ -1045,13 +1095,14 @@ curl "$BASE_URL/api/v1/patients/$PATIENT_ID/consents" \
 echo "Patient onboarding complete!"
 ```
 
----
+______________________________________________________________________
 
 ## Choosing Between JupyterHealth Exchange Console and REST API
 
 ### When to Use JupyterHealth Exchange Console
 
 ✅ **Best for:**
+
 - Adding individual patients interactively
 - Practitioners who prefer web-based interfaces
 - Viewing and managing patient data visually
@@ -1062,6 +1113,7 @@ echo "Patient onboarding complete!"
 - Day-to-day patient management tasks
 
 ❌ **Not ideal for:**
+
 - Bulk patient imports (>20 patients)
 - Automated workflows
 - Integration with external systems (EHR, etc.)
@@ -1069,6 +1121,7 @@ echo "Patient onboarding complete!"
 - Building custom applications
 
 **Key Features:**
+
 - Full patient lifecycle management (create, view, update, delete)
 - One-click invitation link generation with email
 - Visual consent status tracking
@@ -1080,6 +1133,7 @@ echo "Patient onboarding complete!"
 ### When to Use REST API
 
 ✅ **Best for:**
+
 - Bulk patient imports from CSV or database
 - Automated patient enrollment workflows
 - Integration with EHR systems or other applications
@@ -1090,12 +1144,14 @@ echo "Patient onboarding complete!"
 - Continuous integration/deployment pipelines
 
 ❌ **Not ideal for:**
+
 - One-off patient additions
 - Users unfamiliar with APIs or command line
 - Quick interactive patient management
 - Exploratory data viewing
 
 **Key Features:**
+
 - Batch operations (create 100s of patients at once)
 - Scriptable workflows (Python, JavaScript, shell)
 - Webhook integration
@@ -1110,29 +1166,34 @@ Most organizations use both methods for different purposes:
 **Typical Workflow:**
 
 1. **Initial Setup** (Console):
+
    - Create organizations via web portal
    - Create studies with scope requests
    - Configure data sources
    - Add initial test patients
 
-2. **Bulk Import** (REST API):
+1. **Bulk Import** (REST API):
+
    - Import existing patients from EHR system
    - Enroll patients in studies programmatically
    - Generate and send invitation links in batch
 
-3. **Daily Operations** (Console):
+1. **Daily Operations** (Console):
+
    - Add new patients one-by-one as they enroll
    - View consent status and follow up with patients
    - Monitor data collection in real-time
    - Generate invitation links for individual patients
    - Troubleshoot patient issues
 
-4. **Analysis and Reporting** (REST API):
+1. **Analysis and Reporting** (REST API):
+
    - Export observation data for analysis
    - Generate reports via scripts
    - Integrate with data warehouses
    - Automated quality checks
----
+
+______________________________________________________________________
 
 ## Related Documentation
 

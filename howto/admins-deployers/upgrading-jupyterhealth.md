@@ -3,31 +3,37 @@
 This guide shows you how to upgrade JupyterHealth Exchange to a newer version safely.
 
 ### Preparation
+
 - [Prerequisites](#prerequisites)
 - [Pre-Upgrade Checklist](#pre-upgrade-checklist)
 - [Backup Production Data](#backup-production-data)
 
 ### Upgrade Process
+
 - [Stop Production Services](#stop-production-services)
 - [Update Application Code](#update-application-code)
 - [Run Database Migrations](#run-database-migrations)
 - [Update Static Files](#update-static-files)
 
 ### Restart and Verify
+
 - [Restart Services](#restart-services)
 - [Post-Upgrade Verification](#post-upgrade-verification)
 
 ### Recovery and Special Cases
+
 - [Rollback Procedure (If Needed)](#rollback-procedure-if-needed)
 - [Upgrade Specific Components](#upgrade-specific-components)
 
 ### Best Practices
+
 - [Best Practices](#best-practices)
 
 ### Reference
+
 - [Related Documentation](#related-documentation)
 
----
+______________________________________________________________________
 
 ## Prerequisites
 
@@ -65,6 +71,7 @@ grep "django" Pipfile
 ```
 
 Current requirements:
+
 - Python: 3.10, 3.11, 3.12, or 3.13
 - Django: 5.2
 - PostgreSQL: 13+
@@ -432,6 +439,7 @@ curl -I https://jhe.yourdomain.com/admin/
 ### 1. Smoke Test Critical Paths
 
 #### Test Admin Login
+
 ```bash
 # Navigate to admin panel
 https://jhe.yourdomain.com/admin/
@@ -441,6 +449,7 @@ https://jhe.yourdomain.com/admin/
 ```
 
 #### Test Patient Authentication
+
 ```bash
 # Generate test invitation link
 curl https://jhe.yourdomain.com/api/v1/patients/10001/invitation_link \
@@ -450,6 +459,7 @@ curl https://jhe.yourdomain.com/api/v1/patients/10001/invitation_link \
 ```
 
 #### Test Observation Upload
+
 ```bash
 # Upload test observation
 curl -X POST https://jhe.yourdomain.com/fhir/r5/Observation \
@@ -463,6 +473,7 @@ curl -X POST https://jhe.yourdomain.com/fhir/r5/Observation \
 Reference: `jupyterhealth-exchange/core/views/observation.py`
 
 #### Test Observation Retrieval
+
 ```bash
 # Retrieve observations
 curl "https://jhe.yourdomain.com/fhir/r5/Observation?patient=10001" \

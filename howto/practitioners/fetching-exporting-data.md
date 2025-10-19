@@ -3,32 +3,38 @@
 This guide shows you how to programmatically fetch, export, and analyze patient health data from JupyterHealth Exchange.
 
 ### Introduction
+
 - [Prerequisites](#prerequisites)
 - [Understanding Data Access](#understanding-data-access)
 
 ### Viewing Data (Quick Reference)
+
 - [Viewing Data (Quick Reference)](#viewing-data-quick-reference)
 
 ### Fetching Data Programmatically
+
 - [Fetch via Admin REST API](#fetch-via-admin-rest-api)
 - [Fetch via FHIR API](#fetch-via-fhir-api)
 - [Pagination Strategies](#pagination-strategies)
 
 ### Exporting Data for Analysis
+
 - [Export to CSV](#export-to-csv)
 - [Export to Pandas DataFrame](#export-to-pandas-dataframe)
 - [Export All Patients in Study](#export-all-patients-in-study)
 
 ### Advanced Topics
+
 - [Real-Time Data Monitoring](#real-time-data-monitoring)
 - [Data Quality Checks](#data-quality-checks)
 - [Common Issues](#common-issues)
 - [Best Practices](#best-practices)
 
 ### Reference
+
 - [Related Documentation](#related-documentation)
 
----
+______________________________________________________________________
 
 ## Introduction
 
@@ -44,15 +50,17 @@ This guide shows you how to programmatically fetch, export, and analyze patient 
 #### Authorization Model
 
 You can only access patient data if:
+
 1. You're authorized for the patient's organization
-2. Patient is enrolled in a study you manage
-3. Patient has consented to share the requested data types
+1. Patient is enrolled in a study you manage
+1. Patient has consented to share the requested data types
 
 Reference: `jupyterhealth-exchange/core/models.py`
 
 #### Data Formats
 
 JupyterHealth Exchange stores observations in:
+
 - **Open mHealth (OMH)** format: JSON data conforming to OMH schemas
 - **FHIR** wrapper: Observations wrapped in FHIR resources for interoperability
 
@@ -60,17 +68,18 @@ The OMH data is base64-encoded inside the FHIR `valueAttachment.data` field.
 
 Reference: `jupyterhealth-exchange/core/models.py`
 
----
+______________________________________________________________________
 
 ## Viewing Data (Quick Reference)
 
 For basic viewing of patient observations, see:
+
 - **[View Patient's Data](patient-management.md#view-patients-data)**: View observations in Console or via REST API
 - **[Monitor Study Progress](study-management.md#monitor-study-progress)**: View study-wide data collection
 
 This guide focuses on programmatic data fetching, export, and analysis workflows.
 
----
+______________________________________________________________________
 
 ## Fetch via Admin REST API
 
@@ -84,6 +93,7 @@ curl "https://your-jhe-instance.com/api/v1/observations?organization_id=1&study_
 ```
 
 **Query Parameters**:
+
 - `organization_id` (required): Your organization ID
 - `study_id` (required): Study ID
 - `patient_id` (required): Patient ID
@@ -91,6 +101,7 @@ curl "https://your-jhe-instance.com/api/v1/observations?organization_id=1&study_
 - `offset` (optional): Pagination offset
 
 Response:
+
 ```json
 {
   "count": 250,
@@ -139,7 +150,7 @@ Response:
 
 Reference: `jupyterhealth-exchange/core/views/observation.py`
 
----
+______________________________________________________________________
 
 ## Fetch via FHIR API
 
@@ -153,6 +164,7 @@ curl "https://your-jhe-instance.com/fhir/Observation?patient._has:Group:member:_
 ```
 
 **Query Parameters**:
+
 - `patient._has:Group:member:_id`: Study ID (required)
 - `patient`: Patient ID (required if study has multiple patients)
 - `patient.identifier`: Alternative to patient ID (format: `system|value`)
@@ -163,6 +175,7 @@ curl "https://your-jhe-instance.com/fhir/Observation?patient._has:Group:member:_
 Reference: `jupyterhealth-exchange/core/views/observation.py`
 
 Response (FHIR Bundle):
+
 ```json
 {
   "resourceType": "Bundle",
@@ -213,17 +226,19 @@ The `valueAttachment.data` field contains base64-encoded OMH JSON:
 import base64
 import json
 
+
 def decode_omh_data(fhir_observation):
     """Extract and decode OMH data from FHIR observation"""
-    encoded_data = fhir_observation['valueAttachment']['data']
+    encoded_data = fhir_observation["valueAttachment"]["data"]
 
     # Decode base64
     decoded_bytes = base64.b64decode(encoded_data)
 
     # Parse JSON
-    omh_data = json.loads(decoded_bytes.decode('utf-8'))
+    omh_data = json.loads(decoded_bytes.decode("utf-8"))
 
     return omh_data
+
 
 # Example
 omh_data = decode_omh_data(observation)
@@ -233,28 +248,20 @@ print(f"Value: {omh_data['body']}")
 ```
 
 Output:
+
 ```python
 {
-  "header": {
-    "uuid": "550e8400-e29b-41d4-a716-446655440000",
-    "schema_id": {
-      "namespace": "omh",
-      "name": "blood-glucose",
-      "version": "4.0"
+    "header": {
+        "uuid": "550e8400-e29b-41d4-a716-446655440000",
+        "schema_id": {"namespace": "omh", "name": "blood-glucose", "version": "4.0"},
+        "creation_date_time": "2024-10-25T21:13:31.438Z",
+        "source_creation_date_time": "2024-05-02T08:30:00-07:00",
     },
-    "creation_date_time": "2024-10-25T21:13:31.438Z",
-    "source_creation_date_time": "2024-05-02T08:30:00-07:00"
-  },
-  "body": {
-    "effective_time_frame": {
-      "date_time": "2024-05-02T08:30:00-07:00"
+    "body": {
+        "effective_time_frame": {"date_time": "2024-05-02T08:30:00-07:00"},
+        "blood_glucose": {"value": 105, "unit": "mg/dL"},
+        "temporal_relationship_to_meal": "fasting",
     },
-    "blood_glucose": {
-      "value": 105,
-      "unit": "mg/dL"
-    },
-    "temporal_relationship_to_meal": "fasting"
-  }
 }
 ```
 
@@ -287,7 +294,7 @@ curl "https://your-jhe-instance.com/fhir/Observation?patient._has:Group:member:_
 
 Reference: `jupyterhealth-exchange/core/views/observation.py`
 
----
+______________________________________________________________________
 
 ## Pagination Strategies
 
@@ -303,6 +310,7 @@ import requests
 BASE_URL = "https://your-jhe-instance.com"
 ACCESS_TOKEN = "your-access-token"
 
+
 def fetch_all_observations(org_id, study_id, patient_id):
     """Fetch all observations using pagination"""
     all_observations = []
@@ -311,34 +319,31 @@ def fetch_all_observations(org_id, study_id, patient_id):
         "organization_id": org_id,
         "study_id": study_id,
         "patient_id": patient_id,
-        "limit": 100
+        "limit": 100,
     }
 
     while url:
         response = requests.get(
             url,
             headers={"Authorization": f"Bearer {ACCESS_TOKEN}"},
-            params=params if params else None
+            params=params if params else None,
         )
         response.raise_for_status()
 
         data = response.json()
-        all_observations.extend(data['results'])
+        all_observations.extend(data["results"])
 
         # Get next page
-        url = data.get('next')
+        url = data.get("next")
         params = None  # Next URL has params embedded
 
         print(f"Fetched {len(all_observations)} / {data['count']} observations")
 
     return all_observations
 
+
 # Usage
-observations = fetch_all_observations(
-    org_id=1,
-    study_id=10001,
-    patient_id=10001
-)
+observations = fetch_all_observations(org_id=1, study_id=10001, patient_id=10001)
 
 print(f"Total observations: {len(observations)}")
 ```
@@ -352,28 +357,25 @@ def fetch_all_fhir_observations(study_id, patient_id):
     """Fetch all FHIR observations using pagination"""
     all_entries = []
     url = f"{BASE_URL}/fhir/Observation"
-    params = {
-        "patient._has:Group:member:_id": study_id,
-        "patient": patient_id
-    }
+    params = {"patient._has:Group:member:_id": study_id, "patient": patient_id}
 
     while url:
         response = requests.get(
             url,
             headers={"Authorization": f"Bearer {ACCESS_TOKEN}"},
-            params=params if params else None
+            params=params if params else None,
         )
         response.raise_for_status()
 
         bundle = response.json()
-        all_entries.extend(bundle.get('entry', []))
+        all_entries.extend(bundle.get("entry", []))
 
         # Find next link
         next_link = next(
-            (link for link in bundle.get('link', []) if link.get('relation') == 'next'),
-            None
+            (link for link in bundle.get("link", []) if link.get("relation") == "next"),
+            None,
         )
-        url = next_link['url'] if next_link else None
+        url = next_link["url"] if next_link else None
         params = None  # Next URL has params embedded
 
         print(f"Fetched {len(all_entries)} / {bundle.get('total', 0)} entries")
@@ -383,7 +385,7 @@ def fetch_all_fhir_observations(study_id, patient_id):
 
 **Note**: To fetch the list of patients in a study, see [Patient Management](patient-management.md#enroll-patient-in-study).
 
----
+______________________________________________________________________
 
 ## Export Data for Analysis
 
@@ -399,6 +401,7 @@ from datetime import datetime
 BASE_URL = "https://your-jhe-instance.com"
 ACCESS_TOKEN = "your-access-token"
 
+
 def fetch_observations(org_id, study_id, patient_id):
     """Fetch all observations for a patient"""
     all_obs = []
@@ -407,68 +410,70 @@ def fetch_observations(org_id, study_id, patient_id):
         "organization_id": org_id,
         "study_id": study_id,
         "patient_id": patient_id,
-        "limit": 100
+        "limit": 100,
     }
 
     while url:
         response = requests.get(
             url,
             headers={"Authorization": f"Bearer {ACCESS_TOKEN}"},
-            params=params if params else None
+            params=params if params else None,
         )
         response.raise_for_status()
 
         data = response.json()
-        all_obs.extend(data['results'])
-        url = data.get('next')
+        all_obs.extend(data["results"])
+        url = data.get("next")
         params = None
 
     return all_obs
 
+
 def export_blood_glucose_to_csv(observations, output_file):
     """Export blood glucose observations to CSV"""
-    with open(output_file, 'w', newline='') as f:
+    with open(output_file, "w", newline="") as f:
         writer = csv.writer(f)
 
         # Header
-        writer.writerow([
-            'Observation ID',
-            'Patient Name',
-            'Date/Time',
-            'Glucose (mg/dL)',
-            'Meal Context',
-            'Data Source',
-            'Created'
-        ])
+        writer.writerow(
+            [
+                "Observation ID",
+                "Patient Name",
+                "Date/Time",
+                "Glucose (mg/dL)",
+                "Meal Context",
+                "Data Source",
+                "Created",
+            ]
+        )
 
         # Data
         for obs in observations:
-            if obs['codingCode'] != 'omh:blood-glucose:4.0':
+            if obs["codingCode"] != "omh:blood-glucose:4.0":
                 continue
 
-            omh_data = obs['valueAttachmentData']
-            body = omh_data['body']
+            omh_data = obs["valueAttachmentData"]
+            body = omh_data["body"]
 
-            writer.writerow([
-                obs['id'],
-                obs['patientNameDisplay'],
-                body['effective_time_frame']['date_time'],
-                body['blood_glucose']['value'],
-                body.get('temporal_relationship_to_meal', 'N/A'),
-                obs['dataSourceName'],
-                obs['created']
-            ])
+            writer.writerow(
+                [
+                    obs["id"],
+                    obs["patientNameDisplay"],
+                    body["effective_time_frame"]["date_time"],
+                    body["blood_glucose"]["value"],
+                    body.get("temporal_relationship_to_meal", "N/A"),
+                    obs["dataSourceName"],
+                    obs["created"],
+                ]
+            )
 
     print(f"Exported to {output_file}")
 
-# Usage
-observations = fetch_observations(
-    org_id=1,
-    study_id=10001,
-    patient_id=10001
-)
 
-export_blood_glucose_to_csv(observations, 'blood_glucose.csv')
+# Usage
+observations = fetch_observations(org_id=1, study_id=10001, patient_id=10001)
+
+export_blood_glucose_to_csv(observations, "blood_glucose.csv")
 ```
 
 ### Export to Pandas DataFrame
@@ -477,6 +482,7 @@ export_blood_glucose_to_csv(observations, 'blood_glucose.csv')
 import pandas as pd
 import requests
 
+
 def fetch_to_dataframe(org_id, study_id, patient_id, data_type):
     """Fetch observations and convert to pandas DataFrame"""
 
@@ -484,56 +490,57 @@ def fetch_to_dataframe(org_id, study_id, patient_id, data_type):
     observations = fetch_observations(org_id, study_id, patient_id)
 
     # Filter by data type
-    filtered = [obs for obs in observations if obs['codingCode'] == data_type]
+    filtered = [obs for obs in observations if obs["codingCode"] == data_type]
 
     # Convert to DataFrame
     rows = []
     for obs in filtered:
-        omh_data = obs['valueAttachmentData']
-        body = omh_data['body']
+        omh_data = obs["valueAttachmentData"]
+        body = omh_data["body"]
 
         row = {
-            'observation_id': obs['id'],
-            'patient_id': obs['subjectPatient'],
-            'patient_name': obs['patientNameDisplay'],
-            'timestamp': body['effective_time_frame']['date_time'],
-            'data_source': obs['dataSourceName'],
-            'created': obs['created']
+            "observation_id": obs["id"],
+            "patient_id": obs["subjectPatient"],
+            "patient_name": obs["patientNameDisplay"],
+            "timestamp": body["effective_time_frame"]["date_time"],
+            "data_source": obs["dataSourceName"],
+            "created": obs["created"],
         }
 
         # Add data-type-specific fields
-        if data_type == 'omh:blood-glucose:4.0':
-            row['glucose_mg_dl'] = body['blood_glucose']['value']
-            row['meal_context'] = body.get('temporal_relationship_to_meal')
+        if data_type == "omh:blood-glucose:4.0":
+            row["glucose_mg_dl"] = body["blood_glucose"]["value"]
+            row["meal_context"] = body.get("temporal_relationship_to_meal")
 
-        elif data_type == 'omh:blood-pressure:4.0':
-            row['systolic_mmhg'] = body['systolic_blood_pressure']['value']
-            row['diastolic_mmhg'] = body['diastolic_blood_pressure']['value']
+        elif data_type == "omh:blood-pressure:4.0":
+            row["systolic_mmhg"] = body["systolic_blood_pressure"]["value"]
+            row["diastolic_mmhg"] = body["diastolic_blood_pressure"]["value"]
 
-        elif data_type == 'omh:heart-rate:2.0':
-            row['heart_rate_bpm'] = body['heart_rate']['value']
+        elif data_type == "omh:heart-rate:2.0":
+            row["heart_rate_bpm"] = body["heart_rate"]["value"]
 
         rows.append(row)
 
     df = pd.DataFrame(rows)
 
     # Convert timestamps
-    df['timestamp'] = pd.to_datetime(df['timestamp'])
-    df['created'] = pd.to_datetime(df['created'])
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
+    df["created"] = pd.to_datetime(df["created"])
 
     return df
 
+
 # Usage
-df_glucose = fetch_to_dataframe(1, 10001, 10001, 'omh:blood-glucose:4.0')
-df_bp = fetch_to_dataframe(1, 10001, 10001, 'omh:blood-pressure:4.0')
+df_glucose = fetch_to_dataframe(1, 10001, 10001, "omh:blood-glucose:4.0")
+df_bp = fetch_to_dataframe(1, 10001, 10001, "omh:blood-pressure:4.0")
 
 # Analyze
 print(f"Mean glucose: {df_glucose['glucose_mg_dl'].mean():.1f} mg/dL")
 print(f"Mean systolic BP: {df_bp['systolic_mmhg'].mean():.1f} mmHg")
 
 # Save
-df_glucose.to_csv('glucose_data.csv', index=False)
-df_bp.to_csv('bp_data.csv', index=False)
+df_glucose.to_csv("glucose_data.csv", index=False)
+df_bp.to_csv("bp_data.csv", index=False)
 ```
 
 ### Export All Patients in Study
@@ -542,6 +549,7 @@ df_bp.to_csv('bp_data.csv', index=False)
 import requests
 import pandas as pd
 
+
 def export_study_data(org_id, study_id, data_type):
     """Export data for all patients in a study"""
 
@@ -549,16 +557,16 @@ def export_study_data(org_id, study_id, data_type):
     response = requests.get(
         f"{BASE_URL}/api/v1/patients",
         headers={"Authorization": f"Bearer {ACCESS_TOKEN}"},
-        params={"organization_id": org_id, "study_id": study_id}
+        params={"organization_id": org_id, "study_id": study_id},
     )
-    patients = response.json()['results']
+    patients = response.json()["results"]
 
     # Fetch data for each patient
     all_data = []
     for patient in patients:
         print(f"Fetching data for {patient['nameGiven']} {patient['nameFamily']}...")
 
-        df = fetch_to_dataframe(org_id, study_id, patient['id'], data_type)
+        df = fetch_to_dataframe(org_id, study_id, patient["id"], data_type)
         all_data.append(df)
 
     # Combine
@@ -566,14 +574,17 @@ def export_study_data(org_id, study_id, data_type):
 
     return combined_df
 
-# Usage
-study_df = export_study_data(1, 10001, 'omh:blood-glucose:4.0')
-study_df.to_csv('study_blood_glucose.csv', index=False)
 
-print(f"Exported {len(study_df)} observations from {study_df['patient_id'].nunique()} patients")
+# Usage
+study_df = export_study_data(1, 10001, "omh:blood-glucose:4.0")
+study_df.to_csv("study_blood_glucose.csv", index=False)
+
+print(
+    f"Exported {len(study_df)} observations from {study_df['patient_id'].nunique()} patients"
+)
 ```
 
----
+______________________________________________________________________
 
 ## Real-Time Data Monitoring
 
@@ -582,6 +593,7 @@ print(f"Exported {len(study_df)} observations from {study_df['patient_id'].nuniq
 ```python
 import time
 from datetime import datetime, timedelta
+
 
 def monitor_new_observations(org_id, study_id, patient_id, poll_interval=60):
     """Poll for new observations every poll_interval seconds"""
@@ -595,8 +607,10 @@ def monitor_new_observations(org_id, study_id, patient_id, poll_interval=60):
         observations = fetch_observations(org_id, study_id, patient_id)
 
         new_obs = [
-            obs for obs in observations
-            if datetime.fromisoformat(obs['created'].replace('Z', '+00:00')) > last_check
+            obs
+            for obs in observations
+            if datetime.fromisoformat(obs["created"].replace("Z", "+00:00"))
+            > last_check
         ]
 
         if new_obs:
@@ -609,12 +623,13 @@ def monitor_new_observations(org_id, study_id, patient_id, poll_interval=60):
         # Wait
         time.sleep(poll_interval)
 
+
 # Usage
 monitor_new_observations(
     org_id=1,
     study_id=10001,
     patient_id=10001,
-    poll_interval=60  # Check every 60 seconds
+    poll_interval=60,  # Check every 60 seconds
 )
 ```
 
@@ -623,12 +638,12 @@ monitor_new_observations(
 For production systems, implement webhooks instead of polling:
 
 1. Configure webhook endpoint on your server
-2. Exchange POSTs to your endpoint when new data arrives
-3. Process data immediately without polling overhead
+1. Exchange POSTs to your endpoint when new data arrives
+1. Process data immediately without polling overhead
 
 *Note: Webhook support depends on Exchange configuration.*
 
----
+______________________________________________________________________
 
 ## Data Quality Checks
 
@@ -642,22 +657,22 @@ def check_data_completeness(org_id, study_id, expected_data_types):
     response = requests.get(
         f"{BASE_URL}/api/v1/patients",
         headers={"Authorization": f"Bearer {ACCESS_TOKEN}"},
-        params={"organization_id": org_id, "study_id": study_id}
+        params={"organization_id": org_id, "study_id": study_id},
     )
-    patients = response.json()['results']
+    patients = response.json()["results"]
 
     results = []
 
     for patient in patients:
         row = {
-            'patient_id': patient['id'],
-            'patient_name': f"{patient['nameGiven']} {patient['nameFamily']}"
+            "patient_id": patient["id"],
+            "patient_name": f"{patient['nameGiven']} {patient['nameFamily']}",
         }
 
         # Check each data type
         for data_type in expected_data_types:
-            observations = fetch_observations(org_id, study_id, patient['id'])
-            count = sum(1 for obs in observations if obs['codingCode'] == data_type)
+            observations = fetch_observations(org_id, study_id, patient["id"])
+            count = sum(1 for obs in observations if obs["codingCode"] == data_type)
 
             row[data_type] = count
 
@@ -666,23 +681,24 @@ def check_data_completeness(org_id, study_id, expected_data_types):
     df = pd.DataFrame(results)
     return df
 
+
 # Usage
 completeness = check_data_completeness(
     org_id=1,
     study_id=10001,
     expected_data_types=[
-        'omh:blood-glucose:4.0',
-        'omh:blood-pressure:4.0',
-        'omh:heart-rate:2.0'
-    ]
+        "omh:blood-glucose:4.0",
+        "omh:blood-pressure:4.0",
+        "omh:heart-rate:2.0",
+    ],
 )
 
 print(completeness)
 
 # Identify patients with missing data
-missing = completeness[completeness['omh:blood-glucose:4.0'] == 0]
+missing = completeness[completeness["omh:blood-glucose:4.0"] == 0]
 print(f"\n{len(missing)} patients have not uploaded blood glucose data:")
-print(missing['patient_name'].tolist())
+print(missing["patient_name"].tolist())
 ```
 
 ### Detect Outliers
@@ -695,23 +711,24 @@ def detect_outliers(df, column, threshold_std=3):
     std = df[column].std()
 
     outliers = df[
-        (df[column] < mean - threshold_std * std) |
-        (df[column] > mean + threshold_std * std)
+        (df[column] < mean - threshold_std * std)
+        | (df[column] > mean + threshold_std * std)
     ]
 
     return outliers
 
-# Usage
-df_glucose = fetch_to_dataframe(1, 10001, 10001, 'omh:blood-glucose:4.0')
 
-outliers = detect_outliers(df_glucose, 'glucose_mg_dl', threshold_std=3)
+# Usage
+df_glucose = fetch_to_dataframe(1, 10001, 10001, "omh:blood-glucose:4.0")
+
+outliers = detect_outliers(df_glucose, "glucose_mg_dl", threshold_std=3)
 
 if len(outliers) > 0:
     print(f"Found {len(outliers)} outlier readings:")
-    print(outliers[['timestamp', 'glucose_mg_dl']])
+    print(outliers[["timestamp", "glucose_mg_dl"]])
 ```
 
----
+______________________________________________________________________
 
 ## Common Issues
 
@@ -720,11 +737,12 @@ if len(outliers) > 0:
 **Issue**: Query returns 0 observations even though data exists.
 
 **Common Causes**:
+
 1. **Authorization**: You're not authorized for the patient's study
    - Solution: Verify you're a member/manager of the organization
-2. **Consent**: Patient hasn't consented to share data
+1. **Consent**: Patient hasn't consented to share data
    - Solution: Check consent status via `/api/v1/patients/{id}/consents`
-3. **Wrong parameters**: Incorrect organization_id or study_id
+1. **Wrong parameters**: Incorrect organization_id or study_id
    - Solution: Verify IDs match the patient's enrollment
 
 Reference: Authorization checks at `jupyterhealth-exchange/core/views/observation.py`
@@ -739,12 +757,12 @@ Reference: Authorization checks at `jupyterhealth-exchange/core/views/observatio
 
 ```python
 # Admin API - already decoded
-omh_data = observation['valueAttachmentData']  # Already a dict
+omh_data = observation["valueAttachmentData"]  # Already a dict
 
 # FHIR API - needs decoding
-encoded = observation['valueAttachment']['data']
+encoded = observation["valueAttachment"]["data"]
 decoded = base64.b64decode(encoded)
-omh_data = json.loads(decoded.decode('utf-8'))
+omh_data = json.loads(decoded.decode("utf-8"))
 ```
 
 ### Permission Denied
@@ -780,30 +798,30 @@ else:
 
 Reference: `jupyterhealth-exchange/core/models.py`
 
----
+______________________________________________________________________
 
 ## Best Practices
 
 ### Performance
 
 1. **Use pagination**: Fetch data in chunks (100-1000 records)
-2. **Cache tokens**: Reuse access tokens until expiry (10 hours default)
-3. **Filter server-side**: Use query parameters instead of filtering in client
-4. **Batch requests**: Fetch data for multiple patients in parallel
+1. **Cache tokens**: Reuse access tokens until expiry (10 hours default)
+1. **Filter server-side**: Use query parameters instead of filtering in client
+1. **Batch requests**: Fetch data for multiple patients in parallel
 
 ### Data Privacy
 
 1. **Minimum necessary**: Only fetch data types needed for analysis
-2. **De-identify**: Remove PII before storing locally
-3. **Secure storage**: Encrypt exported data at rest
-4. **Audit access**: Log all data retrieval operations
+1. **De-identify**: Remove PII before storing locally
+1. **Secure storage**: Encrypt exported data at rest
+1. **Audit access**: Log all data retrieval operations
 
 ### Data Quality
 
 1. **Validate timestamps**: Check for future dates or invalid formats
-2. **Check units**: Verify units match expected values (mmHg, mg/dL, etc.)
-3. **Detect duplicates**: Use observation IDs to prevent duplicate processing
-4. **Handle missing data**: Implement strategies for incomplete datasets
+1. **Check units**: Verify units match expected values (mmHg, mg/dL, etc.)
+1. **Detect duplicates**: Use observation IDs to prevent duplicate processing
+1. **Handle missing data**: Implement strategies for incomplete datasets
 
 ### Error Handling
 
@@ -811,6 +829,7 @@ Reference: `jupyterhealth-exchange/core/models.py`
 import requests
 from requests.exceptions import HTTPError, ConnectionError, Timeout
 import time
+
 
 def fetch_with_retry(url, headers, params, max_retries=3):
     """Fetch data with exponential backoff retry"""
@@ -833,7 +852,7 @@ def fetch_with_retry(url, headers, params, max_retries=3):
 
             elif e.response.status_code >= 500:
                 # Server error - retry with backoff
-                wait = 2 ** attempt
+                wait = 2**attempt
                 print(f"Server error, retrying in {wait}s...")
                 time.sleep(wait)
                 continue
@@ -843,7 +862,7 @@ def fetch_with_retry(url, headers, params, max_retries=3):
 
         except (ConnectionError, Timeout) as e:
             # Network error - retry with backoff
-            wait = 2 ** attempt
+            wait = 2**attempt
             print(f"Network error, retrying in {wait}s...")
             time.sleep(wait)
             continue
@@ -851,7 +870,7 @@ def fetch_with_retry(url, headers, params, max_retries=3):
     raise Exception(f"Failed after {max_retries} attempts")
 ```
 
----
+______________________________________________________________________
 
 ## Related Documentation
 

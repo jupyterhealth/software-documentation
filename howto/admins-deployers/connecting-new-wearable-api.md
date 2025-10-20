@@ -3,74 +3,83 @@
 This guide shows you how to integrate a new wearable device or health data source into JupyterHealth Exchange.
 
 ### Getting Started
-
 - [Overview](#overview)
 - [Prerequisites](#prerequisites)
 
 ### Exchange Configuration
-
 - [Add DataSource to Exchange](#add-datasource-to-exchange)
 - [Map Device Data to OMH Schemas](#map-device-data-to-omh-schemas)
 
 ### Extended Setup
-
 - [If Device Supports New Data Types](#if-device-supports-new-data-types)
 - [Link DataSource to Studies](#link-datasource-to-studies)
 
 ### Mobile App Integration
-
 - [Implement Mobile App Integration](#implement-mobile-app-integration)
 
 ### Testing and Troubleshooting
-
 - [Test Integration](#test-integration)
 - [Troubleshooting](#troubleshooting)
 
 ### Reference
-
 - [Related Documentation](#related-documentation)
 
-______________________________________________________________________
+---
 
 ## Overview
 
 JupyterHealth Exchange receives health data from mobile applications (like CommonHealth Android) that connect to wearable devices. Adding a new wearable involves:
 
 1. Creating a DataSource entry in the Exchange
-1. Mapping device data types to Open mHealth (OMH) schemas
-1. Implementing device integration in the mobile app
+2. Mapping device data types to Open mHealth (OMH) schemas
+3. Implementing device integration in the mobile app
 
 ## Prerequisites
 
-- Django admin access to JupyterHealth Exchange
+- Access to JupyterHealth Exchange Console with a **super user** account, OR
+- Django shell access, OR
+- Super user API access
 - Understanding of the wearable device's API
 - Knowledge of Open mHealth data schemas
 - Mobile app development access if implementing client-side integration
 
 ## Add DataSource to Exchange
 
-### 1. Create DataSource via Django Admin
+### 1. Create DataSource
 
-Navigate to the Django admin interface:
+#### Using JupyterHealth Exchange Console (Recommended)
 
-```
-https://your-jhe-instance.com/admin/core/datasource/add/
-```
+1. Login to the JupyterHealth Exchange Console at:
+   ```
+   https://your-jhe-instance.com/portal/
+   ```
 
-Fill in the following fields:
+2. Login with a **super user** account (e.g., `sam@example.com`)
 
-- **Name**: Device manufacturer or app name (e.g., "Fitbit", "Withings", "Apple Health")
-- **Type**: Select from:
-  - `personal_device` - Consumer wearables (most common)
-  - `device` - Medical-grade devices
-  - `mobile_app` - Smartphone apps
-  - `server` - Server-to-server integration
+3. Navigate to the **Data Sources** section
 
-Click "Save" to create the DataSource. Note the assigned ID (e.g., `70002`).
+4. Click the **"Add Data Source"** button
+
+5. Fill in the form:
+   - **Name**: Device manufacturer or app name (e.g., "Fitbit", "Withings", "Apple Health")
+   - **Type**: Currently only `personal_device` (Personal Device) is supported
+
+6. Click **"Create"**
+
+7. Note the assigned ID (e.g., `70002`)
+
+**Note**: Only super users can create data sources. Django admin does not have DataSource registered. Use the console or Django shell instead.
 
 Reference: `jupyterhealth-exchange/core/models.py`
 
-### 2. Create DataSource via API (Alternative)
+#### Via Django Shell (Alternative)
+
+```bash
+cd /path/to/jupyterhealth-exchange
+python manage.py shell -c "from core.models import DataSource; ds = DataSource.objects.create(name='Fitbit', type='personal_device'); print(f'Created DataSource ID: {ds.id}')"
+```
+
+### 2. Via API (Alternative)
 
 ```bash
 curl -X POST https://your-jhe-instance.com/api/v1/data_sources \
@@ -90,19 +99,19 @@ Reference: `jupyterhealth-exchange/core/permissions.py`
 
 For each data type the device supports, create a `DataSourceSupportedScope` link.
 
-Via Django admin:
+#### Using JupyterHealth Exchange Console (Recommended)
 
-```
-https://your-jhe-instance.com/admin/core/datasourcesupportedscope/add/
-```
+1. In the **Data Sources** section, click the **View** (eye icon) button next to your data source
 
-Fields:
+2. In the **Supported Scopes** section, click the **Add** button (plus icon)
 
-- **Data source**: Select your newly created DataSource
-- **Scope code**: Select the CodeableConcept (e.g., "omh:blood-pressure:4.0")
+3. Select the data type/scope from the dropdown (e.g., "Blood pressure", "Heart Rate")
 
-Via Django shell:
+4. Click **Add** to confirm
 
+5. Repeat for each data type the device supports
+
+#### Via Django Shell (Alternative)
 ```python
 python manage.py shell
 
@@ -131,7 +140,6 @@ ls jupyterhealth-exchange/data/omh/json-schemas/data/
 ```
 
 Common schemas:
-
 - `schema-omh_blood-pressure_4-0.json`
 - `schema-omh_blood-glucose_4-0.json`
 - `schema-omh_heart-rate_2-0.json`
@@ -162,7 +170,6 @@ Example: Blood pressure schema at `data/omh/json-schemas/data/schema-omh_blood-p
 Document the mapping from device API format to OMH format:
 
 **Device API Response (Fitbit example):**
-
 ```json
 {
   "bp": [{
@@ -174,7 +181,6 @@ Document the mapping from device API format to OMH format:
 ```
 
 **OMH Format (for JHE):**
-
 ```json
 {
   "header": {
@@ -216,7 +222,6 @@ Reference: Example data at `jupyterhealth-exchange/data/omh/examples/data-points
 If your wearable device supports data types that don't yet exist in JupyterHealth Exchange (e.g., `sleep-duration`, `body-weight`, `physical-activity`), you'll need to add those data types first before linking them to your DataSource.
 
 **See**: [Add a Data Source, Data Type to the Exchange](add-data-source-type.md) for complete instructions on:
-
 - Downloading OMH schemas
 - Creating CodeableConcept entries
 - Adding example data files
@@ -240,11 +245,17 @@ curl -X POST https://your-jhe-instance.com/api/v1/studies/10001/data_sources \
   }'
 ```
 
-### Via Django Admin
+### Using JupyterHealth Exchange Console
 
-1. Navigate to Study detail page
-1. Scroll to "Study data sources" section
-1. Add inline: Select DataSource and save
+1. Navigate to the **Studies** section
+
+2. Find your study and click the **View** (eye icon) button
+
+3. In the **Data Sources** section, click the **Add** button (plus icon)
+
+4. Select your newly created data source from the dropdown
+
+5. Click **Add** to confirm
 
 Reference: `jupyterhealth-exchange/core/views/study.py`
 

@@ -3,14 +3,12 @@
 This guide shows you how to add new data sources and data types to JupyterHealth Exchange.
 
 ### Adding a New Data Source
-
 - [Prerequisites](#prerequisites)
 - [Step 1: Create DataSource Entry](#step-1-create-datasource-entry)
 - [Step 2: Link Supported Data Types](#step-2-link-supported-data-types)
 - [Step 3: Verify DataSource](#step-3-verify-datasource)
 
 ### Adding a New Data Type
-
 - [Prerequisites](#prerequisites)
 - [Step 1: Obtain Open mHealth Schema](#step-1-obtain-open-mhealth-schema)
 - [Step 2: Review Schema Structure](#step-2-review-schema-structure)
@@ -20,7 +18,6 @@ This guide shows you how to add new data sources and data types to JupyterHealth
 - [Step 6: Verify Data Type](#step-6-verify-data-type)
 
 ### Testing New Data Source and Type
-
 - [Step 1: Add Data Source to Study](#step-1-add-data-source-to-study)
 - [Step 2: Add Scope Request to Study](#step-2-add-scope-request-to-study)
 - [Step 3: Grant Patient Consent](#step-3-grant-patient-consent)
@@ -28,20 +25,17 @@ This guide shows you how to add new data sources and data types to JupyterHealth
 - [Step 5: Retrieve Test Observation](#step-5-retrieve-test-observation)
 
 ## #Common Issues
-
 - [Schema Validation Fails](#schema-validation-fails)
 - [CodeableConcept Not Found](#codeableconcept-not-found)
 - [DataSource Not Appearing in Study](#datasource-not-appearing-in-study)
 
 ### Advanced
-
 - [Adding Custom (Non-OMH) Data Types](#adding-custom-non-omh-data-types)
 
 ### Reference
-
 - [Related Documentation](#related-documentation)
 
-______________________________________________________________________
+---
 
 ## Adding a New Data Source
 
@@ -49,32 +43,45 @@ Data sources represent devices or applications that produce health observations 
 
 ### Prerequisites
 
-- Django admin or super user API access
+- Access to JupyterHealth Exchange Console with a **super user** account, OR
+- Django shell access, OR
+- Super user API access
 - Understanding of the device's capabilities
 - List of data types the device supports
 
 ### Step 1: Create DataSource Entry
 
-#### Via Django Admin
+#### Using JupyterHealth Exchange Console (Recommended)
 
-1. Navigate to Django admin:
-
+1. Login to the JupyterHealth Exchange Console:
    ```
-   https://your-jhe-instance.com/admin/core/datasource/add/
+   https://your-jhe-instance.com/portal/
    ```
 
-1. Fill in the form:
+2. Login with a **super user** account (e.g., `sam@example.com`)
 
+3. Navigate to the **Data Sources** section
+
+4. Click the **"Add Data Source"** button
+
+5. Fill in the modal form:
    - **Name**: Manufacturer or app name (e.g., "Apple Watch", "Omron", "Garmin")
-   - **Type**: Select one:
-     - `personal_device` - Consumer wearables (most common)
-     - `device` - Medical-grade devices
-     - `mobile_app` - Smartphone applications
-     - `server` - Server-to-server integration
+   - **Type**: Currently only `personal_device` (Personal Device) is supported
 
-1. Click "Save"
+6. Click **"Create"**
 
-1. Note the generated ID (e.g., `70004`)
+7. Note the generated ID (e.g., `70004`)
+
+**Note**: Only super users can create data sources. The "Add Data Source" button is only visible to super users.
+
+#### Via Django Shell
+
+Django admin does not have DataSource registered. Use Django shell instead:
+
+```bash
+cd /path/to/jupyterhealth-exchange
+python manage.py shell -c "from core.models import DataSource; ds = DataSource.objects.create(name='Apple Watch', type='personal_device'); print(f'Created DataSource ID: {ds.id}')"
+```
 
 #### Via API
 
@@ -89,7 +96,6 @@ curl -X POST https://your-jhe-instance.com/api/v1/data_sources \
 ```
 
 Response:
-
 ```json
 {
   "id": 70004,
@@ -106,20 +112,21 @@ Reference: `jupyterhealth-exchange/core/permissions.py` and `jupyterhealth-excha
 
 For each OMH data type the device supports, create a relationship.
 
-#### Via Django Admin
+#### Using JupyterHealth Exchange Console (Recommended)
 
-1. Navigate to:
+1. In the Data Sources list, click the **View** (eye icon) button next to your data source
 
-   ```
-   https://your-jhe-instance.com/admin/core/datasourcesupportedscope/add/
-   ```
+2. In the modal that opens, find the **"Supported Scopes"** section
 
-1. Select:
+3. Click the **Add** button (plus icon)
 
-   - **Data source**: Your newly created data source
-   - **Scope code**: The CodeableConcept for the data type
+4. Select the scope/data type from the dropdown (e.g., "Blood pressure", "Heart Rate")
 
-1. Repeat for each supported data type
+5. Click **"Add"** to confirm
+
+6. Repeat for each data type the device supports
+
+**Note**: This feature is available when viewing a data source in read mode.
 
 #### Via Django Shell
 
@@ -156,6 +163,18 @@ print(f"Apple Watch supports {apple_watch.supported_scopes.count()} data types")
 
 ### Step 3: Verify DataSource
 
+#### Using JupyterHealth Exchange Console
+
+1. Navigate to the **Data Sources** section in the console
+
+2. Find your newly created data source in the list
+
+3. Click the **View** (eye icon) button to see details
+
+4. Verify the data source name, type, and supported scopes are correct
+
+#### Via API
+
 ```bash
 # List all data sources with scopes
 curl "https://your-jhe-instance.com/api/v1/data_sources?include_scopes=true" \
@@ -163,7 +182,6 @@ curl "https://your-jhe-instance.com/api/v1/data_sources?include_scopes=true" \
 ```
 
 Expected response includes:
-
 ```json
 {
   "id": 70004,
@@ -188,9 +206,9 @@ Data types define the structure and schema for health observations using Open mH
 
 ### Prerequisites
 
-- Super user access to Django admin
+- Django shell access (CodeableConcept not available in Django admin)
 - Open mHealth schema for the data type
-- Understanding of FHIR R5 Observation structure
+- Understanding of FHIR Observation structure
 
 ### Step 1: Obtain Open mHealth Schema
 
@@ -203,7 +221,6 @@ https://github.com/openmhealth/schemas/tree/master/schema
 ```
 
 Common schemas available:
-
 - `heart-rate` (v2.0)
 - `blood-pressure` (v4.0)
 - `blood-glucose` (v4.0)
@@ -231,7 +248,6 @@ mv step-count-2.0.json schema-omh_step-count_2-0.json
 **Naming Convention**: `schema-omh_{type-name}_{version-with-dashes}.json`
 
 Examples:
-
 - `schema-omh_heart-rate_2-0.json`
 - `schema-omh_body-weight_2-0.json`
 - `schema-omh_sleep-duration_2-0.json`
@@ -245,7 +261,6 @@ cat schema-omh_step-count_2-0.json
 ```
 
 Example schema structure:
-
 ```json
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
@@ -275,7 +290,6 @@ nano omh_step-count_2-0.json
 ```
 
 Content:
-
 ```json
 {
   "header": {
@@ -309,13 +323,11 @@ Content:
 **Header Fields**:
 
 *Required:*
-
 - `uuid`: Unique identifier for this data point (RFC 4122 UUID format)
 - `schema_id`: Must match your schema with `namespace`, `name`, and `version`
 - `source_creation_date_time`: When the measurement was taken by the device
 
 *Optional:*
-
 - `modality`: How the data was obtained (`"sensed"` or `"self-reported"`)
 - `external_datasheets`: References to documentation about the device/software
   - `datasheet_type`: Type of component (e.g., `"manufacturer"`, `"software"`, `"study"`)
@@ -323,7 +335,6 @@ Content:
 - `acquisition_rate`: Rate at which measures are acquired (frequency_unit_value)
 
 **Body Requirements**:
-
 - `effective_time_frame`: Required for all OMH data (when measurement occurred)
 - Other fields per schema specification
 
@@ -332,6 +343,15 @@ Reference: Example at `jupyterhealth-exchange/data/omh/examples/data-points/omh_
 ### Step 4: Create CodeableConcept
 
 #### Via Django Shell
+
+Django admin does not have CodeableConcept registered. Use Django shell:
+
+```bash
+cd /path/to/jupyterhealth-exchange
+python manage.py shell -c "from core.models import CodeableConcept; cc = CodeableConcept.objects.create(coding_system='https://w3id.org/openmhealth', coding_code='omh:step-count:2.0', text='Step Count'); print(f'Created CodeableConcept ID: {cc.id}')"
+```
+
+Or interactively:
 
 ```python
 python manage.py shell
@@ -347,22 +367,6 @@ step_count = CodeableConcept.objects.create(
 
 print(f"Created CodeableConcept ID: {step_count.id}")
 ```
-
-#### Via Django Admin
-
-1. Navigate to:
-
-   ```
-   https://your-jhe-instance.com/admin/core/codeableconcept/add/
-   ```
-
-1. Fill in:
-
-   - **Coding system**: `https://w3id.org/openmhealth`
-   - **Coding code**: `omh:step-count:2.0`
-   - **Text**: `Step Count`
-
-1. Click "Save"
 
 **Coding Code Format**: `omh:{schema-name}:{version}`
 
@@ -387,13 +391,13 @@ def seed_codeable_concept(apps):
     CodeableConcept.objects.get_or_create(
         coding_system="https://w3id.org/openmhealth",
         coding_code="omh:step-count:2.0",
-        defaults={"text": "Step Count"},
+        defaults={"text": "Step Count"}
     )
 
     CodeableConcept.objects.get_or_create(
         coding_system="https://w3id.org/openmhealth",
         coding_code="omh:body-weight:2.0",
-        defaults={"text": "Body Weight"},
+        defaults={"text": "Body Weight"}
     )
 ```
 
@@ -420,6 +424,20 @@ for cc in omh_types:
 
 ### Step 1: Add Data Source to Study
 
+#### Using JupyterHealth Exchange Console
+
+1. Navigate to the **Studies** section
+
+2. Find your study and click the **View** (eye icon) button
+
+3. In the **Data Sources** section, click the **Add** button (plus icon)
+
+4. Select your newly created data source from the dropdown
+
+5. Click **Add** to confirm
+
+#### Via API
+
 ```bash
 # Associate data source with study
 curl -X POST https://your-jhe-instance.com/api/v1/studies/10001/data_sources \
@@ -433,6 +451,20 @@ curl -X POST https://your-jhe-instance.com/api/v1/studies/10001/data_sources \
 Reference: `jupyterhealth-exchange/core/views/study.py`
 
 ### Step 2: Add Scope Request to Study
+
+#### Using JupyterHealth Exchange Console
+
+1. Navigate to the **Studies** section
+
+2. Find your study and click the **View** (eye icon) button
+
+3. In the **Scope Requests** section, click the **Add** button (plus icon)
+
+4. Select your newly created data type/scope from the dropdown
+
+5. Click **Add** to confirm
+
+#### Via API
 
 ```bash
 # Request step count data for study
@@ -449,6 +481,36 @@ Replace `8` with the ID of your CodeableConcept.
 Reference: `jupyterhealth-exchange/core/views/study.py`
 
 ### Step 3: Grant Patient Consent
+
+#### Using JupyterHealth Exchange Console
+
+**Option A: As a Patient**
+
+1. Login as a patient user (e.g., `peter@example.com`, `pamela@example.com`)
+
+2. Navigate to the **Patients** section and view your patient profile
+
+3. In the **Studies Pending Consent** section, you'll see studies requesting data access
+
+4. Review the requested data types/scopes
+
+5. Click the checkbox or consent button to grant access to the requested data
+
+**Option B: As a Practitioner (Manager or Member)**
+
+Practitioners with **manager** or **member** roles can grant consent on behalf of patients:
+
+1. Login as a practitioner with manager/member role (e.g., `mary@example.com`, `megan@example.com`, `mark@example.com`)
+
+2. Navigate to the **Patients** section
+
+3. Find and view the patient profile
+
+4. In the **Studies Pending Consent** section, grant consent on behalf of the patient
+
+**Note**: Practitioners with **viewer** role cannot grant consent.
+
+#### Via API
 
 ```bash
 # Patient consents to share step count data
@@ -470,6 +532,8 @@ curl -X POST https://your-jhe-instance.com/api/v1/patients/10001/consents \
 Reference: `jupyterhealth-exchange/core/views/patient.py`
 
 ### Step 4: Upload Test Observation
+
+**Note**: Uploading observations can only be done via the FHIR API. There is no console UI for uploading observations.
 
 Prepare test data:
 
@@ -509,23 +573,27 @@ import base64
 omh_data = {
     "header": {
         "uuid": "d9c46d90-4e36-4c3e-a331-28d7c2b84c4d",
-        "schema_id": {"namespace": "omh", "name": "step-count", "version": "2.0"},
+        "schema_id": {
+            "namespace": "omh",
+            "name": "step-count",
+            "version": "2.0"
+        },
         "creation_date_time": "2024-10-25T21:13:31.438Z",
-        "source_creation_date_time": "2024-05-02T00:00:00Z",
+        "source_creation_date_time": "2024-05-02T00:00:00Z"
     },
     "body": {
         "effective_time_frame": {
             "time_interval": {
                 "start_date_time": "2024-05-02T00:00:00Z",
-                "end_date_time": "2024-05-02T23:59:59Z",
+                "end_date_time": "2024-05-02T23:59:59Z"
             }
         },
-        "step_count": 8725,
-    },
+        "step_count": 8725
+    }
 }
 
 json_string = json.dumps(omh_data)
-encoded = base64.b64encode(json_string.encode("utf-8")).decode("utf-8")
+encoded = base64.b64encode(json_string.encode('utf-8')).decode('utf-8')
 print(encoded)
 ```
 
@@ -563,6 +631,18 @@ Reference: `jupyterhealth-exchange/core/models.py`
 
 ### Step 5: Retrieve Test Observation
 
+#### Using JupyterHealth Exchange Console
+
+1. Navigate to the **Observations** section
+
+2. Use the filters to select the organization and study
+
+3. View the list of observations including your newly uploaded test data
+
+4. Click the **View** (eye icon) button to see the full observation details
+
+#### Via API
+
 ```bash
 # Retrieve observations for patient
 curl "https://your-jhe-instance.com/fhir/r5/Observation?patient=10001&code=https://w3id.org/openmhealth|omh:step-count:2.0" \
@@ -580,7 +660,6 @@ Reference: `jupyterhealth-exchange/core/views/observation.py`
 **Error**: "Required property missing" or similar schema validation error.
 
 **Solution**:
-
 1. Validate your OMH data against the schema:
 
 ```python
@@ -588,7 +667,7 @@ import json
 from jsonschema import validate, ValidationError
 
 # Load schema
-with open("data/omh/json-schemas/data/schema-omh_step-count_2-0.json") as f:
+with open('data/omh/json-schemas/data/schema-omh_step-count_2-0.json') as f:
     schema = json.load(f)
 
 # Load your data body
@@ -596,10 +675,10 @@ data = {
     "effective_time_frame": {
         "time_interval": {
             "start_date_time": "2024-05-02T00:00:00Z",
-            "end_date_time": "2024-05-02T23:59:59Z",
+            "end_date_time": "2024-05-02T23:59:59Z"
         }
     },
-    "step_count": 8725,
+    "step_count": 8725
 }
 
 try:
@@ -611,7 +690,6 @@ except ValidationError as e:
 ```
 
 2. Compare with example data:
-
 ```bash
 cat data/omh/examples/data-points/omh_step-count_2-0.json
 ```
@@ -675,7 +753,6 @@ nano schema-custom_glucose-meter_1-0.json
 ```
 
 Content:
-
 ```json
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
@@ -721,16 +798,12 @@ def clean(self):
 
     # Add custom schema validation
     if self.codeable_concept.coding_system == "https://yourdomain.com/schemas":
-        schema_path = (
-            settings.DATA_DIR_PATH.custom_schemas
-            / f"schema-{self.codeable_concept.coding_code.replace(':', '_')}.json"
-        )
+        schema_path = settings.DATA_DIR_PATH.custom_schemas / \
+            f"schema-{self.codeable_concept.coding_code.replace(':', '_')}.json"
 
         if schema_path.exists():
             schema = json.loads(schema_path.read_text())
-            validate_with_registry(
-                instance=value_attachment_data.get("body"), schema=schema
-            )
+            validate_with_registry(instance=value_attachment_data.get("body"), schema=schema)
 ```
 
 **Note**: Custom schemas require code changes and should be avoided if possible. Prefer using or extending Open mHealth schemas.

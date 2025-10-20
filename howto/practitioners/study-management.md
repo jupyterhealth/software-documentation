@@ -3,12 +3,10 @@
 This guide shows you how to manage research studies in JupyterHealth Exchange using either the web-based **Console** (Method 1) or the **REST API** (Method 2).
 
 ### Introduction
-
 - [Prerequisites](#prerequisites)
 - [Study Attributes](#study-attributes)
 
 ### Core Study Operations
-
 - [Create Study](#create-study)
 - [View Study](#view-study)
 - [Update Study Details](#update-study-details)
@@ -16,7 +14,6 @@ This guide shows you how to manage research studies in JupyterHealth Exchange us
 - [Delete Study](#delete-study)
 
 ### Advanced Topics
-
 - [Enroll Patients in Study](#enroll-patients-in-study)
 - [Monitor Study Progress](#monitor-study-progress)
 - [Common Issues](#common-issues)
@@ -24,25 +21,22 @@ This guide shows you how to manage research studies in JupyterHealth Exchange us
 - [Complete Study Setup Example](#complete-study-setup-example)
 
 ### Reference
-
 - [Choosing Between Console and REST API](#choosing-between-console-and-rest-api)
 - [Related Documentation](#related-documentation)
 
-______________________________________________________________________
+---
 
 ## Introduction
 
 ### Prerequisites
 
 **For Console Access:**
-
 - Practitioner account with login credentials
 - Manager or member role in an organization
 - List of data types you want to collect
 - List of data sources (devices) participants will use
 
 **For REST API Access:**
-
 - OAuth2 access token
 - Manager or member role in an organization
 - HTTP client (curl, Python, JavaScript, etc.)
@@ -52,7 +46,6 @@ Choose the method that best fits your workflow.
 ### Study Attributes
 
 A study in JupyterHealth Exchange represents a research project or clinical program that:
-
 - Belongs to a single organization
 - Requests specific types of health data (scopes)
 - Supports specific data sources (devices/apps)
@@ -60,7 +53,7 @@ A study in JupyterHealth Exchange represents a research project or clinical prog
 
 Reference: `jupyterhealth-exchange/core/models.py`
 
-______________________________________________________________________
+---
 
 ## Create Study
 
@@ -78,48 +71,46 @@ The Console allows you to create studies through the Organizations page.
 #### Step 1: Navigate to Organizations Page
 
 1. Log in to the Console:
-
    ```
    https://your-jhe-instance.com/portal/
    ```
 
-1. Click the **Organizations** tab in the navigation
+2. Click the **Organizations** tab in the navigation
 
 #### Step 2: Open Your Organization
 
 1. Find your organization in the table
-1. Click the **"eye" icon** (View button) to view organization details
-1. A modal opens showing organization information
+2. Click the **"eye" icon** (View button) to view organization details
+3. A modal opens showing organization information
 
 #### Step 3: Create New Study
 
 1. In the organization details modal, scroll down to the **"Studies"** section
 
-1. Click the **"+" icon** (Add Study button) next to "Studies"
+2. Click the **"+" icon** (Add Study button) next to "Studies"
 
-1. The Studies modal closes and a "Create Study" modal opens
+3. The Studies modal closes and a "Create Study" modal opens
 
-1. Fill in the study form:
-
+4. Fill in the study form:
    - **Name** (required): e.g., "Diabetes Management Study"
    - **Description** (required): Detailed study description
    - **Icon URL** (optional): URL to study icon/logo
      - As you type, the icon preview updates in real-time
    - **Organization Name**: Auto-filled (read-only)
 
-1. Click **"Create"** button
+5. Click **"Create"** button
 
-1. The study is created and the modal closes
+6. The study is created and the modal closes
 
 #### Step 4: Configure Study (Optional)
 
 After creating the study, you can immediately configure it:
 
 1. Navigate to the **Studies** tab
-1. Select your organization from the dropdown
-1. Find your new study in the table
-1. Click the **"eye" icon** to view study details
-1. Add data sources and scope requests (see [Configure Data Collection](#configure-data-collection))
+2. Select your organization from the dropdown
+3. Find your new study in the table
+4. Click the **"eye" icon** to view study details
+5. Add data sources and scope requests (see [Configure Data Collection](#configure-data-collection))
 
 **Note**: New studies are always created from the Organizations page. The Studies tab is for viewing, editing, and deleting existing studies.
 
@@ -151,7 +142,6 @@ curl https://your-jhe-instance.com/api/v1/organizations \
 ```
 
 Response:
-
 ```json
 [
   {
@@ -188,14 +178,12 @@ curl -X POST https://your-jhe-instance.com/api/v1/studies \
 ```
 
 **Fields**:
-
 - `name` (required): Study name (e.g., "Diabetes Management Study")
 - `description` (required): Detailed study description
 - `organization` (required): Organization ID
 - `iconUrl` (optional): URL to study icon/logo
 
 Response:
-
 ```json
 {
   "id": 10001,
@@ -213,7 +201,7 @@ Note the study ID (e.g., `10001`) for subsequent steps.
 
 Reference: `jupyterhealth-exchange/core/views/study.py`
 
-______________________________________________________________________
+---
 
 ## Configure Data Collection
 
@@ -232,9 +220,9 @@ The Console provides an interactive interface for managing study data sources an
 #### Step 1: Navigate to Study Details
 
 1. Log in to the Console and click the **Studies** tab
-1. Select your **Organization** from the dropdown
-1. Find your study in the table
-1. Click the **"eye" icon** (View button) to open study details modal
+2. Select your **Organization** from the dropdown
+3. Find your study in the table
+4. Click the **"eye" icon** (View button) to open study details modal
 
 #### Step 2: Add Data Sources (Devices)
 
@@ -242,20 +230,18 @@ In the study details modal:
 
 1. Scroll down to the **"Data Sources"** section
 
-1. Click the **"+" icon** next to "Data Sources"
+2. Click the **"+" icon** next to "Data Sources"
 
-1. A dropdown appears with available data sources:
-
+3. A dropdown appears with available data sources:
    - Select a data source (e.g., "iHealth", "Dexcom", "CareX")
 
-1. Click the **"Add"** button (green)
+4. Click the **"Add"** button (green)
 
-1. The data source appears in the list
+5. The data source appears in the list
 
-1. Repeat for additional data sources
+6. Repeat for additional data sources
 
-1. To remove a data source:
-
+7. To remove a data source:
    - Click the **trash icon** next to the data source name
    - Confirmation is instant
 
@@ -265,25 +251,22 @@ In the same study details modal:
 
 1. Scroll down to the **"Scope Requests"** section
 
-1. Click the **"+" icon** next to "Scope Requests"
+2. Click the **"+" icon** next to "Scope Requests"
 
-1. A dropdown appears with available data types:
-
+3. A dropdown appears with available data types:
    - Select a scope (e.g., "Blood Glucose", "Blood Pressure", "Heart Rate")
 
-1. Click the **"Add"** button (green)
+4. Click the **"Add"** button (green)
 
-1. The scope request appears in the list
+5. The scope request appears in the list
 
-1. Repeat for additional data types
+6. Repeat for additional data types
 
-1. To remove a scope request:
-
+7. To remove a scope request:
    - Click the **trash icon** next to the scope name
    - **Warning**: Removing scope requests prevents collection of that data type going forward
 
 **Console Tips:**
-
 - You can add/remove data sources and scopes at any time
 - Changes take effect immediately
 - Adding new scope requests requires patients to provide additional consent
@@ -311,7 +294,6 @@ curl https://your-jhe-instance.com/api/v1/data_sources \
 ```
 
 Look for `supportedScopes` in the response to see available data types:
-
 ```json
 {
   "supportedScopes": [
@@ -370,7 +352,6 @@ curl "https://your-jhe-instance.com/api/v1/studies?organization_id=1" \
 ```
 
 Response includes `scopeRequests`:
-
 ```json
 {
   "id": 10001,
@@ -402,7 +383,6 @@ curl https://your-jhe-instance.com/api/v1/data_sources \
 ```
 
 Response:
-
 ```json
 [
   {
@@ -453,7 +433,6 @@ curl "https://your-jhe-instance.com/api/v1/studies?organization_id=1" \
 ```
 
 Response includes `dataSources`:
-
 ```json
 {
   "id": 10001,
@@ -473,7 +452,7 @@ Response includes `dataSources`:
 }
 ```
 
-______________________________________________________________________
+---
 
 ## View Study
 
@@ -482,10 +461,10 @@ You can view study details using either the Console or REST API.
 ### Method 1: Using JupyterHealth Exchange Console
 
 1. Navigate to the **Studies** tab in the Console
-1. Select your **Organization** from the dropdown
-1. Find the study in the table
-1. Click the **"eye" icon** (View button)
-1. A modal opens showing:
+2. Select your **Organization** from the dropdown
+3. Find the study in the table
+4. Click the **"eye" icon** (View button)
+5. A modal opens showing:
    - Study ID
    - Name and description
    - Icon URL (with live preview)
@@ -504,7 +483,7 @@ Response includes all studies for the organization with full details.
 
 Reference: `jupyterhealth-exchange/core/views/study.py`
 
-______________________________________________________________________
+---
 
 ## Update Study Details
 
@@ -513,16 +492,16 @@ You can update study name, description, and icon URL using either the Console or
 ### Method 1: Using JupyterHealth Exchange Console
 
 1. Navigate to the **Studies** tab
-1. Select your **Organization** from the dropdown
-1. Find the study in the table
-1. Click the **"pencil" icon** (Edit/Update button)
-1. In the modal, update the fields:
+2. Select your **Organization** from the dropdown
+3. Find the study in the table
+4. Click the **"pencil" icon** (Edit/Update button)
+5. In the modal, update the fields:
    - **Name**: Study name
    - **Description**: Study description
    - **Icon URL**: URL to study icon
      - The icon preview updates in real-time as you type
-1. Click **"Update"** button
-1. Study information is updated
+6. Click **"Update"** button
+7. Study information is updated
 
 **Note**: You cannot change the organization of an existing study. To manage data sources and scope requests, use the View mode (eye icon) instead of Update mode.
 
@@ -538,20 +517,19 @@ curl -X PATCH https://your-jhe-instance.com/api/v1/studies/10001 \
 ```
 
 **Updatable Fields**:
-
 - `name`
 - `description`
 - `iconUrl`
 
 Reference: `jupyterhealth-exchange/core/views/study.py`
 
-______________________________________________________________________
+---
 
 ## Enroll Patients in Study
 
 Patient enrollment in studies is covered in detail in the [Patient Management](patient-management.md#enroll-patient-in-study) guide, which includes step-by-step instructions for both Console and REST API methods.
 
-______________________________________________________________________
+---
 
 ## Monitor Study Progress
 
@@ -562,11 +540,11 @@ After enrolling patients in a study, you can monitor their consent status and da
 #### View Patient Consent Status
 
 1. Navigate to the **Patients** tab in the Console
-1. Select your **Organization** from the dropdown
-1. Select the **Study** from the dropdown
-1. Find a patient in the table
-1. Click the **"eye" icon** (View button) to open patient details
-1. Scroll down to view:
+2. Select your **Organization** from the dropdown
+3. Select the **Study** from the dropdown
+4. Find a patient in the table
+5. Click the **"eye" icon** (View button) to open patient details
+6. Scroll down to view:
    - **Studies Pending Response**: Studies awaiting patient's consent decision
    - **Studies Responded To**: Studies with consent status
      - Checkmark icon (✓) = Patient consented to this data type
@@ -575,26 +553,31 @@ After enrolling patients in a study, you can monitor their consent status and da
 #### View Study Data Collection
 
 1. Navigate to the **Observations** tab in the Console
-1. Select your **Organization** from the dropdown
-1. Select your **Study** from the dropdown
-1. The observations table displays all data collected for the study:
-   - Observation ID
-   - Patient name
-   - Data type (codeable concept)
-   - Data source (device/wearable)
-   - Status
-   - Created date/time
-1. Use filters to narrow the data:
-   - **Patient**: Select specific patient
-   - **Data Type**: Filter by codeable concept
-   - **Date Range**: Filter by time period
-1. Click on an observation row to view full details
+
+2. Select your **Organization** from the dropdown at the top
+
+3. Select your **Study** from the dropdown
+
+4. The observations table displays all data collected for the study with these columns:
+   - **ID**: Observation ID number
+   - **Scope**: Data type (e.g., "Blood pressure", "Heart Rate")
+   - **Patient**: Patient name (Last, First format)
+   - **Transaction Time**: When the data was uploaded (timestamp)
+   - **Data**: Preview of the JSON data (Open mHealth format)
+
+5. Use the pagination controls:
+   - Navigate between pages using the page number input
+   - Adjust items per page (20, 50, 100, etc.) from the dropdown
+
+6. The **Data** column displays the full OMH (Open mHealth) JSON structure for each observation including:
+   - `body`: The actual health measurements (e.g., systolic/diastolic blood pressure values, heart rate)
+   - `header`: Metadata including UUID, schema ID, modality, source creation time, and data source reference
 
 **Console Tips:**
-
-- Use date filters to track recent data uploads
-- Filter by patient to check individual compliance
-- Export data via REST API for analysis
+- The JSON data is displayed directly in the table for easy viewing
+- Each observation shows both the header (metadata) and body (actual measurements)
+- Use the Organization and Study dropdowns to switch between different studies
+- For programmatic access, filtering, or exporting data, use the REST API (see below)
 
 ### Method 2: Using REST API
 
@@ -606,7 +589,6 @@ curl https://your-jhe-instance.com/api/v1/patients/10001/consents \
 ```
 
 Response:
-
 ```json
 {
   "patient": {
@@ -656,7 +638,6 @@ curl "https://your-jhe-instance.com/api/v1/observations?organization_id=1&study_
 ```
 
 Response:
-
 ```json
 {
   "count": 150,
@@ -671,7 +652,7 @@ Response:
 }
 ```
 
-______________________________________________________________________
+---
 
 ## Delete Study
 
@@ -680,15 +661,14 @@ You can delete studies using either the Console or REST API.
 ### Method 1: Using JupyterHealth Exchange Console
 
 1. Navigate to the **Studies** tab
-1. Select your **Organization** from the dropdown
-1. Find the study in the table
-1. Click the **"trash" icon** (Delete button)
-1. A confirmation modal appears: "Are you sure you want to delete this entire record?"
-1. Click **"Delete"** button to confirm
-1. The study is permanently deleted
+2. Select your **Organization** from the dropdown
+3. Find the study in the table
+4. Click the **"trash" icon** (Delete button)
+5. A confirmation modal appears: "Are you sure you want to delete this entire record?"
+6. Click **"Delete"** button to confirm
+7. The study is permanently deleted
 
 **Warning**: This permanently deletes:
-
 - The study
 - All patient enrollments
 - All consent records
@@ -704,7 +684,6 @@ curl -X DELETE https://your-jhe-instance.com/api/v1/studies/10001 \
 ```
 
 **Warning**: This permanently deletes:
-
 - The study
 - All patient enrollments
 - All consent records
@@ -714,7 +693,7 @@ Consider archiving inactive studies instead of deleting them.
 
 Reference: `jupyterhealth-exchange/core/views/study.py`
 
-______________________________________________________________________
+---
 
 ## Common Issues
 
@@ -742,9 +721,8 @@ Reference: `jupyterhealth-exchange/core/permissions.py`
 **Cause**: Patient belongs to different organization than study.
 
 **Solution**: Patients can only be added to studies in their organization. Either:
-
 1. Add patient to study's organization first
-1. Create study in patient's organization
+2. Create study in patient's organization
 
 Reference: `jupyterhealth-exchange/core/views/study.py`
 
@@ -769,39 +747,39 @@ else:
     print("Not supported - create DataSourceSupportedScope link")
 ```
 
-______________________________________________________________________
+---
 
 ## Best Practices
 
 ### Study Design
 
 1. **Clear naming**: Use descriptive study names (e.g., "Type 2 Diabetes Glucose Monitoring 2024")
-1. **Detailed descriptions**: Include objectives, procedures, expected duration
-1. **Minimal data collection**: Only request data types you actually need
-1. **Device flexibility**: Support multiple data sources when possible
+2. **Detailed descriptions**: Include objectives, procedures, expected duration
+3. **Minimal data collection**: Only request data types you actually need
+4. **Device flexibility**: Support multiple data sources when possible
 
 ### Data Collection Planning
 
 1. **Start small**: Begin with one or two data types, expand if needed
-1. **Test with pilot**: Enroll a few patients first to validate workflow
-1. **Monitor compliance**: Regularly check that patients are uploading data
-1. **Communicate clearly**: Ensure patients understand what data is collected and why
+2. **Test with pilot**: Enroll a few patients first to validate workflow
+3. **Monitor compliance**: Regularly check that patients are uploading data
+4. **Communicate clearly**: Ensure patients understand what data is collected and why
 
 ### Consent Management
 
 1. **Informed consent**: Provide detailed study information in invitation
-1. **Re-consent for changes**: When adding new data types, notify patients
-1. **Respect withdrawal**: Make it easy for patients to revoke consent
-1. **Document process**: Keep records of when patients consented
+2. **Re-consent for changes**: When adding new data types, notify patients
+3. **Respect withdrawal**: Make it easy for patients to revoke consent
+4. **Document process**: Keep records of when patients consented
 
 ### Security
 
 1. **Role-based access**: Only grant manager/member roles to authorized researchers
-1. **Audit access**: Regularly review who has access to study data
-1. **Data retention**: Define and enforce data retention policies
-1. **De-identification**: Consider de-identifying data for analysis
+2. **Audit access**: Regularly review who has access to study data
+3. **Data retention**: Define and enforce data retention policies
+4. **De-identification**: Consider de-identifying data for analysis
 
-______________________________________________________________________
+---
 
 ## Complete Study Setup Example
 
@@ -860,14 +838,13 @@ done
 echo "Study setup complete!"
 ```
 
-______________________________________________________________________
+---
 
 ## Choosing Between Console and REST API
 
 ### When to Use JupyterHealth Exchange Console
 
 ✅ **Best for:**
-
 - Creating individual studies interactively
 - Configuring data sources and scope requests visually
 - Viewing study details and monitoring progress
@@ -878,14 +855,12 @@ ______________________________________________________________________
 - Training and demonstrations
 
 ❌ **Not ideal for:**
-
 - Bulk study creation
 - Automated study setup workflows
 - Integration with external systems
 - Scheduled or triggered operations
 
 **Key Features:**
-
 - Create studies from Organizations page
 - Visual icon preview with real-time updates
 - Add/remove data sources and scopes with dropdowns
@@ -896,7 +871,6 @@ ______________________________________________________________________
 ### When to Use REST API
 
 ✅ **Best for:**
-
 - Bulk study creation from templates
 - Automated study configuration workflows
 - Integration with research management systems
@@ -907,14 +881,12 @@ ______________________________________________________________________
 - Complex multi-step study configurations
 
 ❌ **Not ideal for:**
-
 - One-off study creation
 - Users unfamiliar with APIs or command line
 - Quick interactive study management
 - Exploratory study viewing
 
 **Key Features:**
-
 - Batch operations (create multiple studies at once)
 - Scriptable workflows (Python, JavaScript, shell)
 - Advanced filtering and querying
@@ -928,32 +900,28 @@ Most organizations use both methods for different purposes:
 **Typical Workflow:**
 
 1. **Initial Setup** (Console):
-
    - Create organization via web portal
    - Create first study interactively
    - Configure data sources and scopes
    - Test with a few patients
 
-1. **Bulk Configuration** (REST API):
-
+2. **Bulk Configuration** (REST API):
    - Create multiple studies from templates
    - Configure data collection programmatically
    - Enroll patients in bulk
 
-1. **Daily Operations** (Console):
-
+3. **Daily Operations** (Console):
    - Monitor patient consent status
    - View study progress and data collection
    - Add/remove data sources as needed
    - Generate reports and insights
 
-1. **Analysis and Reporting** (REST API):
-
+4. **Analysis and Reporting** (REST API):
    - Export observation data for analysis
    - Generate automated reports
    - Integrate with data warehouses
 
-______________________________________________________________________
+---
 
 ## Related Documentation
 

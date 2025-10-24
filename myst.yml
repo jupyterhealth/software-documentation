@@ -15,7 +15,11 @@ project:
     # document types are a placeholder for now
     - title: Tutorials
       children:
-        - pattern: tutorial/*.{md,ipynb}
+        - file: tutorial/index.md
+        - file: tutorial/local-exchange-deployment.md
+        - file: tutorial/exchange-on-kubernetes.md
+        - file: tutorial/openmhealth-bp.ipynb
+        - file: tutorial/tutorial-cgm.ipynb
     - title: How-To Guides
       children:
         - file: howto/index.md

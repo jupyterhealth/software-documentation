@@ -1,6 +1,6 @@
 ---
-title: 'Your First Local JupyterHealth Exchange'
-description: 'Get a working JupyterHealth Exchange running on your computer in 15 minutes'
+title: Your First Local JupyterHealth Exchange
+description: Get a working JupyterHealth Exchange running on your computer in 15 minutes
 ---
 
 # Your First Local JupyterHealth Exchange
@@ -33,6 +33,7 @@ You'll also need to be comfortable running commands in a terminal.
 
 **If you have multiple Python versions installed:**
 The project's `Pipfile` specifies Python 3.12. If you have multiple Python versions, you may need to specify which one to use:
+
 ```bash
 # Tell pipenv to use Python 3.12 specifically
 PIPENV_PYTHON=3.12 pipenv install
@@ -45,10 +46,13 @@ set PIPENV_PYTHON=3.12 && pipenv install
 After installing PostgreSQL, verify it's running:
 
 **On Mac:**
+
 ```bash
 brew services list | grep postgresql
 ```
+
 If it says "started", you're good to go. If not, start it with:
+
 ```bash
 brew services start postgresql
 ```
@@ -57,10 +61,13 @@ brew services start postgresql
 Check if the PostgreSQL service is running in Services (press Win+R, type `services.msc`, look for "postgresql").
 
 **On Linux:**
+
 ```bash
 sudo systemctl status postgresql
 ```
+
 If it's not running, start it with:
+
 ```bash
 sudo systemctl start postgresql
 ```
@@ -70,16 +77,19 @@ sudo systemctl start postgresql
 First, let's install pipenv, which will manage our Python dependencies.
 
 **On Mac (with Homebrew):**
+
 ```bash
 brew install pipenv
 ```
 
 **On Linux/WSL:**
+
 ```bash
 pip3 install --user pipenv
 ```
 
 **On Windows:**
+
 ```bash
 pip install --user pipenv
 ```
@@ -89,6 +99,7 @@ pip install --user pipenv
 This is because of PEP 668 which protects your system Python from being corrupted. **Never use `--break-system-packages`** as it can damage your Python installation.
 
 Instead, use one of these safe alternatives:
+
 ```bash
 # Best option for Mac: Use Homebrew
 brew install pipenv
@@ -192,6 +203,7 @@ cp dot_env_example.txt .env
 ```
 
 Now open the `.env` file in your text editor:
+
 - **Windows**: `notepad .env`
 - **Mac**: `open -e .env`
 - **Linux**: `nano .env` or `gedit .env`
@@ -224,12 +236,14 @@ pipenv install --deploy
 The `--deploy` flag ensures you get the exact package versions from the lockfile, matching what the developers use.
 
 **What to expect:**
+
 - This will download and install Django, PostgreSQL drivers, OAuth libraries, and 20+ other packages
 - You'll see lots of text scrolling by - this is normal!
 - It might take 2-5 minutes depending on your internet connection
 - The final message should say something like "Successfully installed..." with a list of packages
 
 **If you see an error** about pipenv not being found, try closing and reopening your terminal, or install it globally:
+
 ```bash
 pip install --user pipenv
 ```
@@ -259,15 +273,17 @@ pipenv run python manage.py migrate
 ```
 
 **What to expect:**
+
 - You'll see output like "Running migrations..." followed by several lines showing "Applying core.0001_initial... OK"
 - This creates tables for users, organizations, studies, patients, observations, and more
 - Takes about 5-10 seconds
 - The last line should say something like "Applying sessions.0001_initial... OK"
 
 **If you see an error** about "connection refused" or "authentication failed", double-check:
+
 1. PostgreSQL is running (see "Before We Start" section)
-2. Your `.env` file has the correct database credentials
-3. You ran the `GRANT ALL ON SCHEMA public TO jheuser;` command if using PostgreSQL 15+
+1. Your `.env` file has the correct database credentials
+1. You ran the `GRANT ALL ON SCHEMA public TO jheuser;` command if using PostgreSQL 15+
 
 ## Step 7: Load Example Data
 
@@ -282,12 +298,15 @@ pipenv run python manage.py seed
 **If you see a "duplicate key" error**, the database already has data from a previous run. You have two options:
 
 1. **Flush and re-seed** (recommended for learning):
+
    ```bash
    pipenv run python manage.py seed --flush-db
    ```
+
    This will clear all existing data and start fresh.
 
-2. **Create a new database** (if you want to preserve existing data):
+1. **Create a new database** (if you want to preserve existing data):
+
    - Create a new database in PostgreSQL with a different name
    - Update `DB_NAME` in your `.env` file
    - Run `pipenv run python manage.py migrate` again
@@ -303,6 +322,7 @@ The `seed` command creates:
 - All the necessary OAuth configuration
 
 **What to expect:**
+
 - You'll see output saying "Creating organizations...", "Creating studies...", etc.
 - This takes about 10-20 seconds
 - The final message should say something like "Database seeded successfully!"
@@ -428,11 +448,13 @@ Organizations (hierarchical)
 The seed data created two complete research programs for you to explore:
 
 **UC Berkeley Program:**
+
 - BIDS runs two studies on cardiovascular health
 - Patients Peter and Pamela are enrolled
 - Data includes blood pressure and heart rate measurements
 
 **UCSF Program:**
+
 - Multiple cardiology labs (Moslehi Lab, Olgin Lab)
 - Studies on temperature, oxygen saturation, and respiratory rate
 - Different patients enrolled in different studies
@@ -445,13 +467,13 @@ Now that you have a working JupyterHealth Exchange, you can:
 
 1. **Experiment with the REST API** - JupyterHealth Exchange provides a full FHIR R5 API. Try the [API reference](../reference/exchange-apis.md) to learn how to fetch data programmatically.
 
-2. **Upload your own data** - Create a new patient, generate an invitation link, and use the API to upload health observations.
+1. **Upload your own data** - Create a new patient, generate an invitation link, and use the API to upload health observations.
 
-3. **Learn about deployment** - When you're ready to deploy for real users, see our [Kubernetes deployment tutorial](exchange-on-kubernetes.md).
+1. **Learn about deployment** - When you're ready to deploy for real users, see our [Kubernetes deployment tutorial](exchange-on-kubernetes.md).
 
-4. **Understand the architecture** - Read the [Exchange Overview](../explanation/exchange-overview.md) to learn how JupyterHealth Exchange works under the hood.
+1. **Understand the architecture** - Read the [Exchange Overview](../explanation/exchange-overview.md) to learn how JupyterHealth Exchange works under the hood.
 
-5. **Connect to JupyterHub** - JupyterHealth Exchange can work with JupyterHub to give researchers computational notebooks with access to health data.
+1. **Connect to JupyterHub** - JupyterHealth Exchange can work with JupyterHub to give researchers computational notebooks with access to health data.
 
 ## Troubleshooting
 
@@ -485,6 +507,7 @@ git checkout main
 ### "FATAL: password authentication failed for user 'jheuser'"
 
 Check your database settings in `.env` match the user and password you created in PostgreSQL. Common issues:
+
 - The password in `.env` doesn't match what you used in `CREATE USER`
 - The database name is wrong (should be `jhe_dev`)
 - PostgreSQL isn't running (see "Before We Start" section)

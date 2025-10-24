@@ -61,6 +61,7 @@ project:
         - "http://localhost:8000"
         - "http://localhost:8000/"
         - "http://localhost:8000/admin"
+        - "http://localhost:8001"
 site:
   template: book-theme
   title: JupyterHealth Software

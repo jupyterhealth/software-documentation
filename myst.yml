@@ -18,7 +18,20 @@ project:
         - pattern: tutorial/*.{md,ipynb}
     - title: How-To Guides
       children:
-        - pattern: howto/*
+        - file: howto/index.md
+        - title: For Admins and Deployment
+          children:
+            - file: howto/admins-deployers/configuring-hipaa-storage.md
+            - file: howto/admins-deployers/add-data-source-type.md
+            - file: howto/admins-deployers/connecting-new-wearable-api.md
+            - file: howto/admins-deployers/upgrading-jupyterhealth.md
+            - file: howto/admins-deployers/troubleshooting-ingestion-errors.md
+        - title: For Clinicians and Researchers
+          children:
+            - file: howto/practitioners/study-management.md
+            - file: howto/practitioners/patient-management.md
+            - file: howto/practitioners/fetching-exporting-data.md
+            - file: howto/practitioners/using-rest-api.md
     - title: Explanation
       children:
         - file: explanation/index.md

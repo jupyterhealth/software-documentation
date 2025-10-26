@@ -72,6 +72,59 @@ If it's not running, start it with:
 sudo systemctl start postgresql
 ```
 
+### Alternative: Using Docker for PostgreSQL
+
+If you prefer not to install PostgreSQL system-wide, or if you want to avoid conflicts with an existing PostgreSQL installation, you can run PostgreSQL in a Docker container instead.
+
+**Prerequisites for this option:**
+- Docker Desktop installed ([docker.com](https://www.docker.com/products/docker-desktop))
+
+**Start PostgreSQL in a container:**
+
+```bash
+docker run --name jhe-postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=jhe_dev \
+  -e POSTGRES_USER=postgres \
+  -p 5432:5432 \
+  -d postgres:15
+```
+
+**What this does:**
+- Creates a container named `jhe-postgres`
+- Runs PostgreSQL 15
+- Exposes it on localhost:5432 (same as a local installation)
+- Creates the `jhe_dev` database automatically
+
+**Create the jheuser:**
+
+```bash
+docker exec -it jhe-postgres psql -U postgres -d jhe_dev -c "CREATE USER jheuser WITH PASSWORD 'jhepassword';"
+docker exec -it jhe-postgres psql -U postgres -d jhe_dev -c "GRANT ALL PRIVILEGES ON DATABASE jhe_dev TO jheuser;"
+docker exec -it jhe-postgres psql -U postgres -d jhe_dev -c "GRANT ALL ON SCHEMA public TO jheuser;"
+```
+
+**To stop the container later:**
+
+```bash
+docker stop jhe-postgres
+```
+
+**To restart it:**
+
+```bash
+docker start jhe-postgres
+```
+
+**To remove it completely:**
+
+```bash
+docker stop jhe-postgres
+docker rm jhe-postgres
+```
+
+If you use this Docker approach, your `.env` file should use `DB_HOST="localhost"` (which is already the default in `dot_env_example.txt`), and you can skip the rest of Step 2 below.
+
 ## Step 1: Set Up Your Python Environment
 
 First, let's install pipenv, which will manage our Python dependencies.
@@ -221,7 +274,33 @@ DB_PORT=5432
 
 If you used different values when creating your database, update these lines to match.
 
-Notice the file already contains OAuth keys and secrets. These are **demo keys for development only** - they're intentionally included in the example file to make this tutorial work smoothly. In a real deployment, you would generate your own secure keys.
+### Generate a SECRET_KEY
+
+> **⚠️ SECURITY WARNING:** The `dot_env_example.txt` file contains a `SECRET_KEY` value. **Do NOT use this example value!** Every installation must have its own unique SECRET_KEY.
+
+Django uses the SECRET_KEY to protect session data, password reset tokens, and other security-critical features. If multiple installations share the same SECRET_KEY, attackers could potentially forge session tokens or compromise user data.
+
+**Generate your own SECRET_KEY now:**
+
+```bash
+openssl rand -base64 32
+```
+
+This will output a random string like `xJ8kP2mN9qR5tY7wA3fD6hL4sG8bV1nC0zX5mK7jP9q=`
+
+**Copy this value and update the SECRET_KEY line in your `.env` file:**
+
+```env
+SECRET_KEY="xJ8kP2mN9qR5tY7wA3fD6hL4sG8bV1nC0zX5mK7jP9q="
+```
+
+Replace the existing value with your newly generated key.
+
+> **Note:** If you skip this step, JupyterHealth Exchange will auto-generate a random SECRET_KEY when it starts. However, this auto-generated key only works with a single server process. For consistency and to avoid issues when scaling up later, it's best to set your own SECRET_KEY now.
+
+**About the other secrets in the file:**
+
+Notice the file also contains OAuth keys (`OIDC_RSA_PRIVATE_KEY`, `PATIENT_AUTHORIZATION_CODE_CHALLENGE`, etc.). These are **demo keys for development only** - they're intentionally included in the example file to make this tutorial work smoothly with the seeded test data. In a real deployment, you would generate your own secure OAuth keys following the instructions in the [main README](https://github.com/jupyterhealth/jupyterhealth-exchange#getting-started).
 
 Save and close the `.env` file. We're ready to start!
 

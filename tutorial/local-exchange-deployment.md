@@ -77,6 +77,7 @@ sudo systemctl start postgresql
 If you prefer not to install PostgreSQL system-wide, or if you want to avoid conflicts with an existing PostgreSQL installation, you can run PostgreSQL in a Docker container instead.
 
 **Prerequisites for this option:**
+
 - Docker Desktop installed ([docker.com](https://www.docker.com/products/docker-desktop))
 
 **Start PostgreSQL in a container:**
@@ -91,6 +92,7 @@ docker run --name jhe-postgres \
 ```
 
 **What this does:**
+
 - Creates a container named `jhe-postgres`
 - Runs PostgreSQL 15
 - Exposes it on localhost:5432 (same as a local installation)

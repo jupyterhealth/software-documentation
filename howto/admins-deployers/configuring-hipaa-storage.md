@@ -2,7 +2,7 @@
 
 This guide shows you how to configure JupyterHealth Exchange for HIPAA-compliant patient data storage.
 
-> **Note**: This guide includes instructions for AWS RDS, Google Cloud SQL, Azure Database for PostgreSQL, and self-hosted deployments. Before proceeding, verify command syntax and feature availability in your cloud provider's current documentation (links provided in each section).
+> **Note:** This guide includes instructions for AWS RDS, Google Cloud SQL, Azure Database for PostgreSQL, and self-hosted deployments. Before proceeding, verify command syntax and feature availability in your cloud provider's current documentation (links provided in each section).
 
 ### Initial Setup
 

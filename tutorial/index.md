@@ -15,7 +15,7 @@ Note: [the difference between how-to and tutorial](https://diataxis.fr/tutorials
 
 - "Zero to JupyterHealth" - deploying JupyterHealth in the cloud on AWS (or whatever)
 - Installation and First Setup
-- Acquiring Data from Wearables (Dexcom, Oura, CareX)
+- Acquiring Data from Wearables (Dexcom, Oura), Apps (CareX)
 - Running Your First Analysis in a Notebook
 - Deploying a standalone JupyterHealth Hub
 - Fetching and viewing data from the Exchange with JupyterHealth Client

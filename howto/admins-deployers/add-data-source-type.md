@@ -4,14 +4,14 @@ This guide shows you how to add new data sources and data types to JupyterHealth
 
 ### Adding a New Data Source
 
-- [Prerequisites](#prerequisites)
+- [Prerequisites](#prerequisites-for-adding-data-source)
 - [Step 1: Create DataSource Entry](#step-1-create-datasource-entry)
 - [Step 2: Link Supported Data Types](#step-2-link-supported-data-types)
 - [Step 3: Verify DataSource](#step-3-verify-datasource)
 
 ### Adding a New Data Type
 
-- [Prerequisites](#prerequisites)
+- [Prerequisites](#prerequisites-for-adding-data-type)
 - [Step 1: Obtain Open mHealth Schema](#step-1-obtain-open-mhealth-schema)
 - [Step 2: Review Schema Structure](#step-2-review-schema-structure)
 - [Step 3: Create Example Data Point](#step-3-create-example-data-point)
@@ -27,7 +27,7 @@ This guide shows you how to add new data sources and data types to JupyterHealth
 - [Step 4: Upload Test Observation](#step-4-upload-test-observation)
 - [Step 5: Retrieve Test Observation](#step-5-retrieve-test-observation)
 
-## #Common Issues
+### Common Issues
 
 - [Schema Validation Fails](#schema-validation-fails)
 - [CodeableConcept Not Found](#codeableconcept-not-found)
@@ -47,7 +47,7 @@ ______________________________________________________________________
 
 Data sources represent devices or applications that produce health observations (e.g., Fitbit, Apple Watch, Dexcom).
 
-### Prerequisites
+### Prerequisites for Adding Data Source
 
 - Access to JupyterHealth Exchange Console with a **super user** account, OR
 - Django shell access, OR
@@ -214,7 +214,7 @@ Reference: `jupyterhealth-exchange/core/models.py`
 
 Data types define the structure and schema for health observations using Open mHealth standards.
 
-### Prerequisites
+### Prerequisites for Adding Data Type
 
 - Django shell access (CodeableConcept not available in Django admin)
 - Open mHealth schema for the data type

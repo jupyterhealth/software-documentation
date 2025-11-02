@@ -11,7 +11,7 @@ This document traces that journey step by step, explaining not just *what* happe
 
 Health data flows through JupyterHealth Exchange across three major phases: **Acquisition**, **Exchange**, and **Analysis**. This sequence diagram shows **who** does **what** at each stage:
 
-:::\{div}
+:::{div}
 :class: dark:hidden
 
 ```{mermaid}
@@ -51,7 +51,7 @@ sequenceDiagram
 
 :::
 
-:::\{div}
+:::{div}
 :class: hidden dark:block
 
 ```{mermaid}

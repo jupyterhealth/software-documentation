@@ -13,7 +13,7 @@ The JupyterHealth ecosystem enables patients to share health data from personal 
 
 ### High-Level Data Flow
 
-```mermaid
+```{mermaid}
 graph LR
     subgraph Device Manufacturers
         iHealth[iHealth]
@@ -98,7 +98,7 @@ Device Data → OMH Format → FHIR Observation → JupyterHealth Exchange
 
 **Architecture Layers**:
 
-```mermaid
+```{mermaid}
 graph TB
     API[REST API Layer<br/>Django REST Framework]
     Auth[Authentication Layer<br/>OAuth 2.0]
@@ -255,7 +255,7 @@ For local development and testing, JupyterHealth Exchange can be run using Djang
 
 The current JupyterHealth Exchange production deployment runs on [Fly.io](https://fly.io):
 
-```mermaid
+```{mermaid}
 graph LR
     Android[CommonHealth<br/>Android App]
 

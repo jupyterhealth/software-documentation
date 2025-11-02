@@ -240,7 +240,6 @@ Common schemas available:
 - `respiratory-rate` (v2.0)
 - `step-count` (v2.0)
 - `physical-activity` (v2.0)
-- `sleep-duration` (v2.0)
 - `body-weight` (v2.0)
 - `body-mass-index` (v2.0)
 
@@ -262,7 +261,6 @@ Examples:
 
 - `schema-omh_heart-rate_2-0.json`
 - `schema-omh_body-weight_2-0.json`
-- `schema-omh_sleep-duration_2-0.json`
 
 ### Step 2: Review Schema Structure
 

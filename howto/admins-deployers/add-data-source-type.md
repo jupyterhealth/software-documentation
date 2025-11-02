@@ -35,7 +35,7 @@ This guide shows you how to add new data sources and data types to JupyterHealth
 
 ### Advanced
 
-- [Adding Custom (Non-OMH) Data Types](#adding-custom-non-omh-data-types)
+<!-- - [Adding Custom (Non-OMH) Data Types](#adding-custom-non-omh-data-types) -->
 
 ### Reference
 

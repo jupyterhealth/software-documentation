@@ -253,7 +253,7 @@ For local development and testing, JupyterHealth Exchange can be run using Djang
 
 ### Production Deployment (Fly.io)
 
-The current JupyterHealth Exchange production deployment runs on Fly.io:
+The current JupyterHealth Exchange production deployment runs on [Fly.io](https://fly.io):
 
 ```mermaid
 graph LR
@@ -278,9 +278,9 @@ graph LR
 
 | Component       | Technology       | Configuration                                        |
 | --------------- | ---------------- | ---------------------------------------------------- |
-| **Platform**    | Fly.io           | Primary region: Newark (ewr)                         |
+| **Platform**    | [Fly.io](https://fly.io) | Primary region: Newark (ewr)                         |
 | **Application** | Docker container | Gunicorn with 2 workers, WhiteNoise for static files |
-| **Compute**     | Fly.io VM        | 1GB RAM, 1 shared vCPU                               |
+| **Compute**     | [Fly.io](https://fly.io) VM | 1GB RAM, 1 shared vCPU                               |
 | **Database**    | Fly Postgres     | Managed PostgreSQL with automated backups            |
 | **HTTPS**       | Fly Proxy        | Automatic TLS certificates, forced HTTPS             |
 | **Scaling**     | Auto-scaling     | Min 1 machine, auto-stop/start on traffic            |
@@ -292,7 +292,7 @@ graph LR
 1. GitHub Actions workflow triggered
 1. `.env` file created from GitHub repository secrets
 1. Docker image built with embedded `.env` file
-1. Image deployed to Fly.io
+1. Image deployed to [Fly.io](https://fly.io)
 1. Database migrations run automatically (`python manage.py migrate`)
 1. New container started with zero downtime
 

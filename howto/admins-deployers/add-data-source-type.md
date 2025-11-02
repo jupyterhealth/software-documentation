@@ -753,6 +753,7 @@ else:
         print(f"  {scope.coding_code}: {scope.text}")
 ```
 
+<!--
 ## Adding Custom (Non-OMH) Data Types
 
 If you need to add a proprietary data type not from Open mHealth:
@@ -825,6 +826,7 @@ def clean(self):
 ```
 
 **Note**: Custom schemas require code changes and should be avoided if possible. Prefer using or extending Open mHealth schemas.
+-->
 
 ## Related Documentation
 

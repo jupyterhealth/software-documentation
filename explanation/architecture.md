@@ -171,7 +171,7 @@ graph TB
 
 **Workflow**:
 
-:::\{div}
+:::{div}
 :class: dark:hidden
 
 ```{mermaid}
@@ -195,7 +195,7 @@ sequenceDiagram
 
 :::
 
-:::\{div}
+:::{div}
 :class: hidden dark:block
 
 ```{mermaid}

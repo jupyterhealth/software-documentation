@@ -171,7 +171,7 @@ graph TB
 
 **Workflow**:
 
-:::{div}
+:::\{div}
 :class: dark:hidden
 
 ```{mermaid}
@@ -195,7 +195,7 @@ sequenceDiagram
 
 :::
 
-:::{div}
+:::\{div}
 :class: hidden dark:block
 
 ```{mermaid}
@@ -276,15 +276,15 @@ graph LR
 
 **Infrastructure Details**:
 
-| Component       | Technology       | Configuration                                        |
-| --------------- | ---------------- | ---------------------------------------------------- |
-| **Platform**    | [Fly.io](https://fly.io) | Primary region: Newark (ewr)                         |
-| **Application** | Docker container | Gunicorn with 2 workers, WhiteNoise for static files |
+| Component       | Technology                  | Configuration                                        |
+| --------------- | --------------------------- | ---------------------------------------------------- |
+| **Platform**    | [Fly.io](https://fly.io)    | Primary region: Newark (ewr)                         |
+| **Application** | Docker container            | Gunicorn with 2 workers, WhiteNoise for static files |
 | **Compute**     | [Fly.io](https://fly.io) VM | 1GB RAM, 1 shared vCPU                               |
-| **Database**    | Fly Postgres     | Managed PostgreSQL with automated backups            |
-| **HTTPS**       | Fly Proxy        | Automatic TLS certificates, forced HTTPS             |
-| **Scaling**     | Auto-scaling     | Min 1 machine, auto-stop/start on traffic            |
-| **Deployment**  | GitHub Actions   | Automated deploy on push to main branch              |
+| **Database**    | Fly Postgres                | Managed PostgreSQL with automated backups            |
+| **HTTPS**       | Fly Proxy                   | Automatic TLS certificates, forced HTTPS             |
+| **Scaling**     | Auto-scaling                | Min 1 machine, auto-stop/start on traffic            |
+| **Deployment**  | GitHub Actions              | Automated deploy on push to main branch              |
 
 **Deployment Workflow**:
 

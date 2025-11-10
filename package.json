@@ -6,6 +6,6 @@
     "test": "myst build --html --check-links --strict"
   },
   "dependencies": {
-    "mystmd": "^1.6.3"
+    "mystmd": "^1.6.4"
   }
 }

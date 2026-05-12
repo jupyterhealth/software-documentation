@@ -6,10 +6,10 @@ title: FHIR API
 
 The `FHIR Patient` endpoint returns a list of Patients as a FHIR Bundle for a given Study ID passed as query parameter`_has:Group:member:_id` or alternatively a single Patient matching the query parameter `identifier=<system>|<value>`
 
-| Query Parameter         | Example                         | Description                                                  |
-| ----------------------- | ------------------------------- | ------------------------------------------------------------ |
-| `_has:Group:member:_id` | `30001`                         | Filter by Patients that are in the Study with ID 30001       |
-| `identifier`            | `http://ehr.example.com|abc123` | Filter by single Patient with Identifier System `http://ehr.example.com` and Value `abc123` |
+| Query Parameter         | Example                  | Description                                            |
+| ----------------------- | ------------------------ | ------------------------------------------------------ |
+| `_has:Group:member:_id` | `30001`                  | Filter by Patients that are in the Study with ID 30001 |
+| `identifier`            | \`http://ehr.example.com | abc123\`                                               |
 
 ```json
 // GET /fhir/r5/Patient?_has:Group:member:_id=30001
@@ -62,14 +62,12 @@ The `FHIR Patient` endpoint returns a list of Patients as a FHIR Bundle for a gi
 - `device.reference` references a Data Source ID
 - `valueAttachment` is Base 64 Encoded Binary JSON
 
-| Query Parameter                 | Example                                               | Description                                                  |
-| ------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------ |
-| `patient._has:Group:member:_id` | `30001`                                               | Filter by Patients that are in the Study with ID 30001       |
-| `patient`                       | `40001`                                               | Filter by single Patient with ID 40001                       |
-| `patient.identifier`            | `http://ehr.example.com\|abc123`                       | Filter by single Patient with Identifier System `http://ehr.example.com` and Value `abc123` |
+| Query Parameter                 | Example                                                | Description                                                                                       |
+| ------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| `patient._has:Group:member:_id` | `30001`                                                | Filter by Patients that are in the Study with ID 30001                                            |
+| `patient`                       | `40001`                                                | Filter by single Patient with ID 40001                                                            |
+| `patient.identifier`            | `http://ehr.example.com\|abc123`                       | Filter by single Patient with Identifier System `http://ehr.example.com` and Value `abc123`       |
 | `code`                          | `https://w3id.org/openmhealth\|omh:blood-pressure:4.0` | Filter by Type/Scope with System `https://w3id.org/openmhealth` and Code `omh:blood-pressure:4.0` |
-
-
 
 ```json
 // GET /fhir/r5/Observation?patient._has:Group:member:_id=30001&patient=40001&code=https://w3id.org/openmhealth|omh:blood-pressure:4.0

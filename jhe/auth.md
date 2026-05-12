@@ -18,12 +18,14 @@ Separate OAuth clients are created for the Web UI (Practitioners) and for indivi
 #### 1. Patient receives Invitation Link
 
 The patient receives a link by E-mail or SMS that looks like this example: `https://app.tcp.org/invitation/jhe.tcp.org_0wYuXvhoyRfko9yFYl9inpBiNkHLVBMy`
+
 - `https://app.tcp.org/` is the URL used to launch the app or web browser
 - `jhe.tcp.org_0wYuXvhoyRfko9yFYl9inpBiNkHLVBMy` is the invitation code and it can be configured how/where it's included into the URL
 
 #### 2. Client is launched and consumes the invitation code
 
 The patient clicks the link to launch the client which consumes the invitation code
+
 - `jhe.tcp.org_0wYuXvhoyRfko9yFYl9inpBiNkHLVBMy` is the invitation code
   - The client first splits the invitation code on "`_`"
     - `jhe.tcp.org` is the JHE host (may also include port eg `jhe.tcp.org:8080`)
@@ -79,7 +81,6 @@ eg: `grant_type=authorization_code&redirect_uri=http%3A%2F%2Fjhe.tcp.org%2Fauth%
 
 The returned `access_token` must be included in the `Authorization` header for all subsequent API requests with the prefix `Bearer `
 
-
 ### Single Sign-On (SSO) with SAML2
 
 The [django-saml2-auth](https://github.com/grafana/django-saml2-auth) library is included to support SSO with SAML2.
@@ -88,12 +89,11 @@ The [django-saml2-auth](https://github.com/grafana/django-saml2-auth) library is
 
 Ensure you have the following System Settings
 
-| Key | Value Type | Value | Notes |
-|-----|-----------|-------|-------|
-| `auth.sso.saml2` | int | `1` | Set to 0 to disable SAML SSO |
-| `auth.sso.idp_metadata_url` | string | `https://mocksaml.com/api/saml/metadata` | SAML IdP metadata URL |
-| `auth.sso.valid_domains` | string | `example.com,example.org` | Comma-separated email domains for SSO |
-
+| Key                         | Value Type | Value                                    | Notes                                 |
+| --------------------------- | ---------- | ---------------------------------------- | ------------------------------------- |
+| `auth.sso.saml2`            | int        | `1`                                      | Set to 0 to disable SAML SSO          |
+| `auth.sso.idp_metadata_url` | string     | `https://mocksaml.com/api/saml/metadata` | SAML IdP metadata URL                 |
+| `auth.sso.valid_domains`    | string     | `example.com,example.org`                | Comma-separated email domains for SSO |
 
 ##### Test Flow
 
@@ -103,7 +103,10 @@ Ensure you have the following System Settings
 
    - Audience: `http://localhost:8000/sso/acs/`
 
-2. Enter any email name `@example.com`
-2. Enter any password
-2. Click Sign in
-2. The JHE portal should be displayed with the user in the matching user name in the bottom left hand corner
+1. Enter any email name `@example.com`
+
+1. Enter any password
+
+1. Click Sign in
+
+1. The JHE portal should be displayed with the user in the matching user name in the bottom left hand corner

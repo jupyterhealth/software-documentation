@@ -62,11 +62,11 @@ sequenceDiagram
 
 ## Implementing a Client Step by Step
 
-1. The first thing you need to do is determine the invitation URL for your client and communicate this to the JHE admin to register and configure your client on the target JHE instance(s). The invitation URL is clicked/tapped by patients who receive an E-mail or SMS to  join the study. For web based clients, the URL will typically point to a launch page, for app based clients, the URL will follow a domain or pattern that triggers the OS to launch the app. The position of the invitation code (`jhe.tcp.org_0wYuXvhoyRfko9yFYl9inpBiNkHLVBMy` in the example below) in the URL is configured when the client is registered. Eg:
+1. The first thing you need to do is determine the invitation URL for your client and communicate this to the JHE admin to register and configure your client on the target JHE instance(s). The invitation URL is clicked/tapped by patients who receive an E-mail or SMS to join the study. For web based clients, the URL will typically point to a launch page, for app based clients, the URL will follow a domain or pattern that triggers the OS to launch the app. The position of the invitation code (`jhe.tcp.org_0wYuXvhoyRfko9yFYl9inpBiNkHLVBMy` in the example below) in the URL is configured when the client is registered. Eg:
    - `https://webapp.tcp.org/jhe/launch?invitation=jhe.tcp.org_0wYuXvhoyRfko9yFYl9inpBiNkHLVBMy`
    - `https://app.tcp.org/jhe/invitation/jhe.tcp.org_0wYuXvhoyRfko9yFYl9inpBiNkHLVBMy`
 1. Your client then needs to consume the the invitation code (`jhe.tcp.org_0wYuXvhoyRfko9yFYl9inpBiNkHLVBMy` in the example above) and exchange it for an access token that is specific to the patient. See [Auth](auth) for instructions on how to do this.
-1. Once you have the access token, it is added to the `Authorization` header with a `Bearer `  prefix to authorize all subsequent requests, eg `'Authorization: Bearer x3VdsqpjayuOQ08G9EnWyAf7LDUor6'`
+1. Once you have the access token, it is added to the `Authorization` header with a `Bearer ` prefix to authorize all subsequent requests, eg `'Authorization: Bearer x3VdsqpjayuOQ08G9EnWyAf7LDUor6'`
 1. Next, you need to present the Patient with the list of studies they have been invited to and the data scopes requested by the study. This is done is two steps below (see [Admin API](admin-api) for examples):
    1. Get the Patient ID by requesting `GET /api/v1/users/profile`
    1. Use that ID to list consents `GET /api/v1/patients/40001/consents`

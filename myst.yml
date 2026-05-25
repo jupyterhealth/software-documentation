@@ -22,6 +22,7 @@ project:
         - file: jhe/admin-api.md
         - file: jhe/fhir-api.md
         - file: jhe/data-model.md
+        - file: jhe/ow-integration.md
         # - title: Deploy
         #   children:
         #     - file: jhe/deploy/kubernetes.md

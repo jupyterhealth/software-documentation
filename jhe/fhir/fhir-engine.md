@@ -7,14 +7,14 @@ A small, config-driven engine that powers a FHIR R5 server over Django. The guid
 
 Concretely, the Django models hold:
 
-| FHIR resource | Django model (JHE system) | Everything else → `FhirAuxResource` |
-| --- | --- | --- |
-| `Observation` | `Observation` — **OMH only** (`code` system `https://w3id.org/openmhealth`) | any other / code-less Observation |
-| `Device` | `DataSource` | any other Device |
-| `Group` | `Study` | any other Group |
-| `Organization` | `Organization` | any other Organization |
-| `Patient` | `Patient` | any other Patient |
-| `Practitioner` | `Practitioner` | any other Practitioner |
+| FHIR resource  | Django model (JHE system)                                                   | Everything else → `FhirAuxResource` |
+| -------------- | --------------------------------------------------------------------------- | ----------------------------------- |
+| `Observation`  | `Observation` — **OMH only** (`code` system `https://w3id.org/openmhealth`) | any other / code-less Observation   |
+| `Device`       | `DataSource`                                                                | any other Device                    |
+| `Group`        | `Study`                                                                     | any other Group                     |
+| `Organization` | `Organization`                                                              | any other Organization              |
+| `Patient`      | `Patient`                                                                   | any other Patient                   |
+| `Practitioner` | `Practitioner`                                                              | any other Practitioner              |
 
 Both kinds of resource are declared in [core/fhir/fhir_config.json](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/fhir/fhir_config.json).
 A **mapped resource** is projected onto its Django model by a field mapping (read renders the
@@ -38,11 +38,11 @@ The config drives which backing store handles it, via two annotations:
 
 Given a resource `R` with mapped interactions `M`, aux interactions `A`, and optional criteria `C`:
 
-| Interaction | Routing |
-| --- | --- |
-| **search** | UNION of the mapped Django rows (if `search ∈ M`) and the `FhirAuxResource` rows of that type (if `search ∈ A`), in one searchset Bundle. |
+| Interaction                | Routing                                                                                                                                                                                      |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **search**                 | UNION of the mapped Django rows (if `search ∈ M`) and the `FhirAuxResource` rows of that type (if `search ∈ A`), in one searchset Bundle.                                                    |
 | **read / update / delete** | by **id shape** — a **UUID** id targets `FhirAuxResource`; an **integer** id targets the mapped Django model. (FhirAuxResource uses a UUID primary key, so the two id spaces never collide.) |
-| **create** | if `create ∈ M` and (`C` absent or `C` matches the payload) → mapped model; else if `create ∈ A` → aux; else `405`. |
+| **create**                 | if `create ∈ M` and (`C` absent or `C` matches the payload) → mapped model; else if `create ∈ A` → aux; else `405`.                                                                          |
 
 With the shipped config, `Device`/`Group`/`Organization`/`Patient`/`Practitioner` are
 `read,search` against their model — so **all their writes fall through to `FhirAuxResource`** —
@@ -54,16 +54,16 @@ So searching `Group` returns the mapped `Study` rows **plus** any `Group` rows i
 
 ## Components
 
-| File | Responsibility |
-| --- | --- |
-| [core/fhir/fhir_config.json](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/fhir/fhir_config.json) | Declares `mapped_resources` (field mappings + `meta.__interaction` / `__criteria`) and `aux_resources` (`resourceType` + `__interaction`). |
-| [core/fhir/config.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/fhir/config.py) | Loads the JSON once at import; exposes `get_resource_mapping`, `mapped_interactions` / `aux_interactions`, `mapped_criteria`, `mapped_model_name`, and **`get_config_errors()`** (validation, see below). |
-| [core/fhir/engine.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/fhir/engine.py) | The renderer: `build_fhir_resource` (model → FHIR dict), `render_resource`, `matches_criteria`, `expand_interactions`. |
-| [core/fhir/fhir_validation.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/fhir/fhir_validation.py) | `validate_fhir_resource(resource_type, data)` — parse an incoming FHIR body against its `fhir.resources` model (DRF 400 on failure). |
-| [core/serializers/observation.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/serializers/observation.py), [core/serializers/patient.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/serializers/patient.py) | `FHIRObservationSerializer` / `FHIRPatientSerializer` call the engine. (Observation Base64-encodes `valueAttachment.data` afterwards.) |
-| [core/serializers/aux_resource.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/serializers/aux_resource.py) | `FHIRAuxResourceSerializer` returns a `FhirAuxResource`'s stored body verbatim (with `resourceType`/`id` forced). |
-| [core/views/fhir.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/views/fhir.py) | `FHIRResourceView` — the unified endpoint, routing table, mapped handlers, and the aux handler. |
-| [core/fhir/pagination.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/fhir/pagination.py) | Wraps serialized resources in a FHIR `searchset` Bundle. |
+| File                                                                                                                                                                                                                                                               | Responsibility                                                                                                                                                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [core/fhir/fhir_config.json](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/fhir/fhir_config.json)                                                                                                                                         | Declares `mapped_resources` (field mappings + `meta.__interaction` / `__criteria`) and `aux_resources` (`resourceType` + `__interaction`).                                                                |
+| [core/fhir/config.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/fhir/config.py)                                                                                                                                                       | Loads the JSON once at import; exposes `get_resource_mapping`, `mapped_interactions` / `aux_interactions`, `mapped_criteria`, `mapped_model_name`, and **`get_config_errors()`** (validation, see below). |
+| [core/fhir/engine.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/fhir/engine.py)                                                                                                                                                       | The renderer: `build_fhir_resource` (model → FHIR dict), `render_resource`, `matches_criteria`, `expand_interactions`.                                                                                    |
+| [core/fhir/fhir_validation.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/fhir/fhir_validation.py)                                                                                                                                     | `validate_fhir_resource(resource_type, data)` — parse an incoming FHIR body against its `fhir.resources` model (DRF 400 on failure).                                                                      |
+| [core/serializers/observation.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/serializers/observation.py), [core/serializers/patient.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/serializers/patient.py) | `FHIRObservationSerializer` / `FHIRPatientSerializer` call the engine. (Observation Base64-encodes `valueAttachment.data` afterwards.)                                                                    |
+| [core/serializers/aux_resource.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/serializers/aux_resource.py)                                                                                                                             | `FHIRAuxResourceSerializer` returns a `FhirAuxResource`'s stored body verbatim (with `resourceType`/`id` forced).                                                                                         |
+| [core/views/fhir.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/views/fhir.py)                                                                                                                                                         | `FHIRResourceView` — the unified endpoint, routing table, mapped handlers, and the aux handler.                                                                                                           |
+| [core/fhir/pagination.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/fhir/pagination.py)                                                                                                                                               | Wraps serialized resources in a FHIR `searchset` Bundle.                                                                                                                                                  |
 
 ## The configuration
 
@@ -84,13 +84,13 @@ returns a **500 OperationOutcome** listing any problems. The five checks
 ([core/fhir/config.py](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/fhir/config.py)):
 
 1. **Every** entry — mapped and aux — has a non-empty `__interaction`.
-2. Each interaction is one of `create/read/update/delete/search` or `"*"`.
-3. A mapped resource whose interactions cover everything (`"*"`) **must** declare `__criteria`
+1. Each interaction is one of `create/read/update/delete/search` or `"*"`.
+1. A mapped resource whose interactions cover everything (`"*"`) **must** declare `__criteria`
    (otherwise it could never fall back to aux).
-4. **Every path resolves** on the backing model: the model is the path prefix (resolved via
+1. **Every path resolves** on the backing model: the model is the path prefix (resolved via
    `apps.get_model("core", name)`), and each dotted segment must be a field, a `@property`, or an
    FK hop (e.g. `Patient.jhe_user.email`, `Observation.codeable_concepts`).
-5. **Every field name is valid FHIR**: each non-`__` key of a mapped resource must be a real
+1. **Every field name is valid FHIR**: each non-`__` key of a mapped resource must be a real
    element of the matching `fhir.resources` model (`ModelClass.elements_sequence()`).
 
 ## Auxiliary resources, FhirSource & the source header

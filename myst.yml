@@ -20,7 +20,10 @@ project:
         - file: jhe/client-flow.md
         - file: jhe/auth.md
         - file: jhe/admin-api.md
-        - file: jhe/fhir-api.md
+        - title: FHIR
+          children:
+            - file: jhe/fhir/fhir-api.md
+            - file: jhe/fhir/fhir-engine.md
         - file: jhe/data-model.md
         - file: jhe/ow-integration.md
         # - title: Deploy

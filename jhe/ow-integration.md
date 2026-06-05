@@ -6,14 +6,14 @@ JHE can ingest observations from an [Open Wearables](https://github.com/the-mome
 
 This page is the single onboarding doc for the OW PoC: setup, configuration, end-to-end test.
 
-| What                                   | Where                                                                                                                                                              |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| OAuth proxy + user creation views      | [`core/views/ow.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/ow.py)                                                           |
-| Patient-facing launch / complete pages | [`core/templates/ow_client/`](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/templates/ow_client)                                          |
-| Polling command (every 15 min)         | [`core/management/commands/ow_poll.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/management/commands/ow_poll.py)                     |
-| Raw S3 reader (raw mode only)          | [`core/services/ow_ingest/raw_payload_reader.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/services/ow_ingest/raw_payload_reader.py) |
-| Cron sidecar schedule                  | [`deploy/crontab`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/deploy/crontab)                                                               |
-| Tests                                  | [`tests/test_ow_poll.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/tests/test_ow_poll.py)                                                 |
+| What                                   | Where                                                                                                                                          |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| OAuth proxy + user creation views      | [`core/views/ow.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/ow.py)                                       |
+| Patient-facing launch / complete pages | [`core/templates/clients/ow/`](https://github.com/jupyterhealth/jupyterhealth-exchange/tree/main/core/templates/clients/ow)                    |
+| Polling command (every 15 min)         | [`core/management/commands/ow_poll.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/management/commands/ow_poll.py) |
+| Raw S3 reader (raw mode only)          | [`core/services/ow_ingest.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/services/ow_ingest.py)                   |
+| Cron sidecar schedule                  | [`deploy/crontab`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/deploy/crontab)                                           |
+| Tests                                  | [`tests/backend/test_ow_poll.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/tests/backend/test_ow_poll.py)             |
 
 ## Architecture
 

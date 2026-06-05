@@ -73,6 +73,6 @@ sequenceDiagram
 1. After the Patient has agreed/consented to the studies and scopes presented in your UI, you need to record this by sending a `POST /api/v1/patients/40001/consents` (see [Admin API](admin-api) for examples). Equivalent `PATCH` and `DELETE` requests can be used to update or revoke consents from your UI.
 1. Finally, now that JHE knows the Patient has consented to sharing their data, the Observations can be uploaded over FHIR.
    - Data is expected to be in [Open mHealth](https://www.openmhealth.org/documentation/#/schema-docs/schema-library) JSON format
-   - Because the FHIR spec does not include JSON as an Observation value, the closest thing we have is to convert it to binary and then Base 64 encode it and send it in the `valueAttachment` JSON property. See [FHIR API](fhir-api) for an example.
-   - Multiple Observations are uploaded at once by posting to the `/fhir/r5/` endpoint. See [FHIR API](fhir-api) for an example.
+   - Because the FHIR spec does not include JSON as an Observation value, the closest thing we have is to convert it to binary and then Base 64 encode it and send it in the `valueAttachment` JSON property. See [FHIR API](fhir/fhir-api) for an example.
+   - Multiple Observations are uploaded at once by posting to the `/fhir/r5/` endpoint. See [FHIR API](fhir/fhir-api) for an example.
    - When the Observations hit JHE, the Open mHealth data is validated against the corresponding schema before it is accepted.

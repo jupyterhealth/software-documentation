@@ -104,7 +104,7 @@ The `FHIR Patient` endpoint returns a list of Patients as a FHIR Bundle for a gi
           ]
         },
         "valueAttachment": {
-          "data": "eyJib2R5IjogeyJlZmZlY3RpdmVfdGltZV9mcmFtZSI6IHsiZGF0ZV90aW1lIjogIjIwMjQtMDUt\nMDJUMDc6MjE6MDAtMDc6MDAifSwgInN5c3RvbGljX2Jsb29kX3ByZXNzdXJlIjogeyJ1bml0Ijog\nIm1tSGciLCAidmFsdWUiOiAxMjJ9LCAiZGlhc3RvbGljX2Jsb29kX3ByZXNzdXJlIjogeyJ1bml0\nIjogIm1tSGciLCAidmFsdWUiOiA3N319LCAiaGVhZGVyIjogeyJ1dWlkIjogIjZlM2RiODg3LTRh\nMjAtMzIyMi05OTk4LTI5NzJhZjZmYjA5MSIsICJtb2RhbGl0eSI6ICJzZW5zZWQiLCAic2NoZW1h\nX2lkIjogeyJuYW1lIjogImJsb29kLXByZXNzdXJlIiwgInZlcnNpb24iOiAiMy4xIiwgIm5hbWVz\ncGFjZSI6ICJvbWgifSwgImNyZWF0aW9uX2RhdGVfdGltZSI6ICIyMDI0LTEwLTI1VDIxOjEzOjMx\nLjQzOFoiLCAiZXh0ZXJuYWxfZGF0YXNoZWV0cyI6IFt7ImRhdGFzaGVldF90eXBlIjogIm1hbnVm\nYWN0dXJlciIsICJkYXRhc2hlZXRfcmVmZXJlbmNlIjogImh0dHBzOi8vaWhlYWx0aGxhYnMuY29t\nL3Byb2R1Y3RzIn1dLCAic291cmNlX2RhdGFfcG9pbnRfaWQiOiAiZTZjMTliMDQyOGM4NWJiYjdj\nMTk4MGNiOTRkZDE3N2YiLCAic291cmNlX2NyZWF0aW9uX2RhdGVfdGltZSI6ICIyMDI0LTA1LTAy\nVDA3OjIxOjAwLTA3OjAwIn19",
+          "data": "eyJoZWFkZXIiOnsidXVpZCI6IjZlM2RiODg3LTRhMjAtMzIyMi05OTk4LTI5NzJhZjZmYjA5MSIsInNjaGVtYV9pZCI6eyJuYW1lc3BhY2UiOiJvbWgiLCJuYW1lIjoiYmxvb2QtcHJlc3N1cmUiLCJ2ZXJzaW9uIjoiNC4wIn0sInNvdXJjZV9jcmVhdGlvbl9kYXRlX3RpbWUiOiIyMDIxLTAzLTE0VDA5OjI1OjAwLTA3OjAwIn0sImJvZHkiOnsic3lzdG9saWNfYmxvb2RfcHJlc3N1cmUiOnsidmFsdWUiOjE0MiwidW5pdCI6Im1tSGcifSwiZGlhc3RvbGljX2Jsb29kX3ByZXNzdXJlIjp7InZhbHVlIjo4OSwidW5pdCI6Im1tSGcifSwiZWZmZWN0aXZlX3RpbWVfZnJhbWUiOnsiZGF0ZV90aW1lIjoiMjAyMS0wMy0xNFQwOToyNTowMC0wNzowMCJ9fX0=",
           "contentType": "application/json"
         }
       }
@@ -146,7 +146,7 @@ Observations are uploaded as FHIR Batch bundles sent as a POST to the root endpo
         ],
         "valueAttachment": {
           "contentType": "application/json",
-          "data": "eyJzeXN0b2xpY19ibG9vZF9wcmVzc3VyZSI6eyJ2YWx1ZSI6MTQyLCJ1bml0IjoibW1IZyJ9LCJkaWFzdG9saWNfYmxvb2RfcHJlc3N1cmUiOnsidmFsdWUiOjg5LCJ1bml0IjoibW1IZyJ9LCJlZmZlY3RpdmVfdGltZV9mcmFtZSI6eyJkYXRlX3RpbWUiOiIyMDIxLTAzLTE0VDA5OjI1OjAwLTA3OjAwIn19"
+          "data": "eyJoZWFkZXIiOnsidXVpZCI6IjZlM2RiODg3LTRhMjAtMzIyMi05OTk4LTI5NzJhZjZmYjA5MSIsInNjaGVtYV9pZCI6eyJuYW1lc3BhY2UiOiJvbWgiLCJuYW1lIjoiYmxvb2QtcHJlc3N1cmUiLCJ2ZXJzaW9uIjoiNC4wIn0sInNvdXJjZV9jcmVhdGlvbl9kYXRlX3RpbWUiOiIyMDIxLTAzLTE0VDA5OjI1OjAwLTA3OjAwIn0sImJvZHkiOnsic3lzdG9saWNfYmxvb2RfcHJlc3N1cmUiOnsidmFsdWUiOjE0MiwidW5pdCI6Im1tSGcifSwiZGlhc3RvbGljX2Jsb29kX3ByZXNzdXJlIjp7InZhbHVlIjo4OSwidW5pdCI6Im1tSGcifSwiZWZmZWN0aXZlX3RpbWVfZnJhbWUiOnsiZGF0ZV90aW1lIjoiMjAyMS0wMy0xNFQwOToyNTowMC0wNzowMCJ9fX0="
         }
       },
       "request": {

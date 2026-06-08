@@ -75,6 +75,7 @@ project:
         - "http://localhost:8000/"
         - "http://localhost:8000/admin"
         - "http://localhost:8001"
+        - "http://localhost:8010/smart/callback"
 site:
   template: book-theme
   title: JupyterHealth Software

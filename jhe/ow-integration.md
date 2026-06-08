@@ -107,6 +107,49 @@ s.set_value('bool', True); s.save()
 python manage.py ow_poll
 ```
 
+## Local Setup (Docker)
+
+The from-scratch flow above runs JHE natively on `:8000`. The Docker Compose
+stack used for local testing maps the ports differently. These are the canonical
+local-test ports - keep JHE on 8001 and OW on 8000; if another service needs a
+port, move that service (the MyChart PoC already uses 8010 for this reason).
+
+| Service                | Host port | URL                                  | Source                                                    |
+| ---------------------- | --------- | ------------------------------------ | --------------------------------------------------------- |
+| JHE web                | 8001      | http://localhost:8001                | `jupyterhealth-exchange/docker-compose.yml` (`8001:8000`) |
+| Open Wearables backend | 8000      | http://localhost:8000                | `open-wearables/docker-compose.yml` (`API_PORT:-8000`)    |
+| MyChart PoC (SMART)    | 8010      | http://localhost:8010/smart/callback | `smart-mychart-poc/serve.py`                              |
+
+Inside the JHE container, OW is reached at `host.docker.internal:8000`, so JHE's
+compose sets `OW_API_URL=http://host.docker.internal:8000` (overriding the `.env`
+value, which targets the native `:8001` flow above).
+
+```bash
+# 1. JHE  (host 8001 -> container 8000)
+cd jupyterhealth-exchange
+docker compose up -d --build        # web on http://localhost:8001
+
+# 2. Open Wearables  (host 8000)
+cd ../open-wearables
+docker compose up -d                # API on http://localhost:8000, /docs for Swagger
+
+# 3. MyChart PoC  (host 8010, optional - Epic SMART standalone launch)
+cd ../smart-mychart-poc
+python serve.py                     # http://localhost:8010/smart/callback
+```
+
+Verify each service the way it is actually used:
+
+| Service   | Check                                              | Expected        |
+| --------- | -------------------------------------------------- | --------------- |
+| OW        | `GET http://localhost:8000/docs`                   | 200, Swagger UI |
+| JHE       | `GET http://localhost:8001/api/schema/swagger-ui/` | 200, Swagger UI |
+| JHE -> OW | from `jhe-web`: reach `host.docker.internal:8000`  | 200             |
+| MyChart   | `GET http://localhost:8010/smart/callback`         | 200, PoC page   |
+
+The MyChart PoC's Epic redirect URI must be registered as
+`http://localhost:8010/smart/callback` (see the `smart-mychart-poc` README).
+
 ## Production Setup
 
 1. Set `OW_API_URL` and `OW_API_KEY` in your deployment env (Fly secrets, K8s Secret, etc.).

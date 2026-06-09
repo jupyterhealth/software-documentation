@@ -12,15 +12,16 @@ OMH Observations are the primary data type in JHE and are stored natively in the
 
 At least one patient-scoping parameter is required. When filtering by study (`patient._has:Group:member:_id`), results are additionally restricted to the study's consented observation codes.
 
-| Query Parameter | Example | Description |
-| --- | --- | --- |
-| `patient._has:Group:member:_id` | `30001` | Observations for patients enrolled in Study 30001 |
-| `patient` | `40001` | Observations for Patient 40001 |
-| `patient.organization` | `20001` | Observations for patients in Organization 20001 |
-| `patient.identifier` | `http://ehr.example.com\|abc123` | Observations for the patient with that identifier |
-| `code` | `https://w3id.org/openmhealth\|omh:blood-pressure:4.0` | Filter by observation type |
+| Query Parameter                 | Example                                                | Description                                       |
+| ------------------------------- | ------------------------------------------------------ | ------------------------------------------------- |
+| `patient._has:Group:member:_id` | `30001`                                                | Observations for patients enrolled in Study 30001 |
+| `patient`                       | `40001`                                                | Observations for Patient 40001                    |
+| `patient.organization`          | `20001`                                                | Observations for patients in Organization 20001   |
+| `patient.identifier`            | `http://ehr.example.com\|abc123`                       | Observations for the patient with that identifier |
+| `code`                          | `https://w3id.org/openmhealth\|omh:blood-pressure:4.0` | Filter by observation type                        |
 
 Notes:
+
 - `subject.reference` references a Patient ID
 - `device.reference` references a Data Source (Device) ID
 - `valueAttachment.data` is Base64-encoded JSON
@@ -119,14 +120,14 @@ Observations are uploaded as FHIR Batch Bundles via `POST` to the base endpoint.
 
 These resources are **read-only** projections of JHE system entities — writes to them via FHIR are not supported (use the `/api/v1/` REST API to manage these). All support the same patient-scoping query parameters.
 
-| Query Parameter | Example | Description |
-| --- | --- | --- |
-| `_has:Group:member:_id` | `30001` | Resources belonging to patients in Study 30001 |
-| `patient` | `40001` | Resources belonging to Patient 40001 |
-| `patient.organization` | `20001` | Resources belonging to patients in Organization 20001 |
-| `patient._has:Group:member:_id` | `30001` | Resources belonging to patients enrolled in Study 30001 |
-| `patient.identifier` | `http://ehr.example.com\|abc123` | Resources belonging to the patient with that identifier |
-| `identifier` | `http://ehr.example.com\|abc123` | Match the resource itself by identifier (Patient only) |
+| Query Parameter                 | Example                          | Description                                             |
+| ------------------------------- | -------------------------------- | ------------------------------------------------------- |
+| `_has:Group:member:_id`         | `30001`                          | Resources belonging to patients in Study 30001          |
+| `patient`                       | `40001`                          | Resources belonging to Patient 40001                    |
+| `patient.organization`          | `20001`                          | Resources belonging to patients in Organization 20001   |
+| `patient._has:Group:member:_id` | `30001`                          | Resources belonging to patients enrolled in Study 30001 |
+| `patient.identifier`            | `http://ehr.example.com\|abc123` | Resources belonging to the patient with that identifier |
+| `identifier`                    | `http://ehr.example.com\|abc123` | Match the resource itself by identifier (Patient only)  |
 
 ```json
 // GET /FHIR/R5/Patient?_has:Group:member:_id=30001
@@ -171,20 +172,20 @@ These resources are **read-only** projections of JHE system entities — writes 
 
 The same scoping parameters apply to `Group` (Study), `Device` (Data Source), `Organization`, and `Practitioner`:
 
-| Resource | Query | Returns |
-| --- | --- | --- |
-| `Group` (Study) | `GET /FHIR/R5/Group?patient._has:Group:member:_id=30001` | The study with ID 30001 |
-| `Group` (Study) | `GET /FHIR/R5/Group?patient=40001` | Studies Patient 40001 is enrolled in |
-| `Group` (Study) | `GET /FHIR/R5/Group?patient.organization=20001` | Studies in Organization 20001 |
-| `Device` (Data Source) | `GET /FHIR/R5/Device?patient._has:Group:member:_id=30001` | Data sources used in Study 30001 |
-| `Device` (Data Source) | `GET /FHIR/R5/Device?patient=40001` | Data sources used in Patient 40001's studies |
-| `Device` (Data Source) | `GET /FHIR/R5/Device?patient.organization=20001` | Data sources in studies under Organization 20001 |
-| `Organization` | `GET /FHIR/R5/Organization?patient._has:Group:member:_id=30001` | The organization backing Study 30001 |
-| `Organization` | `GET /FHIR/R5/Organization?patient=40001` | Organizations Patient 40001 belongs to |
-| `Organization` | `GET /FHIR/R5/Organization?patient.organization=20001` | Organization 20001 |
-| `Practitioner` | `GET /FHIR/R5/Practitioner?patient._has:Group:member:_id=30001` | Practitioners in Study 30001's organization |
-| `Practitioner` | `GET /FHIR/R5/Practitioner?patient=40001` | Practitioners in Patient 40001's organizations |
-| `Practitioner` | `GET /FHIR/R5/Practitioner?patient.organization=20001` | Practitioners in Organization 20001 |
+| Resource               | Query                                                           | Returns                                          |
+| ---------------------- | --------------------------------------------------------------- | ------------------------------------------------ |
+| `Group` (Study)        | `GET /FHIR/R5/Group?patient._has:Group:member:_id=30001`        | The study with ID 30001                          |
+| `Group` (Study)        | `GET /FHIR/R5/Group?patient=40001`                              | Studies Patient 40001 is enrolled in             |
+| `Group` (Study)        | `GET /FHIR/R5/Group?patient.organization=20001`                 | Studies in Organization 20001                    |
+| `Device` (Data Source) | `GET /FHIR/R5/Device?patient._has:Group:member:_id=30001`       | Data sources used in Study 30001                 |
+| `Device` (Data Source) | `GET /FHIR/R5/Device?patient=40001`                             | Data sources used in Patient 40001's studies     |
+| `Device` (Data Source) | `GET /FHIR/R5/Device?patient.organization=20001`                | Data sources in studies under Organization 20001 |
+| `Organization`         | `GET /FHIR/R5/Organization?patient._has:Group:member:_id=30001` | The organization backing Study 30001             |
+| `Organization`         | `GET /FHIR/R5/Organization?patient=40001`                       | Organizations Patient 40001 belongs to           |
+| `Organization`         | `GET /FHIR/R5/Organization?patient.organization=20001`          | Organization 20001                               |
+| `Practitioner`         | `GET /FHIR/R5/Practitioner?patient._has:Group:member:_id=30001` | Practitioners in Study 30001's organization      |
+| `Practitioner`         | `GET /FHIR/R5/Practitioner?patient=40001`                       | Practitioners in Patient 40001's organizations   |
+| `Practitioner`         | `GET /FHIR/R5/Practitioner?patient.organization=20001`          | Practitioners in Organization 20001              |
 
 ## Working with other resources
 

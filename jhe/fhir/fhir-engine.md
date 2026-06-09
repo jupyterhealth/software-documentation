@@ -7,14 +7,14 @@ A small, config-driven engine that powers a FHIR R5 server over Django. The guid
 
 Concretely, the Django models hold:
 
-| FHIR resource | Django model (JHE system) | Everything else → `FhirAuxResource` |
-| --- | --- | --- |
-| `Observation` | `Observation` — **OMH only** (`code` system `https://w3id.org/openmhealth`) | any other / code-less Observation |
-| `Device` | `DataSource` | any other Device |
-| `Group` | `Study` | any other Group |
-| `Organization` | `Organization` | any other Organization |
-| `Patient` | `Patient` | any other Patient |
-| `Practitioner` | `Practitioner` | any other Practitioner |
+| FHIR resource  | Django model (JHE system)                                                   | Everything else → `FhirAuxResource` |
+| -------------- | --------------------------------------------------------------------------- | ----------------------------------- |
+| `Observation`  | `Observation` — **OMH only** (`code` system `https://w3id.org/openmhealth`) | any other / code-less Observation   |
+| `Device`       | `DataSource`                                                                | any other Device                    |
+| `Group`        | `Study`                                                                     | any other Group                     |
+| `Organization` | `Organization`                                                              | any other Organization              |
+| `Patient`      | `Patient`                                                                   | any other Patient                   |
+| `Practitioner` | `Practitioner`                                                              | any other Practitioner              |
 
 Both kinds of resource are declared in [core/fhir/fhir_config.json](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/fhir_config.json).
 A **mapped resource** is projected onto its Django model by a field mapping (read renders the
@@ -38,11 +38,11 @@ The config drives which backing store handles it, via two annotations:
 
 Given a resource `R` with mapped interactions `M`, aux interactions `A`, and optional criteria `C`:
 
-| Interaction | Routing |
-| --- | --- |
-| **search** | UNION of the mapped Django rows (if `search ∈ M`) and the `FhirAuxResource` rows of that type (if `search ∈ A`), in one searchset Bundle. |
+| Interaction                | Routing                                                                                                                                                                                      |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **search**                 | UNION of the mapped Django rows (if `search ∈ M`) and the `FhirAuxResource` rows of that type (if `search ∈ A`), in one searchset Bundle.                                                    |
 | **read / update / delete** | by **id shape** — a **UUID** id targets `FhirAuxResource`; an **integer** id targets the mapped Django model. (FhirAuxResource uses a UUID primary key, so the two id spaces never collide.) |
-| **create** | if `create ∈ M` and (`C` absent or `C` matches the payload) → mapped model; else if `create ∈ A` → aux; else `405`. |
+| **create**                 | if `create ∈ M` and (`C` absent or `C` matches the payload) → mapped model; else if `create ∈ A` → aux; else `405`.                                                                          |
 
 With the shipped config, `Device`/`Group`/`Organization`/`Patient`/`Practitioner` are
 `read,search` against their model — so **all their writes fall through to `FhirAuxResource`** —
@@ -69,42 +69,42 @@ mapping; formatting is never the model's job). The contract is identical across 
    (a single query, both role profiles `select_related`-ed). There is no `is_patient` flag —
    the method decides the branch itself, so handlers and tests just pass an id. An unknown id is
    a **404**.
-2. **A patient user gets a self-scoped result.** The `organization_id` / `study_id` /
+1. **A patient user gets a self-scoped result.** The `organization_id` / `study_id` /
    `patient_id` filters are **ignored**; the method returns the rows that belong to that patient
    (their own observations, the studies/organizations/devices/practitioners they are attached to,
    or their own Patient record).
-3. **A practitioner gets an organization-membership-scoped result.** The base queryset is anchored
+1. **A practitioner gets an organization-membership-scoped result.** The base queryset is anchored
    on the practitioner's organizations, then narrowed by whichever explicit filters are present.
    Each *targeted* filter is authorized up front by
    [`authorize_practitioner_scope`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/scope.py): an `organization_id` they do not belong
    to, a `study_id` under an organization they are not in, or a `patient_id` who shares no
    organization with them raises **403**. A **paramless** practitioner search returns *everything*
    across their authorized organizations (the "return-all" rule).
-4. **`resource_id`** narrows to a single row by primary key. The view only ever passes it for a
+1. **`resource_id`** narrows to a single row by primary key. The view only ever passes it for a
    **read** of an **integer** id (UUID ids are routed to `FhirAuxResource` first), and it is
    applied *inside* the same authorization scope — so reading an id you may not see is a clean
    **404**, not a 403.
-5. **`**params`** carries the non-location filters — `patient_identifier_system` /
+1. **`**params`** carries the non-location filters — `patient_identifier_system` /
    `patient_identifier_value` (Patient, Observation) and `coding_system` / `coding_code`
    (Observation). Every model accepts `**params` and ignores the keys it does not use. An
    **identifier is a search predicate, not a targeted resource**: it is *not* authorized (no 403)
    — the organization join already scopes the result, so an unmatched/unauthorized identifier just
    yields an empty set.
-6. **Filters chain (AND).** Passing several at once narrows progressively.
+1. **Filters chain (AND).** Passing several at once narrows progressively.
 
 ### Query parameters → `fhir_search` kwargs
 
 The generic handler ([`MappedResourceHandler._search_kwargs`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/fhir.py)) translates the
 canonical FHIR search params for every mapped resource:
 
-| Query parameter | kwarg |
-| --- | --- |
-| `?patient=<id>` | `patient_id` |
-| `?patient.organization=<id>` | `organization_id` |
-| `?patient._has:Group:member:_id=<id>` | `study_id` |
+| Query parameter                                                           | kwarg                                                    |
+| ------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `?patient=<id>`                                                           | `patient_id`                                             |
+| `?patient.organization=<id>`                                              | `organization_id`                                        |
+| `?patient._has:Group:member:_id=<id>`                                     | `study_id`                                               |
 | `?identifier=<system>\|<value>` / `?patient.identifier=<system>\|<value>` | `patient_identifier_system` / `patient_identifier_value` |
-| `?code=<system>\|<value>` | `coding_system` / `coding_code` |
-| path id `.../<resource>/<id>` | `resource_id` |
+| `?code=<system>\|<value>`                                                 | `coding_system` / `coding_code`                          |
+| path id `.../<resource>/<id>`                                             | `resource_id`                                            |
 
 > **camelCase caveat:** the client sends the FHIR-standard `patient._has:Group:member:_id` (capital
 > `Group`), but `djangorestframework_camel_case` snake-cases every incoming query-param key before
@@ -117,14 +117,14 @@ In every row below, the *practitioner* paths are additionally bounded by the pra
 organization membership (and authorized, 403 on a targeted mismatch); the *patient* path ignores
 the location filters and returns the self-scoped set.
 
-| Model (resource) | `organization_id` | `study_id` | `patient_id` | extra `**params` | patient user sees |
-| --- | --- | --- | --- | --- | --- |
-| **DataSource** (`Device`) | devices in studies under that org | devices used in that study | devices used in the studies that patient is in | — | devices in the studies they are enrolled in |
-| **Study** (`Group`) | studies under that org | the single study | studies that patient is enrolled in | — | the studies they are enrolled in |
-| **Organization** | the single org | the org backing that study | the orgs that patient belongs to | — | the orgs they belong to |
-| **Practitioner** | practitioners in that org | practitioners in that study's org | practitioners in the orgs that patient belongs to | — | practitioners in the orgs they belong to |
-| **Patient** | patients in that org | patients enrolled in that study | the single patient | `identifier` → the patient with that identifier | only themselves |
-| **Observation** | observations of patients in that org | observations of patients enrolled in that study **whose code is one of the study's requested scopes** | that patient's observations | `identifier` → that patient's; `code` → matching `system\|code` | their own observations |
+| Model (resource)          | `organization_id`                    | `study_id`                                                                                            | `patient_id`                                      | extra `**params`                                                | patient user sees                           |
+| ------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------- |
+| **DataSource** (`Device`) | devices in studies under that org    | devices used in that study                                                                            | devices used in the studies that patient is in    | —                                                               | devices in the studies they are enrolled in |
+| **Study** (`Group`)       | studies under that org               | the single study                                                                                      | studies that patient is enrolled in               | —                                                               | the studies they are enrolled in            |
+| **Organization**          | the single org                       | the org backing that study                                                                            | the orgs that patient belongs to                  | —                                                               | the orgs they belong to                     |
+| **Practitioner**          | practitioners in that org            | practitioners in that study's org                                                                     | practitioners in the orgs that patient belongs to | —                                                               | practitioners in the orgs they belong to    |
+| **Patient**               | patients in that org                 | patients enrolled in that study                                                                       | the single patient                                | `identifier` → the patient with that identifier                 | only themselves                             |
+| **Observation**           | observations of patients in that org | observations of patients enrolled in that study **whose code is one of the study's requested scopes** | that patient's observations                       | `identifier` → that patient's; `code` → matching `system\|code` | their own observations                      |
 
 Notes:
 
@@ -146,8 +146,15 @@ The auxiliary store follows the **same normalized contract**, with one extra req
 the `resource_type`, since the single `FhirAuxResource` table holds every aux type:
 
 ```python
-FhirAuxResource.fhir_search(jhe_user_id, resource_type, resource_id=None,
-                            organization_id=None, study_id=None, patient_id=None, **params)
+FhirAuxResource.fhir_search(
+    jhe_user_id,
+    resource_type,
+    resource_id=None,
+    organization_id=None,
+    study_id=None,
+    patient_id=None,
+    **params
+)
 ```
 
 Each aux row reaches its owning patient through its `FhirSource`
@@ -164,17 +171,17 @@ patient.)
 
 ## Components
 
-| File | Responsibility |
-| --- | --- |
-| [core/fhir/fhir_config.json](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/fhir_config.json) | Declares `mapped_resources` (field mappings + `meta.__interaction` / `__criteria`) and `aux_resources` (`resourceType` + `__interaction`). |
-| [core/fhir/config.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/config.py) | Loads the JSON once at import; exposes `get_resource_mapping`, `mapped_interactions` / `aux_interactions`, `mapped_criteria`, `mapped_model_name`, and **`get_config_errors()`** (validation, see below). |
-| [core/fhir/engine.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/engine.py) | The renderer: `build_fhir_resource` (model → FHIR dict), `render_resource`, `matches_criteria`, `expand_interactions`. |
-| [core/fhir/fhir_validation.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/fhir_validation.py) | `validate_fhir_resource(resource_type, data)` — parse an incoming FHIR body against its `fhir.resources` model (DRF 400 on failure). |
-| [core/serializers/observation.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/serializers/observation.py), [core/serializers/patient.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/serializers/patient.py) | `FHIRObservationSerializer` / `FHIRPatientSerializer` call the engine. (Observation Base64-encodes `valueAttachment.data` afterwards.) |
-| [core/serializers/aux_resource.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/serializers/aux_resource.py) | `FHIRAuxResourceSerializer` returns a `FhirAuxResource`'s stored body verbatim (with `resourceType`/`id` forced). |
-| [core/fhir/scope.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/scope.py) | `resolve_fhir_user` (patient-vs-practitioner from the `jhe_user_id`) and `authorize_practitioner_scope` (403 on an unauthorized organization/study/patient), shared by every model's `fhir_search`. |
-| [core/views/fhir.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/fhir.py) | `FHIRResourceView` — the unified endpoint, routing table, the generic mapped handler, and the aux handler. |
-| [core/fhir/pagination.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/pagination.py) | Wraps serialized resources in a FHIR `searchset` Bundle. |
+| File                                                                                                                                                                                                                                                               | Responsibility                                                                                                                                                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [core/fhir/fhir_config.json](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/fhir_config.json)                                                                                                                                         | Declares `mapped_resources` (field mappings + `meta.__interaction` / `__criteria`) and `aux_resources` (`resourceType` + `__interaction`).                                                                |
+| [core/fhir/config.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/config.py)                                                                                                                                                       | Loads the JSON once at import; exposes `get_resource_mapping`, `mapped_interactions` / `aux_interactions`, `mapped_criteria`, `mapped_model_name`, and **`get_config_errors()`** (validation, see below). |
+| [core/fhir/engine.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/engine.py)                                                                                                                                                       | The renderer: `build_fhir_resource` (model → FHIR dict), `render_resource`, `matches_criteria`, `expand_interactions`.                                                                                    |
+| [core/fhir/fhir_validation.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/fhir_validation.py)                                                                                                                                     | `validate_fhir_resource(resource_type, data)` — parse an incoming FHIR body against its `fhir.resources` model (DRF 400 on failure).                                                                      |
+| [core/serializers/observation.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/serializers/observation.py), [core/serializers/patient.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/serializers/patient.py) | `FHIRObservationSerializer` / `FHIRPatientSerializer` call the engine. (Observation Base64-encodes `valueAttachment.data` afterwards.)                                                                    |
+| [core/serializers/aux_resource.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/serializers/aux_resource.py)                                                                                                                             | `FHIRAuxResourceSerializer` returns a `FhirAuxResource`'s stored body verbatim (with `resourceType`/`id` forced).                                                                                         |
+| [core/fhir/scope.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/scope.py)                                                                                                                                                         | `resolve_fhir_user` (patient-vs-practitioner from the `jhe_user_id`) and `authorize_practitioner_scope` (403 on an unauthorized organization/study/patient), shared by every model's `fhir_search`.       |
+| [core/views/fhir.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/fhir.py)                                                                                                                                                         | `FHIRResourceView` — the unified endpoint, routing table, the generic mapped handler, and the aux handler.                                                                                                |
+| [core/fhir/pagination.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/pagination.py)                                                                                                                                               | Wraps serialized resources in a FHIR `searchset` Bundle.                                                                                                                                                  |
 
 ## The configuration
 
@@ -195,13 +202,13 @@ returns a **500 OperationOutcome** listing any problems. The five checks
 ([core/fhir/config.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/config.py)):
 
 1. **Every** entry — mapped and aux — has a non-empty `__interaction`.
-2. Each interaction is one of `create/read/update/delete/search` or `"*"`.
-3. A mapped resource whose interactions cover everything (`"*"`) **must** declare `__criteria`
+1. Each interaction is one of `create/read/update/delete/search` or `"*"`.
+1. A mapped resource whose interactions cover everything (`"*"`) **must** declare `__criteria`
    (otherwise it could never fall back to aux).
-4. **Every path resolves** on the backing model: the model is the path prefix (resolved via
+1. **Every path resolves** on the backing model: the model is the path prefix (resolved via
    `apps.get_model("core", name)`), and each dotted segment must be a field, a `@property`, or an
    FK hop (e.g. `Patient.jhe_user.email`, `Observation.codeable_concepts`).
-5. **Every field name is valid FHIR**: each non-`__` key of a mapped resource must be a real
+1. **Every field name is valid FHIR**: each non-`__` key of a mapped resource must be a real
    element of the matching `fhir.resources` model (`ModelClass.elements_sequence()`).
 
 ## Auxiliary resources, FhirSource & the source header
@@ -273,8 +280,7 @@ with the right status by `handle_exception`.
   `aux_resources` and restart. No model/serializer/handler changes.
 - **A new mapped resource**: add an entry to `mapped_resources` (field mapping + `meta.__interaction`,
   and `__criteria` if it is fully writable), add a matching aux entry if its non-system rows should
-  fall through, and give the backing model a `fhir_search(jhe_user_id, resource_id=None,
-  organization_id=None, study_id=None, patient_id=None, **params)` returning instances (use
+  fall through, and give the backing model a `fhir_search(jhe_user_id, resource_id=None, organization_id=None, study_id=None, patient_id=None, **params)` returning instances (use
   [`resolve_fhir_user`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/scope.py) + [`authorize_practitioner_scope`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/scope.py)
   for the patient/practitioner split and the 403s). The generic handler then serves it with no view
   changes; only register a subclass in `_MAPPED_HANDLERS` if it needs custom serialize/create (as

@@ -18,7 +18,7 @@ This page is the single onboarding doc for the OW PoC: setup, configuration, end
 ## Architecture
 
 ```
-Patient browser  ──▶  /ow/?code=<invitation>     (launch.html)
+Patient browser  ──▶  /clients/ow/?code=<invitation>     (launch.html)
                        │
                        ├─ POST /api/v1/ow/users           ──▶ OW: create user
                        └─ GET  /api/v1/ow/oauth/oura/...  ──▶ OW: provider auth URL

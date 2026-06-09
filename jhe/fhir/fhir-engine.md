@@ -218,14 +218,52 @@ whole FHIR body in `fhir_data`, served with full CRUD and no computation. Key po
 
 - The **primary key is a UUID**, so the FHIR `id` is a UUID — disjoint from the integer pks of the
   mapped models, which is what makes id-shape routing unambiguous.
+
 - **Every row links to a `FhirSource` (required)** and, through it, to a `patient`.
+
 - Writes are validated against `fhir.resources`; the incoming body (snake-cased by the camel-case
   parser) is re-camelized before validation/storage so `fhir_data` is valid FHIR.
+
 - On every write, two best-effort columns are populated from the body (both may be null):
+
   - `fhir_resource_id` ← the resource's own `id`;
   - `patient_fhir_id` ← the referenced Patient id: the resource `id` itself when
     `resourceType == Patient`, else the `Patient/<id>` in `subject.reference`, `patient.reference`,
     or `beneficiary.reference` (first match wins).
+- On every write, the stored body is also **stamped with JHE provenance extensions**
+  (`apply_jhe_extensions` in [core/models/fhir_aux_resource.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/models/fhir_aux_resource.py),
+  applied by `_persist_aux` in [core/views/fhir.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/fhir.py))
+  so a reader can attribute an opaque aux body to its source and patient without a join. Three
+  `extension` entries (base URL `https://jupyterhealth.org/fhir/StructureDefinition/`) are added:
+  - `.../fhir-source-id` — `valueInteger`, the `FhirSource` pk;
+  - `.../patient-id` — `valueInteger`, the owning patient's pk (from the source);
+  - `.../patient-full-name` — `valueString`, the patient's `name_given name_family` (omitted
+    entirely when the patient has no name).
+
+  Any prior copies of these three URLs are stripped first, so re-stamping on update (or a re-seed)
+  replaces the values rather than accumulating duplicates; other extensions on the body are left
+  untouched. The columns above are computed *before* `_aux_body` strips `resourceType`; the
+  extensions are added *after* `fhir.resources` validation, so they never affect the incoming-body
+  check. The same helper is used by the seed command so freshly seeded aux rows carry the
+  extensions too.
+
+- On every write, the stored body is also **stamped with JHE provenance extensions**
+  (`apply_jhe_extensions` in [core/models/fhir_aux_resource.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/models/fhir_aux_resource.py),
+  applied by `_persist_aux` in [core/views/fhir.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/fhir.py))
+  so a reader can attribute an opaque aux body to its source and patient without a join. Three
+  `extension` entries (base URL `https://jupyterhealth.org/fhir/StructureDefinition/`) are added:
+
+  - `.../fhir-source-id` — `valueInteger`, the `FhirSource` pk;
+  - `.../patient-id` — `valueInteger`, the owning patient's pk (from the source);
+  - `.../patient-full-name` — `valueString`, the patient's `name_given name_family` (omitted
+    entirely when the patient has no name).
+
+  Any prior copies of these three URLs are stripped first, so re-stamping on update (or a re-seed)
+  replaces the values rather than accumulating duplicates; other extensions on the body are left
+  untouched. The columns above are computed *before* `_aux_body` strips `resourceType`; the
+  extensions are added *after* `fhir.resources` validation, so they never affect the incoming-body
+  check. The same helper is used by the seed command so freshly seeded aux rows carry the
+  extensions too.
 
 ### FhirSource
 

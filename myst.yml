@@ -27,6 +27,7 @@ project:
         - file: jhe/data-model.md
         - file: jhe/ow-integration.md
         - file: jhe/mychart-integration.md
+        - file: jhe/mcp-server.md
         # - title: Deploy
         #   children:
         #     - file: jhe/deploy/kubernetes.md

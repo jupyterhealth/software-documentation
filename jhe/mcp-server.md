@@ -101,7 +101,9 @@ Manual registration above is a one-time setup. To make the broker's JHE OAuth ap
 # on the JHE deployment
 MCP_OAUTH_CLIENT_ID=<client_id>
 MCP_OAUTH_CLIENT_SECRET=<client_secret>
-# optional: MCP_OAUTH_REDIRECT_URI=https://<your-mcp-host>/oauth/callback  (this is the default)
+# optional: set to match your MCP host's /oauth/callback.
+# Defaults to https://jhe-mcp.fly.dev/oauth/callback, so non-reference deployments must set it.
+MCP_OAUTH_REDIRECT_URI=https://<your-mcp-host>/oauth/callback
 ```
 
 `seed.py::seed_mcp_broker_application` reads these and creates/updates the `JHE MCP Server` application; when they are unset (local/CI seeds) it is skipped. They must match the `JHE_CLIENT_ID` / `JHE_CLIENT_SECRET` set on the MCP server (see [Configuration](#configuration)) so the broker can authenticate against the seeded record.

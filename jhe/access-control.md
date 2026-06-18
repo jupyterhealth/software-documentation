@@ -4,7 +4,7 @@ title: Access Control
 
 # Role-Based Access Control
 
-JupyterHealth Exchange (JHE) uses a simple role-based access control (RBAC) system to
+JHE uses a simple role-based access control (RBAC) system to
 manage who can read and write organizations, studies, patients, and health data. This
 document explains the user types, the practitioner role hierarchy, how permissions are
 resolved per-organization, and how patient consent fits in.
@@ -50,8 +50,8 @@ Django `is_superuser` flag.
 ```{important}
 **No Console access.** Patients do NOT have access to the JupyterHealth Exchange Console.
 The Console is for Practitioners and Admins only. Patients interact with JHE through:
-- the **CommonHealth mobile app** (primary patient interface),
-- a **patient-access web client** (email one-time-code login), or
+- a **JHE Client** (e.g. the CommonHealth mobile app),
+- an **authorized Patient-Access Client** (email one-time-code login), or
 - **direct API / FHIR calls**.
 ```
 
@@ -81,11 +81,12 @@ or Manager).
 **Multi-organization, per-organization roles.** A practitioner can belong to several
 organizations and hold a *different role in each*. For example:
 
-- **Manager** in "University Hospital Research Dept",
-- **Viewer** in "Clinical Trials Consortium".
+- **Manager** in "Cosmic Cardio Lab",
+- **Member** in "Neptunian Pulse Lab",
+- **Viewer** in "Lifespan Lab".
 
 Their abilities are evaluated separately for each organization: they can manage studies in
-the first but only read in the second.
+the first two but only read in the third.
 
 **Access scope.** A practitioner can read data for every patient who shares one of their
 organizations, and can write to the extent their role in the owning organization allows.
@@ -148,12 +149,6 @@ participants.
 - ✅ Set/revoke consent on behalf of a patient in their organization's studies (with proper
   documented authorization — see the consent note below).
 - ❌ Cannot add/remove practitioners or change practitioner roles.
-
-```{note}
-**Correction vs. earlier documentation:** Members *can* create and manage studies. The
-member and manager roles differ only in **practitioner management** (see below); both can
-fully manage patients and studies.
-```
 
 ### Manager (organization administration)
 
@@ -275,7 +270,7 @@ Consent governs:
 organization with a patient can read that patient's stored observations regardless of the
 patient's per-study consent flags. Consent constrains what data *exists* (patients only
 upload consented scopes) and how study-scoped queries filter, but the practitioner read
-boundary is **organization membership**. If you require consent-gated practitioner reads,
+boundary is **organization membership**. If consent-gated practitioner reads are required,
 that is not the behavior today.
 ```
 
@@ -303,7 +298,8 @@ See the dedicated write-up for full details (model, key format, lifecycle).
 
 ## Default organization assignment for new practitioners
 
-When a practitioner `JheUser` is first created, JHE can auto-assign organization memberships
+This is an **optional System Admin feature**, off by default. When enabled, the moment a
+practitioner `JheUser` is first created JHE auto-assigns organization memberships
 and roles from the `auth.default_orgs` setting
 ([`core/models/jhe_user.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/models/jhe_user.py)).
 The value is a `;`-separated list of `<org_id>:<role>` pairs, e.g. `20001:viewer;20002:manager`.
@@ -354,8 +350,9 @@ the study, but `study.manage_for_organization` is not in `ROLE_PERMISSIONS["view
 **Member creates a study** → granted. `study.manage_for_organization` is in the member's
 permissions for that organization.
 
-**Member in Org A tries to edit a study in Org B (where they are a viewer)** → `403`. The
-role is resolved against Org B (the study's owner), where they lack the permission.
+**A practitioner who is a member of Neptunian Pulse Lab tries to edit a study in Lifespan
+Lab (where they are a viewer)** → `403`. The role is resolved against Lifespan Lab (the
+study's owner), where they lack the permission.
 
 **Practitioner reads a patient's observations** → granted if they share any organization
 with the patient, regardless of role or the patient's consent flags.

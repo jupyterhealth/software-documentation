@@ -19,6 +19,7 @@ project:
         - file: jhe/upgrading.md
         - file: jhe/client-flow.md
         - file: jhe/auth.md
+        - file: jhe/access-control.md
         - file: jhe/admin-api.md
         - title: FHIR
           children:

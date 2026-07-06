@@ -25,6 +25,7 @@ project:
           children:
             - file: jhe/fhir/fhir-api.md
             - file: jhe/fhir/fhir-engine.md
+        - file: jhe/bruno-api-collection.md
         - file: jhe/data-model.md
         - file: jhe/patient-identifiers.md
         - file: jhe/ow-integration.md

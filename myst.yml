@@ -30,6 +30,7 @@ project:
         - file: jhe/patient-identifiers.md
         - file: jhe/ow-integration.md
         - file: jhe/mychart-integration.md
+        - file: jhe/provider-ehr-launch.md
         - file: jhe/mcp-server.md
         # - title: Deploy
         #   children:
@@ -44,6 +45,7 @@ project:
         # - file: tutorial/exchange-on-kubernetes.md
         - file: tutorial/openmhealth-bp.ipynb
         - file: tutorial/tutorial-cgm.ipynb
+        - file: tutorial/medplum-provider-dashboard.md
     # - title: How-To Guides
     #   children:
     #     - title: For Admins and Deployment

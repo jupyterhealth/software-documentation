@@ -8,6 +8,8 @@ Note: [the difference between how-to and tutorial](https://diataxis.fr/tutorials
 
 ## Available Tutorials
 
+- **[Launch a JupyterHealth dashboard via SMART on FHIR (MedPlum example)](medplum-provider-dashboard.md)** - Build a provider-facing dashboard app that launches from an EHR, exchanges the EHR login for JHE access, and renders the launched patient's device data
+
 <!-- - **[Your First Local JupyterHealth Exchange](local-exchange-deployment.md)** - Deploy JupyterHealth Exchange on your computer in 15 minutes and explore example research data
 - **[Deploying JupyterHealth Exchange on Kubernetes](exchange-on-kubernetes.md)** - Deploy a production JupyterHealth Exchange on AWS with Kubernetes -->
 
@@ -19,7 +21,6 @@ Note: [the difference between how-to and tutorial](https://diataxis.fr/tutorials
 - Running Your First Analysis in a Notebook
 - Deploying a standalone JupyterHealth Hub
 - Fetching and viewing data from the Exchange with JupyterHealth Client
-- Launch a JupyterHealth-powered dashboard via SMART-on-FHIR (medplum example)
 
 Borderline tutorial/how-to depending on what we choose to write:
 

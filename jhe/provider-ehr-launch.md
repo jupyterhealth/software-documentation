@@ -2,10 +2,18 @@
 title: Provider EHR Launch (SMART on FHIR)
 ---
 
-An external **SMART on FHIR provider app** — launched from an EHR like Epic, Cerner, or
-MedPlum — can trade the EHR-issued OIDC **`id_token`** for a **JHE user-bound access
-token** over OAuth 2.0 Token Exchange ([RFC 8693](https://datatracker.ietf.org/doc/html/rfc8693)).
-The provider logs in once, at the EHR; there is no second JHE login.
+Clinicians work in the EHR; the remote-monitoring data their patients generate — CGM
+traces, wearable vitals, sleep — lives in JupyterHealth Exchange. This flow puts that
+data **inside the clinical workflow**: the provider opens a patient's chart, clicks a
+JupyterHealth app, and sees that patient's device data right there — already in patient
+context, already authenticated. No separate portal, no second login, no re-finding the
+patient, and JHE's access control still applies (the provider sees only patients they're
+authorized for in JHE).
+
+Technically, the launched app is a **SMART on FHIR provider app** (Epic, Cerner,
+MedPlum, …) that trades the EHR-issued OIDC **`id_token`** for a **JHE user-bound access
+token** over OAuth 2.0 Token Exchange ([RFC 8693](https://datatracker.ietf.org/doc/html/rfc8693)) —
+that exchange is what makes the single login possible, and it's what this page documents.
 
 JHE verifies the `id_token` **offline against the EHR's JWKS** (discovered from
 `{iss}/.well-known/smart-configuration`), identifies the provider from the **`fhirUser`**

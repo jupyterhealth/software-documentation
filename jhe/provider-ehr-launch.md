@@ -90,6 +90,13 @@ for ~60s, so a change takes effect within that window):
 | `auth.sof.trusted_issuers`  | `json`   | EHR OIDC issuers (`id_token.iss`) whose tokens are accepted; JWKS is discovered from each. |
 | `auth.sof.trusted_audience` | `string` | The SMART app's `client_id` at the EHR (the `id_token.aud`).                               |
 
+> **The issuer is the id_token's literal `iss` — usually the EHR's OAuth server, not
+> its FHIR base.** Epic's sandbox, for example, issues
+> `https://fhir.epic.com/interconnect-fhir-oauth/oauth2` (JWKS discovery resolves there
+> via the `openid-configuration` fallback). MedPlum is the outlier: its `iss` is the
+> FHIR base URL, with a trailing slash. When in doubt, decode a captured id_token and
+> copy its `iss` verbatim.
+
 ### The "SoF EHR Launch" confidential client
 
 `manage.py seed` also creates a confidential OAuth `Application` named **SoF EHR

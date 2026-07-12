@@ -43,28 +43,33 @@ as that provider, under JHE's normal access control.
 ## Architecture
 
 ```
-                ┌──────────────────── EHR (Epic, Cerner, MedPlum, …) ───────────────────┐
-                │  SMART App Launch (openid fhirUser)                                    │
-  Provider ───▶ │  → issues id_token (iss = EHR, aud = app's EHR client_id, fhirUser)    │
-                └────────────────────────────────────────────────────────────────────────┘
-                                 │  id_token (+ the app's JHE client_id/secret)
-                                 ▼
-  ┌───────────────────── External SMART app (confidential backend) ───────────────────┐
-  │  POST /o/token-exchange  (client auth + subject_token = id_token)                  │
-  └────────────────────────────────────────────────────────────────────────────────────┘
-                                 │
-                                 ▼
-  ┌───────────────────────────── JHE /o/token-exchange ───────────────────────────────┐
-  │  1. Authenticate the confidential client (RFC 6749 client auth)                    │
-  │  2. Read id_token `iss`; require it ∈ auth.sof.trusted_issuers                     │
-  │  3. Discover JWKS: {iss}/.well-known/smart-configuration → jwks_uri                │
-  │  4. Verify signature + exp/iat + aud == auth.sof.trusted_audience                  │
-  │  5. fhirUser ("Practitioner/<id>") → JheUser.identifier == <id>                    │
-  │  6. Issue access token: user = the Practitioner, application = the client          │
-  └────────────────────────────────────────────────────────────────────────────────────┘
-                                 │  { access_token, token_type: Bearer, expires_in }
-                                 ▼
-                 App calls JHE FHIR API with  Authorization: Bearer <access_token>
+               ┌────────────────────────────────────────────────────────────────────────────┐
+               │ EHR (Epic, Cerner, MedPlum, …)                                             │
+  Provider ───▶│ SMART App Launch (openid fhirUser)                                         │
+               │ → issues id_token (iss = EHR OAuth issuer, aud = app's EHR client_id,      │
+               │   fhirUser = the launching Practitioner)                                   │
+               └────────────────────────────────────────────────────────────────────────────┘
+                                                      │  id_token (+ the app's JHE client_id/secret)
+                                                      ▼
+               ┌────────────────────────────────────────────────────────────────────────────┐
+               │ External SMART app (confidential backend)                                  │
+               │ POST /o/token-exchange  (client auth + subject_token = id_token)           │
+               └────────────────────────────────────────────────────────────────────────────┘
+                                                      │
+                                                      ▼
+               ┌────────────────────────────────────────────────────────────────────────────┐
+               │ JHE /o/token-exchange                                                      │
+               │ 1. Authenticate the confidential client (RFC 6749 client auth)             │
+               │ 2. Read id_token `iss`; require it ∈ auth.sof.trusted_issuers              │
+               │ 3. Discover JWKS: {iss}/.well-known/smart-configuration → jwks_uri         │
+               │    (falls back to {iss}/.well-known/openid-configuration)                  │
+               │ 4. Verify signature + exp/iat + aud == auth.sof.trusted_audience           │
+               │ 5. fhirUser ("Practitioner/<id>") → JheUser.identifier == <id>             │
+               │ 6. Issue access token: user = the Practitioner, application = the client   │
+               └────────────────────────────────────────────────────────────────────────────┘
+                                                      │  { access_token, token_type: Bearer, expires_in }
+                                                      ▼
+                     App calls JHE FHIR API with  Authorization: Bearer <access_token>
 ```
 
 ### Two distinct client identities (do not conflate)

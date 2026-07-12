@@ -31,12 +31,13 @@ as that provider, under JHE's normal access control.
 <!-- TODO(flip-to-ready): the oidc_verify.py and test_token_exchange.py links below
      point at the feature branch; switch them to jupyterhealth-exchange main when PR #646
      merges and this PR is marked ready. -->
+
 | What                                   | Where                                                                                                                                                                                      |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Token-exchange endpoint                | [`core/views/common.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/common.py) (`token_exchange`)                                                        |
-| id_token verification (JWKS discovery) | [`core/oidc_verify.py`](https://github.com/the-commons-project/jupyterhealth-exchange/blob/ehr-launch-jhe-sso-with-client/core/oidc_verify.py)                                                                             |
+| id_token verification (JWKS discovery) | [`core/oidc_verify.py`](https://github.com/the-commons-project/jupyterhealth-exchange/blob/ehr-launch-jhe-sso-with-client/core/oidc_verify.py)                                             |
 | Client + settings seed                 | [`core/management/commands/seed.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/management/commands/seed.py) (`seed_sof_ehr_launch_application`, `auth.sof.*`) |
-| Tests                                  | [`tests/backend/test_token_exchange.py`](https://github.com/the-commons-project/jupyterhealth-exchange/blob/ehr-launch-jhe-sso-with-client/tests/backend/test_token_exchange.py)                                           |
+| Tests                                  | [`tests/backend/test_token_exchange.py`](https://github.com/the-commons-project/jupyterhealth-exchange/blob/ehr-launch-jhe-sso-with-client/tests/backend/test_token_exchange.py)           |
 | Reference app (template)               | [jupyterhealth-sof-provider-template](https://github.com/jupyterhealth/jupyterhealth-sof-provider-template) — see also the [MedPlum tutorial](../tutorial/medplum-provider-dashboard.md)   |
 
 ## Architecture

@@ -20,13 +20,13 @@ This is the **provider-side** sibling of the patient-side
 clinical data *into* JHE; this flow lets a provider's launched app read JHE data *out*,
 as that provider, under JHE's normal access control.
 
-| What                                   | Where                                                                                                                                                                                        |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Token-exchange endpoint                | [`core/views/common.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/common.py) (`token_exchange`)                                                         |
-| id_token verification (JWKS discovery) | [`core/oidc_verify.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/oidc_verify.py)                                                                              |
-| Client + settings seed                 | [`core/management/commands/seed.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/management/commands/seed.py) (`seed_sof_ehr_launch_application`, `auth.sof.*`)   |
-| Tests                                  | [`tests/backend/test_token_exchange.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/tests/backend/test_token_exchange.py)                                            |
-| Reference app (template)               | [jupyterhealth-sof-provider-template](https://github.com/jupyterhealth/jupyterhealth-sof-provider-template) — see also the [MedPlum tutorial](../tutorial/medplum-provider-dashboard.md)    |
+| What                                   | Where                                                                                                                                                                                      |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Token-exchange endpoint                | [`core/views/common.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/common.py) (`token_exchange`)                                                        |
+| id_token verification (JWKS discovery) | [`core/oidc_verify.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/oidc_verify.py)                                                                             |
+| Client + settings seed                 | [`core/management/commands/seed.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/management/commands/seed.py) (`seed_sof_ehr_launch_application`, `auth.sof.*`) |
+| Tests                                  | [`tests/backend/test_token_exchange.py`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/tests/backend/test_token_exchange.py)                                           |
+| Reference app (template)               | [jupyterhealth-sof-provider-template](https://github.com/jupyterhealth/jupyterhealth-sof-provider-template) — see also the [MedPlum tutorial](../tutorial/medplum-provider-dashboard.md)   |
 
 ## Architecture
 
@@ -57,10 +57,10 @@ as that provider, under JHE's normal access control.
 
 ### Two distinct client identities (do not conflate)
 
-|                              | Where it lives                                | What it is                                             | Checked against            |
-| ---------------------------- | --------------------------------------------- | ------------------------------------------------------ | -------------------------- |
-| **EHR client_id**            | inside the `id_token` as `aud`                | the app's registration **at the EHR**                  | `auth.sof.trusted_audience` |
-| **JHE client_id + secret**   | the token-exchange request (client auth)      | the app's registration **in JHE** ("SoF EHR Launch")   | JHE's OAuth application store |
+|                            | Where it lives                           | What it is                                           | Checked against               |
+| -------------------------- | ---------------------------------------- | ---------------------------------------------------- | ----------------------------- |
+| **EHR client_id**          | inside the `id_token` as `aud`           | the app's registration **at the EHR**                | `auth.sof.trusted_audience`   |
+| **JHE client_id + secret** | the token-exchange request (client auth) | the app's registration **in JHE** ("SoF EHR Launch") | JHE's OAuth application store |
 
 The `id_token` proves *which provider* is launching; the JHE client credential proves
 *which app* is calling JHE. Both must be satisfied.
@@ -73,10 +73,10 @@ Configured at runtime via JheSettings (not env vars). Both are created by
 `python manage.py seed`; update them via the JHE settings admin/API (values are cached
 for ~60s, so a change takes effect within that window):
 
-| Key                         | Type     | Meaning                                                                                     |
-| --------------------------- | -------- | ------------------------------------------------------------------------------------------- |
-| `auth.sof.trusted_issuers`  | `json`   | EHR OIDC issuers (`id_token.iss`) whose tokens are accepted; JWKS is discovered from each.  |
-| `auth.sof.trusted_audience` | `string` | The SMART app's `client_id` at the EHR (the `id_token.aud`).                                |
+| Key                         | Type     | Meaning                                                                                    |
+| --------------------------- | -------- | ------------------------------------------------------------------------------------------ |
+| `auth.sof.trusted_issuers`  | `json`   | EHR OIDC issuers (`id_token.iss`) whose tokens are accepted; JWKS is discovered from each. |
+| `auth.sof.trusted_audience` | `string` | The SMART app's `client_id` at the EHR (the `id_token.aud`).                               |
 
 ### The "SoF EHR Launch" confidential client
 
@@ -100,16 +100,16 @@ get `404`.
 
 `POST /o/token-exchange` — `application/x-www-form-urlencoded`.
 
-| Parameter              | Required | Value                                              |
-| ---------------------- | -------- | --------------------------------------------------- |
-| `grant_type`           | ✓        | `urn:ietf:params:oauth:grant-type:token-exchange`   |
-| `subject_token`        | ✓        | the EHR-issued `id_token` (a JWT)                   |
-| `subject_token_type`   | ✓        | `urn:ietf:params:oauth:token-type:id_token`         |
-| `requested_token_type` | ✓        | `urn:ietf:params:oauth:token-type:access_token`     |
+| Parameter              | Required | Value                                                |
+| ---------------------- | -------- | ---------------------------------------------------- |
+| `grant_type`           | ✓        | `urn:ietf:params:oauth:grant-type:token-exchange`    |
+| `subject_token`        | ✓        | the EHR-issued `id_token` (a JWT)                    |
+| `subject_token_type`   | ✓        | `urn:ietf:params:oauth:token-type:id_token`          |
+| `requested_token_type` | ✓        | `urn:ietf:params:oauth:token-type:access_token`      |
 | `audience`             | ✓        | JHE's site URL (must equal JHE's `SITE_URL` exactly) |
-| `scope`                | ✓        | `openid` (only value supported)                     |
-| `client_id`            | ✓        | the app's JHE confidential client id                |
-| `client_secret`        | ✓        | the app's JHE confidential client secret            |
+| `scope`                | ✓        | `openid` (only value supported)                      |
+| `client_id`            | ✓        | the app's JHE confidential client id                 |
+| `client_secret`        | ✓        | the app's JHE confidential client secret             |
 
 Client credentials may be sent as form fields (above) or via HTTP Basic
 (`Authorization: Basic …`) — both placements are accepted.
@@ -145,14 +145,14 @@ re-exchanges per launch.
 
 ### Errors
 
-| Status | Cause                                                                                              |
-| ------ | --------------------------------------------------------------------------------------------------- |
+| Status | Cause                                                                                                               |
+| ------ | ------------------------------------------------------------------------------------------------------------------- |
 | `400`  | Missing/invalid parameter, malformed JWT, wrong `subject_token_type`, `audience` ≠ JHE site URL, missing `fhirUser` |
-| `401`  | Client authentication failed; or `id_token` signature/`exp`/`aud` invalid                           |
-| `403`  | `id_token.iss` not trusted; or `fhirUser` is not a Practitioner                                     |
-| `404`  | No `Practitioner` with `JheUser.identifier` == the `fhirUser` id                                    |
-| `500`  | Token exchange not configured (`auth.sof.*` unset)                                                  |
-| `502`  | JWKS discovery / signing-key resolution failed at the issuer                                        |
+| `401`  | Client authentication failed; or `id_token` signature/`exp`/`aud` invalid                                           |
+| `403`  | `id_token.iss` not trusted; or `fhirUser` is not a Practitioner                                                     |
+| `404`  | No `Practitioner` with `JheUser.identifier` == the `fhirUser` id                                                    |
+| `500`  | Token exchange not configured (`auth.sof.*` unset)                                                                  |
+| `502`  | JWKS discovery / signing-key resolution failed at the issuer                                                        |
 
 ## Security notes / known limitations
 

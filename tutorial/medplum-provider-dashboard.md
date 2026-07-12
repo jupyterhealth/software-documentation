@@ -1,5 +1,5 @@
 ---
-title: "Launch a JupyterHealth dashboard via SMART on FHIR (MedPlum example)"
+title: Launch a JupyterHealth dashboard via SMART on FHIR (MedPlum example)
 ---
 
 In this tutorial you stand up a **provider-facing dashboard app** that a clinician
@@ -73,11 +73,11 @@ The app finds the JHE patient whose **external identifier equals the EHR patient
 value**. Create a MedPlum `Patient` mirroring a JHE patient with data, e.g. the seeded
 CGM patient:
 
-| Field                       | Value                                              |
-| --------------------------- | --------------------------------------------------- |
+| Field                       | Value                                                   |
+| --------------------------- | ------------------------------------------------------- |
 | Name / birth date           | copy from the JHE patient (e.g. May Nguyen, 1984-07-11) |
-| `Patient.identifier.system` | your `MRN_IDENTIFIER_SYSTEM` from step 1            |
-| `Patient.identifier.value`  | the JHE patient's external id (e.g. `1636-69-001`)  |
+| `Patient.identifier.system` | your `MRN_IDENTIFIER_SYSTEM` from step 1                |
+| `Patient.identifier.value`  | the JHE patient's external id (e.g. `1636-69-001`)      |
 
 Name and birth date must match the JHE record — the app verifies the two records are
 the same person before showing anything (it fails closed with a lock notice if not).

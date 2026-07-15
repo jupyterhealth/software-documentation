@@ -88,6 +88,13 @@ project:
         - "http://localhost:8010/smart/callback"
         # epic.com blocks automated requests (403), so the checker can't verify it
         - "https://www.epic.com/software/mychart/"
+    # doi.org intermittently rate-limits CI runners; this citation lookup in
+    # tutorial-cgm.ipynb has flaked repeatedly (2026-07-12, 2026-07-15).
+    - rule: doi-link-valid
+      severity: ignore
+      keys:
+        - "10.1371/journal.pbio.2005143.s010"
+        - "doi:10.1371/journal.pbio.2005143.s010"
 site:
   template: book-theme
   title: JupyterHealth Software

@@ -22,6 +22,8 @@ GET /FHIR/R5/Condition?_source:below=https://jupyterhealth.org/fhir/fhir-source/
 - Imported records carry `meta.source: "https://jupyterhealth.org/fhir/fhir-source/<id>"`.
 - A single query never spans both stores.
 
+(filtering-sorting-counting)=
+
 ## Filtering, sorting & counting
 
 Search parameters (US Core) — the set available depends on the resource type:
@@ -418,7 +420,7 @@ GET /FHIR/R5/QuestionnaireResponse?_source=https://jupyterhealth.org/fhir/fhir-s
 GET /FHIR/R5/QuestionnaireResponse?_source:below=https://jupyterhealth.org/fhir/fhir-source/
 ```
 
-**By patient or study** (add any filter/sort from [Filtering, sorting & counting](#filtering-sorting--counting)):
+**By patient or study** (add any filter/sort from [Filtering, sorting & counting](#filtering-sorting-counting)):
 
 ```
 GET /FHIR/R5/QuestionnaireResponse?patient=40001

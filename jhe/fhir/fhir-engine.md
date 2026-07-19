@@ -40,7 +40,7 @@ Given a resource `R` with mapped interactions `M`, aux interactions `A`, and opt
 
 | Interaction                | Routing                                                                                                                                                                                                                                                                                                                           |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **search**                 | exactly **one** store, chosen by the [`_source`](#the-metasource-discriminator--the-_source-search-param) param — never a union. `_source` absent or the JHE-native URI → the mapped Django rows; a `.../fhir-source/<id>` URI → that source's `FhirAuxResource` rows; `_source:below=.../fhir-source/` → every imported aux row. |
+| **search**                 | exactly **one** store, chosen by the [`_source`](#metasource-discriminator-source-param) param — never a union. `_source` absent or the JHE-native URI → the mapped Django rows; a `.../fhir-source/<id>` URI → that source's `FhirAuxResource` rows; `_source:below=.../fhir-source/` → every imported aux row. |
 | **read / update / delete** | by **id shape** — a **UUID** id targets `FhirAuxResource`; an **integer** id targets the mapped Django model. (FhirAuxResource uses a UUID primary key, so the two id spaces never collide.)                                                                                                                                      |
 | **create**                 | if `create ∈ M` and (`C` absent or `C` matches the payload) → mapped model; else if `create ∈ A` → aux; else `405`.                                                                                                                                                                                                               |
 
@@ -398,6 +398,8 @@ a **patient registers for themselves** (fields: `patient`, `data_source`, `label
 before uploading FHIR resources. CRUD lives at `api/v1/fhir_sources` via
 [`FhirSourceViewSet`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/fhir_source.py), scoped to the requesting patient (their `patient`
 is assigned server-side).
+
+(metasource-discriminator-source-param)=
 
 ### The `meta.source` discriminator & the `_source` search param
 

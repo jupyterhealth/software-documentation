@@ -26,12 +26,12 @@ GET /FHIR/R5/Condition?_source:below=https://jupyterhealth.org/fhir/fhir-source/
 
 Search parameters (US Core) — the set available depends on the resource type:
 
-| Type                 | Examples                                                                        |
-| -------------------- | ------------------------------------------------------------------------------- |
+| Type                 | Examples                                                                                     |
+| -------------------- | -------------------------------------------------------------------------------------------- |
 | token                | `?clinical-status=active` · `?code=http://loinc.org\|1234-5` · `?category=problem-list-item` |
-| date                 | `?recorded-date=ge2024-01-01` · `?date=le2024-12-31` (`ge`/`le`/`gt`/`lt` or a bare date) |
-| string (starts-with) | `?name=nor` matches "North Clinic" (case-insensitive)                           |
-| reference            | `?encounter=Encounter/abc` · `?patient=40001`                                   |
+| date                 | `?recorded-date=ge2024-01-01` · `?date=le2024-12-31` (`ge`/`le`/`gt`/`lt` or a bare date)    |
+| string (starts-with) | `?name=nor` matches "North Clinic" (case-insensitive)                                        |
+| reference            | `?encounter=Encounter/abc` · `?patient=40001`                                                |
 
 - **comma = OR:** `?category=problem-list-item,encounter-diagnosis`
 - **repeat = AND / range:** `?recorded-date=ge2024-01-01&recorded-date=le2024-12-31`
@@ -67,13 +67,13 @@ OMH Observations are the primary data type in JHE and are stored natively in the
 
 Patient-scoping parameters are optional — a paramless search returns everything you can access (a patient user's own observations; a practitioner's observations across all their organizations). When filtering by study (`patient._has:Group:member:_id`), results are additionally restricted to the study's consented observation codes.
 
-| Query Parameter                 | Example                                                | Description                                       |
-| ------------------------------- | ------------------------------------------------------ | ------------------------------------------------- |
-| `patient._has:Group:member:_id` | `30001`                                                | Observations for patients enrolled in Study 30001 |
-| `patient`                       | `40001`                                                | Observations for Patient 40001                    |
-| `patient.organization`          | `20001`                                                | Observations for patients in Organization 20001   |
-| `patient.identifier`            | `http://ehr.example.com\|abc123`                       | Observations for the patient with that identifier |
-| `code`                          | `https://w3id.org/openmhealth\|omh:blood-pressure:4.0` | Filter by observation type                        |
+| Query Parameter                 | Example                                                | Description                                         |
+| ------------------------------- | ------------------------------------------------------ | --------------------------------------------------- |
+| `patient._has:Group:member:_id` | `30001`                                                | Observations for patients enrolled in Study 30001   |
+| `patient`                       | `40001`                                                | Observations for Patient 40001                      |
+| `patient.organization`          | `20001`                                                | Observations for patients in Organization 20001     |
+| `patient.identifier`            | `http://ehr.example.com\|abc123`                       | Observations for the patient with that identifier   |
+| `code`                          | `https://w3id.org/openmhealth\|omh:blood-pressure:4.0` | Filter by observation type                          |
 | `date`                          | `ge2024-01-01`                                         | Filter by `effective[x]` time (`ge`/`le`/`gt`/`lt`) |
 
 Notes:
@@ -200,13 +200,13 @@ On upload, JHE lifts the OMH `body.effective_time_frame` out of the Base64 paylo
 
 A single point in time becomes `effectiveDateTime`; every OMH `time_interval` form becomes an `effectivePeriod` (start + end):
 
-| OMH `effective_time_frame` shape          | Example                                                            | FHIR R5 output                                                     |
-| ----------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `date_time`                               | `{ "date_time": "2026-07-18T09:30:00+09:00" }`                    | `effectiveDateTime: "2026-07-18T09:30:00+09:00"`                  |
-| `time_interval` — `start` + `end`         | `{ "start_date_time": "…T09:00…", "end_date_time": "…T10:00…" }`  | `effectivePeriod: { start, end }`                                 |
-| `time_interval` — `start` + `duration`    | `{ "start_date_time": "…T09:00…", "duration": { "value": 60, "unit": "min" } }` | `effectivePeriod: { start, end }` (end = start + duration) |
-| `time_interval` — `end` + `duration`      | `{ "end_date_time": "…T10:00…", "duration": { "value": 60, "unit": "min" } }`   | `effectivePeriod: { start, end }` (start = end − duration) |
-| `time_interval` — `date` + `part_of_day`  | `{ "date": "2026-07-18", "part_of_day": "morning" }`             | `effectivePeriod: { start, end }` (the part-of-day window)        |
+| OMH `effective_time_frame` shape         | Example                                                                         | FHIR R5 output                                             |
+| ---------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `date_time`                              | `{ "date_time": "2026-07-18T09:30:00+09:00" }`                                  | `effectiveDateTime: "2026-07-18T09:30:00+09:00"`           |
+| `time_interval` — `start` + `end`        | `{ "start_date_time": "…T09:00…", "end_date_time": "…T10:00…" }`                | `effectivePeriod: { start, end }`                          |
+| `time_interval` — `start` + `duration`   | `{ "start_date_time": "…T09:00…", "duration": { "value": 60, "unit": "min" } }` | `effectivePeriod: { start, end }` (end = start + duration) |
+| `time_interval` — `end` + `duration`     | `{ "end_date_time": "…T10:00…", "duration": { "value": 60, "unit": "min" } }`   | `effectivePeriod: { start, end }` (start = end − duration) |
+| `time_interval` — `date` + `part_of_day` | `{ "date": "2026-07-18", "part_of_day": "morning" }`                            | `effectivePeriod: { start, end }` (the part-of-day window) |
 
 Notes:
 
@@ -219,16 +219,16 @@ Notes:
 
 These resources are **read-only** projections of JHE system entities — writes to them via FHIR are not supported (use the `/api/v1/` REST API to manage these). All support the same patient-scoping query parameters.
 
-| Query Parameter                 | Example                          | Description                                             |
-| ------------------------------- | -------------------------------- | ------------------------------------------------------- |
-| `_has:Group:member:_id`         | `30001`                          | Resources belonging to patients in Study 30001          |
-| `patient`                       | `40001`                          | Resources belonging to Patient 40001                    |
-| `patient.organization`          | `20001`                          | Resources belonging to patients in Organization 20001   |
-| `patient._has:Group:member:_id` | `30001`                          | Resources belonging to patients enrolled in Study 30001 |
-| `patient.identifier`            | `http://ehr.example.com\|abc123` | Resources belonging to the patient with that identifier |
-| `identifier`                    | `http://ehr.example.com\|abc123` | Match the resource itself by identifier (Patient only)  |
+| Query Parameter                 | Example                          | Description                                               |
+| ------------------------------- | -------------------------------- | --------------------------------------------------------- |
+| `_has:Group:member:_id`         | `30001`                          | Resources belonging to patients in Study 30001            |
+| `patient`                       | `40001`                          | Resources belonging to Patient 40001                      |
+| `patient.organization`          | `20001`                          | Resources belonging to patients in Organization 20001     |
+| `patient._has:Group:member:_id` | `30001`                          | Resources belonging to patients enrolled in Study 30001   |
+| `patient.identifier`            | `http://ehr.example.com\|abc123` | Resources belonging to the patient with that identifier   |
+| `identifier`                    | `http://ehr.example.com\|abc123` | Match the resource itself by identifier (Patient only)    |
 | `family` / `given` / `name`     | `Smith`                          | Patient name starts-with, case-insensitive (Patient only) |
-| `birthdate`                     | `ge1980-01-01`                   | Patient date of birth (Patient only)                    |
+| `birthdate`                     | `ge1980-01-01`                   | Patient date of birth (Patient only)                      |
 
 ```json
 // GET /FHIR/R5/Patient?_has:Group:member:_id=30001

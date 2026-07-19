@@ -38,11 +38,11 @@ The config drives which backing store handles it, via two annotations:
 
 Given a resource `R` with mapped interactions `M`, aux interactions `A`, and optional criteria `C`:
 
-| Interaction                | Routing                                                                                                                                                                                       |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Interaction                | Routing                                                                                                                                                                                                                                                                                                                           |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **search**                 | exactly **one** store, chosen by the [`_source`](#the-metasource-discriminator--the-_source-search-param) param — never a union. `_source` absent or the JHE-native URI → the mapped Django rows; a `.../fhir-source/<id>` URI → that source's `FhirAuxResource` rows; `_source:below=.../fhir-source/` → every imported aux row. |
-| **read / update / delete** | by **id shape** — a **UUID** id targets `FhirAuxResource`; an **integer** id targets the mapped Django model. (FhirAuxResource uses a UUID primary key, so the two id spaces never collide.) |
-| **create**                 | if `create ∈ M` and (`C` absent or `C` matches the payload) → mapped model; else if `create ∈ A` → aux; else `405`.                                                                          |
+| **read / update / delete** | by **id shape** — a **UUID** id targets `FhirAuxResource`; an **integer** id targets the mapped Django model. (FhirAuxResource uses a UUID primary key, so the two id spaces never collide.)                                                                                                                                      |
+| **create**                 | if `create ∈ M` and (`C` absent or `C` matches the payload) → mapped model; else if `create ∈ A` → aux; else `405`.                                                                                                                                                                                                               |
 
 With the shipped config, `Device`/`Group`/`Organization`/`Patient`/`Practitioner` are
 `read,search` against their model — so **all their writes fall through to `FhirAuxResource`** —
@@ -226,14 +226,14 @@ straight from the US Core CapabilityStatement's supported-searches set.
 
 **Search-param types** (validated by `get_config_errors`):
 
-| type         | Matches                                                                 | Store semantics |
-| ------------ | ---------------------------------------------------------------------- | --------------- |
-| `token`      | a `system\|code` against a `Coding`/`CodeableConcept.coding` (path → the coding array/element) | aux: `@.code`(& `@.system`) equality; mapped: exact match on the code part |
-| `identifier` | like `token` but against an `Identifier` (`@.value` instead of `@.code`) | aux only |
-| `code`       | a plain FHIR `code` scalar (`status`, `intent`, …); the token's system is ignored | aux: `@ == code` |
-| `string`     | case-insensitive **starts-with** over one or more paths                 | aux: `like_regex`; mapped: `__istartswith` |
-| `reference`  | a full `Type/id` **or** a bare id (any `…/id`)                          | aux only |
-| `date`       | `ge`/`le`/`gt`/`lt` comparator or a bare date (prefix); polymorphic `[x]` paths are `COALESCE`d | both |
+| type         | Matches                                                                                                                          | Store semantics                                                                              |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `token`      | a `system\|code` against a `Coding`/`CodeableConcept.coding` (path → the coding array/element)                                   | aux: `@.code`(& `@.system`) equality; mapped: exact match on the code part                   |
+| `identifier` | like `token` but against an `Identifier` (`@.value` instead of `@.code`)                                                         | aux only                                                                                     |
+| `code`       | a plain FHIR `code` scalar (`status`, `intent`, …); the token's system is ignored                                                | aux: `@ == code`                                                                             |
+| `string`     | case-insensitive **starts-with** over one or more paths                                                                          | aux: `like_regex`; mapped: `__istartswith`                                                   |
+| `reference`  | a full `Type/id` **or** a bare id (any `…/id`)                                                                                   | aux only                                                                                     |
+| `date`       | `ge`/`le`/`gt`/`lt` comparator or a bare date (prefix); polymorphic `[x]` paths are `COALESCE`d                                  | both                                                                                         |
 | `const`      | the mapped resource renders this element as a fixed literal (e.g. Observation `status` = `final`, Device `type` = `data-source`) | mapped only: the whole result matches iff the requested code equals the constant, else empty |
 
 Within one param, **comma-separated values OR**; a **repeated** param **ANDs** (standard FHIR). For
@@ -246,8 +246,7 @@ Within one param, **comma-separated values OR**; a **repeated** param **ANDs** (
 ### Mapped store — Django ORM
 
 For a mapped resource the specs become ORM filters on the model's own columns (`birthdate` →
-`birth_date`, `family` → `name_family`, Observation `date` → `COALESCE(effective_date_time,
-effective_period_start)`). `string` uses `__istartswith`; `date` compares at day or instant
+`birth_date`, `family` → `name_family`, Observation `date` → `COALESCE(effective_date_time, effective_period_start)`). `string` uses `__istartswith`; `date` compares at day or instant
 precision depending on the column type; `const` short-circuits the whole queryset to empty when the
 requested token does not equal the rendered literal. `code`/`identifier` for the *mapped* resources
 that already resolve them (Observation `code`, Patient `identifier`) stay in `fhir_search` and are
@@ -305,18 +304,18 @@ returned).
 
 ## Components
 
-| File                                                                                                                                                                                                                                                               | Responsibility                                                                                                                                                                                            |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [core/fhir/fhir_config.json](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/fhir_config.json)                                                                                                                                         | Declares `mapped_resources` (field mappings + `meta.__interaction` / `__criteria`) and `aux_resources` (`resourceType` + `__interaction`), plus each resource's `__search` params and `__sortDate`.       |
+| File                                                                                                                                                                                                                                                               | Responsibility                                                                                                                                                                                                                                                                                |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [core/fhir/fhir_config.json](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/fhir_config.json)                                                                                                                                         | Declares `mapped_resources` (field mappings + `meta.__interaction` / `__criteria`) and `aux_resources` (`resourceType` + `__interaction`), plus each resource's `__search` params and `__sortDate`.                                                                                           |
 | [core/fhir/config.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/config.py)                                                                                                                                                       | Loads the JSON once at import; exposes `get_resource_mapping`, `mapped_interactions` / `aux_interactions`, `mapped_criteria`, `mapped_model_name`, `mapped_search_params` / `aux_search_params`, `mapped_sort_date` / `aux_sort_date`, and **`get_config_errors()`** (validation, see below). |
-| [core/fhir/search.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/search.py)                                                                                                                                                       | The US Core search-param, `_sort` and `_summary` layer: mapped ORM filters and the auxiliary Postgres JSONB query builder (`jsonb_path_exists` / `#>>` via `RawSQL`). |
-| [core/fhir/engine.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/engine.py)                                                                                                                                                       | The renderer: `build_fhir_resource` (model → FHIR dict), `render_resource`, `matches_criteria`, `expand_interactions`.                                                                                    |
-| [core/fhir/fhir_validation.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/fhir_validation.py)                                                                                                                                     | `validate_fhir_resource(resource_type, data)` — parse an incoming FHIR body against its `fhir.resources` model (DRF 400 on failure).                                                                      |
-| [core/serializers/observation.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/serializers/observation.py), [core/serializers/patient.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/serializers/patient.py) | `FHIRObservationSerializer` / `FHIRPatientSerializer` call the engine. (Observation Base64-encodes `valueAttachment.data` afterwards.)                                                                    |
-| [core/serializers/aux_resource.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/serializers/aux_resource.py)                                                                                                                             | `FHIRAuxResourceSerializer` returns a `FhirAuxResource`'s stored body verbatim (with `resourceType`/`id` forced).                                                                                         |
-| [core/fhir/scope.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/scope.py)                                                                                                                                                         | `resolve_fhir_user` (patient-vs-practitioner from the `jhe_user_id`) and `authorize_practitioner_scope` (403 on an unauthorized organization/study/patient), shared by every model's `fhir_search`.       |
-| [core/views/fhir.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/fhir.py)                                                                                                                                                         | `FHIRResourceView` — the unified endpoint, routing table, the generic mapped handler, and the aux handler.                                                                                                |
-| [core/fhir/pagination.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/pagination.py)                                                                                                                                               | Wraps serialized resources in a FHIR `searchset` Bundle.                                                                                                                                                  |
+| [core/fhir/search.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/search.py)                                                                                                                                                       | The US Core search-param, `_sort` and `_summary` layer: mapped ORM filters and the auxiliary Postgres JSONB query builder (`jsonb_path_exists` / `#>>` via `RawSQL`).                                                                                                                         |
+| [core/fhir/engine.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/engine.py)                                                                                                                                                       | The renderer: `build_fhir_resource` (model → FHIR dict), `render_resource`, `matches_criteria`, `expand_interactions`.                                                                                                                                                                        |
+| [core/fhir/fhir_validation.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/fhir_validation.py)                                                                                                                                     | `validate_fhir_resource(resource_type, data)` — parse an incoming FHIR body against its `fhir.resources` model (DRF 400 on failure).                                                                                                                                                          |
+| [core/serializers/observation.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/serializers/observation.py), [core/serializers/patient.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/serializers/patient.py) | `FHIRObservationSerializer` / `FHIRPatientSerializer` call the engine. (Observation Base64-encodes `valueAttachment.data` afterwards.)                                                                                                                                                        |
+| [core/serializers/aux_resource.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/serializers/aux_resource.py)                                                                                                                             | `FHIRAuxResourceSerializer` returns a `FhirAuxResource`'s stored body verbatim (with `resourceType`/`id` forced).                                                                                                                                                                             |
+| [core/fhir/scope.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/scope.py)                                                                                                                                                         | `resolve_fhir_user` (patient-vs-practitioner from the `jhe_user_id`) and `authorize_practitioner_scope` (403 on an unauthorized organization/study/patient), shared by every model's `fhir_search`.                                                                                           |
+| [core/views/fhir.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/fhir.py)                                                                                                                                                         | `FHIRResourceView` — the unified endpoint, routing table, the generic mapped handler, and the aux handler.                                                                                                                                                                                    |
+| [core/fhir/pagination.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/fhir/pagination.py)                                                                                                                                               | Wraps serialized resources in a FHIR `searchset` Bundle.                                                                                                                                                                                                                                      |
 
 ## The configuration
 
@@ -415,13 +414,13 @@ field is the JHE-native-vs-imported discriminator that routes **both reads and w
 **Reads choose their store with the standard `_source` search param** (a resource-level `uri` param
 matching `meta.source`), so a search is always single-table:
 
-| `_source`                                                     | store                            |
-| ------------------------------------------------------------- | -------------------------------- |
-| absent                                                        | mapped (JHE-native default)      |
-| `https://jupyterhealth.org/jhe`                               | mapped                           |
-| `https://jupyterhealth.org/fhir/fhir-source/<id>`             | aux — that one source            |
-| `_source:below=https://jupyterhealth.org/fhir/fhir-source/`   | aux — all imported               |
-| anything else (an external URI, a typo)                       | empty (no stored `meta.source` matches) |
+| `_source`                                                   | store                                   |
+| ----------------------------------------------------------- | --------------------------------------- |
+| absent                                                      | mapped (JHE-native default)             |
+| `https://jupyterhealth.org/jhe`                             | mapped                                  |
+| `https://jupyterhealth.org/fhir/fhir-source/<id>`           | aux — that one source                   |
+| `_source:below=https://jupyterhealth.org/fhir/fhir-source/` | aux — all imported                      |
+| anything else (an external URI, a typo)                     | empty (no stored `meta.source` matches) |
 
 For a **pure-aux** type (no mapped model, e.g. `Condition`) an absent `_source` means aux — there is
 no mapped store to default to. `_source:below` is a **string-prefix** match on the `uri` (FHIR's
@@ -461,7 +460,7 @@ ways, in **precedence order** ([resolve_fhir_source_context](https://github.com/
 
 1. the **`X-JHE-FHIR-Source-ID` header** (the source pk) — **authoritative when present** (it wins
    over the body);
-2. the resource body's own **`meta.source`** (`.../fhir-source/<id>`) — the preferred,
+1. the resource body's own **`meta.source`** (`.../fhir-source/<id>`) — the preferred,
    read/write-symmetric way. A **bundle-level `meta.source` is never consulted**: FHIR defines no
    inheritance from a Bundle to its entries, so each entry must carry its own.
 

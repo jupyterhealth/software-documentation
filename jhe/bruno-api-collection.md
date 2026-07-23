@@ -44,10 +44,10 @@ The token expires after one year. Re-run `create_bruno_app` to mint a new one.
 
 ## Collection structure
 
-| Folder    | Covers                                                                                                |
-| --------- | ----------------------------------------------------------------------------------------------------- |
-| **Admin** | Organizations, Patients, Studies, Users, Practitioners, Data Sources, Clients, Settings, Observations |
-| **FHIR**  | FHIR R5 Patient and Observation endpoints                                                             |
+| Folder    | Covers                                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------------------ |
+| **Admin** | Organizations, Patients, Studies, Users, Practitioners, Data Sources, Clients, Settings, Observations  |
+| **FHIR**  | FHIR R5 Patient, Observation (filtered search + `_summary=count`), and QuestionnaireResponse endpoints |
 
 ## Keeping it in sync
 

@@ -29,7 +29,7 @@ project:
         - file: jhe/data-model.md
         - file: jhe/patient-identifiers.md
         - file: jhe/ow-integration.md
-        - file: jhe/mychart-integration.md
+        - file: jhe/patient-access-integration.md
         - file: jhe/provider-ehr-launch.md
         - file: jhe/mcp-server.md
         # - title: Deploy

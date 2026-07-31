@@ -54,7 +54,7 @@ The EHR patient id is stored as a `PatientIdentifier` (`system` = the EHR `iss`,
 the EHR patient id). The client pulls the demo USCDI set (Patient demographics, Condition,
 MedicationRequest, AllergyIntolerance, lab Observations); each type is fetched and written
 independently so one failure does not abort the rest. Because the EHR serves **R4** and JHE
-stores **R5**, each resource is POSTed to the [`/fhir-import/R4/` endpoint](./fhir/fhir-engine.md),
+stores **R5**, each resource is POSTed to the [`/fhir-import/R4/` endpoint](./fhir/r4-import.md),
 which converts it via the HL7 cross-version maps and then runs the normal create - landing
 non-OMH resources in `FhirAuxResource`, linked to a `FhirSource` the patient registers on the fly.
 
@@ -83,11 +83,16 @@ Brands Bundle** and import it:
 
 ```bash
 # Epic publishes ~94k organizations / ~800 endpoints:
-curl -sSL -o epic_brands.json https://open.epic.com/Endpoints/Brands
+curl -sSL -o epic_brands.json https://open.epic.com/MyApps/Endpoints
 docker compose exec web python manage.py import_ehr_brands --file epic_brands.json
 ```
 
 The importer is idempotent (brands keyed on `fhir_base_url`); re-run to refresh.
+
+> **The full Epic file does not import yet.** Epic's bundle links its organizations to
+> endpoints with `urn:uuid` references, which the importer does not resolve, so the command
+> above completes with few or no locations. Use the shipped sample until that is fixed - see
+> [Out of scope](#out-of-scope-follow-up).
 
 ### Extending to other EHR vendors
 
@@ -107,14 +112,14 @@ authorize/token endpoints from `{iss}/.well-known/smart-configuration`.
 
 ```json
 {
-  "iss": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4",
   "client_id": "<EHR non-production client id>",
   "scopes": "openid profile launch/patient patient/Patient.read patient/Observation.read patient/Condition.read patient/MedicationRequest.read patient/AllergyIntolerance.read"
 }
 ```
 
-> The picker overrides `iss` per selected hospital at authorize time; the `client_id` and
-> `scopes` in `aux_data` still apply.
+> There is no `iss` in `aux_data`. The hospital the patient picks supplies it
+> (`EhrBrand.fhir_base_url`) at authorize time, and the callback reads it back from the
+> authorized server. Only `client_id` and `scopes` are configured.
 
 ### Register the EHR app (one-time, Epic example)
 
@@ -140,10 +145,13 @@ docker compose exec web python manage.py shell -c "
 from oauth2_provider.models import get_application_model as G
 c = G().objects.get(name='Patient Access').jhe_client
 c.aux_data['client_id'] = '<your EHR non-production client id>'
-c.aux_data['iss'] = '<your EHR FHIR base URL>'
 c.save()
 "
 ```
+
+The EHR's FHIR base URL is not configured here. It comes from the `EhrBrand` row the patient
+picks, so import that vendor's brands bundle instead (see
+[Seeding + refreshing the brand list](#seeding-refreshing-the-brand-list)).
 
 ## Local setup (Docker)
 
@@ -165,7 +173,7 @@ Verify:
 | ------------------------------------------------------------------------------------- | -------------------------------------------- |
 | `GET http://localhost:8001/clients/patient-access/`                                   | 200, connect page with a hospital search box |
 | `GET http://localhost:8001/static/clients/patient-access/js/client-patient-access.js` | 200                                          |
-| Page source contains `PATIENT_ACCESS_CONFIG` with the EHR `iss`                       | yes                                          |
+| Page source contains `PATIENT_ACCESS_CONFIG` with `clientId` and `scope` (no `iss`)   | yes                                          |
 
 ## End-to-end test
 

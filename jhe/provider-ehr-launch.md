@@ -24,7 +24,7 @@ capabilities every ONC §170.315(g)(10)-certified EHR must expose (OIDC `id_toke
 per-vendor plumbing.
 
 This is the **provider-side** sibling of the patient-side
-[MyChart (Epic) integration](./mychart-integration.md): MyChart pulls a patient's
+[Patient Access integration](./patient-access-integration.md): Patient Access pulls a patient's
 clinical data *into* JHE; this flow lets a provider's launched app read JHE data *out*,
 as that provider, under JHE's normal access control.
 

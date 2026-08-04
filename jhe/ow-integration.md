@@ -104,8 +104,8 @@ s.save()
 # 1. JHE
 cp dot_env_example.txt .env       # then fill OW_API_URL / OW_API_KEY
 docker compose up -d db
-pipenv install --dev
-pipenv shell
+uv sync
+source .venv/bin/activate
 python manage.py migrate
 python manage.py seed             # creates "Oura" data source + "OW Local" client
 python manage.py runserver 0.0.0.0:8000

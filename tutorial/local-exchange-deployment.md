@@ -26,21 +26,13 @@ Make sure you have these installed on your computer:
 - **Python 3.12** (recommended) - The project is configured for Python 3.12, though Django 5.2 also supports 3.10, 3.11, and 3.13. Check your version with `python --version` or `python3 --version`
 - **PostgreSQL** - Version 12 or newer. Download from [postgresql.org](https://www.postgresql.org/download/)
 - **Git** - Download from [git-scm.com](https://git-scm.com/downloads)
-- **pip** - Should come with Python
-- **pipenv** - Python dependency manager. Detailed installation instructions are provided in Step 1 below
+- **uv** - Python dependency manager. Detailed installation instructions are provided in Step 1 below
 - **A text editor** - Such as Notepad (Windows), TextEdit (Mac), VS Code, or Sublime Text
 
 You'll also need to be comfortable running commands in a terminal.
 
 **If you have multiple Python versions installed:**
-The project's `Pipfile` specifies Python 3.12. If you have multiple Python versions, you may need to specify which one to use:
-
-```bash
-# Tell pipenv to use Python 3.12 specifically
-PIPENV_PYTHON=3.12 pipenv install
-# Or on Windows:
-set PIPENV_PYTHON=3.12 && pipenv install
-```
+uv reads the project's `pyproject.toml` and automatically selects (or downloads) a compatible Python — no extra configuration needed.
 
 ### Check if PostgreSQL is installed and running
 
@@ -130,49 +122,29 @@ If you use this Docker approach, your `.env` file should use `DB_HOST="localhost
 
 ## Step 1: Set Up Your Python Environment
 
-First, let's install pipenv, which will manage our Python dependencies.
+First, let's install [uv](https://docs.astral.sh/uv/), which will manage our Python dependencies (and can even install Python itself).
 
 **On Mac (with Homebrew):**
 
 ```bash
-brew install pipenv
+brew install uv
 ```
 
-**On Linux/WSL:**
+**On Mac/Linux/WSL (standalone installer):**
 
 ```bash
-pip3 install --user pipenv
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 **On Windows:**
 
-```bash
-pip install --user pipenv
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-**If you get "externally-managed-environment" error** (common on macOS/Linux):
+Close and reopen your terminal after installing so `uv` is in your PATH, then verify with `uv --version`.
 
-This is because of PEP 668 which protects your system Python from being corrupted. **Never use `--break-system-packages`** as it can damage your Python installation.
-
-Instead, use one of these safe alternatives:
-
-```bash
-# Best option for Mac: Use Homebrew
-brew install pipenv
-
-# Best option for any platform: Use pipx (a tool designed for installing Python apps)
-# First install pipx, then use it to install pipenv:
-python3 -m pip install --user pipx
-python3 -m pipx ensurepath
-pipx install pipenv
-
-# Alternative: Check if pipenv is already installed
-which pipenv || echo "Not found"
-```
-
-Close and reopen your terminal after installing so pipenv is in your PATH.
-
-Great! Now we have pipenv ready to manage our project dependencies.
+Great! Now we have uv ready to manage our project dependencies.
 
 ## Step 2: Create Your Database
 
@@ -312,10 +284,10 @@ Save and close the `.env` file. We're ready to start!
 Let's install all the Python packages JupyterHealth Exchange needs:
 
 ```bash
-pipenv install --deploy
+uv sync --frozen
 ```
 
-The `--deploy` flag ensures you get the exact package versions from the lockfile, matching what the developers use.
+The `--frozen` flag ensures you get the exact package versions from the lockfile, matching what the developers use.
 
 **What to expect:**
 
@@ -324,34 +296,28 @@ The `--deploy` flag ensures you get the exact package versions from the lockfile
 - It might take 2-5 minutes depending on your internet connection
 - The final message should say something like "Successfully installed..." with a list of packages
 
-**If you see an error** about pipenv not being found, try closing and reopening your terminal, or install it globally:
-
-```bash
-pip install --user pipenv
-```
-
-**If you see a Python version mismatch error**, pipenv requires Python 3.12. Use the `PIPENV_PYTHON=3.12` approach mentioned in the prerequisites section.
+**If you see an error** about uv not being found, try closing and reopening your terminal (see Step 1).
 
 **Important note about running commands:**
 
-In the remaining steps, we'll run Python commands using `pipenv run python manage.py ...`. This automatically uses the correct Python environment without needing to activate a shell.
+In the remaining steps, we'll run Python commands using `uv run python manage.py ...`. This automatically uses the correct Python environment without needing to activate anything.
 
-Alternatively, you can activate the Python environment once and then run commands directly:
+Alternatively, you can activate the environment once and then run commands directly:
 
 ```bash
-pipenv shell
+source .venv/bin/activate
 ```
 
-If you use `pipenv shell`, your command prompt will change to show `(jupyterhealth-exchange)` at the beginning, and you can then run commands like `python manage.py migrate` without the `pipenv run` prefix.
+If you activate the environment, your command prompt will change to show `(.venv)` at the beginning, and you can then run commands like `python manage.py migrate` without the `uv run` prefix.
 
-**For this tutorial, we'll use `pipenv run`** to be more explicit about what's happening.
+**For this tutorial, we'll use `uv run`** to be more explicit about what's happening.
 
 ## Step 6: Set Up the Database
 
 Now we'll create all the database tables that JupyterHealth Exchange needs:
 
 ```bash
-pipenv run python manage.py migrate
+uv run python manage.py migrate
 ```
 
 **What to expect:**
@@ -372,7 +338,7 @@ pipenv run python manage.py migrate
 This is where it gets exciting! We'll populate the database with realistic example data:
 
 ```bash
-pipenv run python manage.py seed
+uv run python manage.py seed
 ```
 
 > **Note:** This tutorial follows the "quick start" approach from the repository README. The `seed` command automatically handles OAuth application setup, so we skip the manual OAuth configuration steps (8-12 in the README). The demo OAuth keys in your `.env` file are pre-configured to work with the seeded data.
@@ -382,7 +348,7 @@ pipenv run python manage.py seed
 1. **Flush and re-seed** (recommended for learning):
 
    ```bash
-   pipenv run python manage.py seed --flush-db
+   uv run python manage.py seed --flush-db
    ```
 
    This will clear all existing data and start fresh.
@@ -391,7 +357,7 @@ pipenv run python manage.py seed
 
    - Create a new database in PostgreSQL with a different name
    - Update `DB_NAME` in your `.env` file
-   - Run `pipenv run python manage.py migrate` again
+   - Run `uv run python manage.py migrate` again
    - Then run the seed command
 
 The `seed` command creates:
@@ -417,7 +383,7 @@ When it finishes, we'll have a fully populated Exchange!
 First, let's collect the static files (images, CSS, JavaScript) so they display properly:
 
 ```bash
-pipenv run python manage.py collectstatic --noinput
+uv run python manage.py collectstatic --noinput
 ```
 
 This copies all static files to a single location where Django can serve them. You should see a message like "186 static files copied to '/path/to/staticfiles'."
@@ -425,7 +391,7 @@ This copies all static files to a single location where Django can serve them. Y
 Now let's start the web server:
 
 ```bash
-pipenv run python manage.py runserver
+uv run python manage.py runserver
 ```
 
 You should see output like:
@@ -563,21 +529,21 @@ Now that you have a working JupyterHealth Exchange, you can:
 
 ### "python: command not found" or "No module named django"
 
-This usually means you forgot to use `pipenv run` or activate the pipenv environment. Make sure you're running commands with:
+This usually means you forgot to use `uv run` or activate the environment. Make sure you're running commands with:
 
 ```bash
 cd jupyterhealth-exchange
-pipenv run python manage.py <command>
+uv run python manage.py <command>
 ```
 
 Or activate the environment first:
 
 ```bash
-pipenv shell
+source .venv/bin/activate
 # Then you can run: python manage.py <command>
 ```
 
-If using `pipenv shell`, you should see `(jupyterhealth-exchange)` at the start of your command prompt.
+If you activate the environment, you should see `(.venv)` at the start of your command prompt.
 
 ### "Error: Your local changes to the following files would be overwritten"
 
@@ -613,7 +579,7 @@ This can happen on Windows. Check your OIDC configuration settings in the `.env`
 Another program is using port 8000. Either stop that program, or run Django on a different port:
 
 ```bash
-pipenv run python manage.py runserver 8001
+uv run python manage.py runserver 8001
 ```
 
 Then access the site at [http://localhost:8001](http://localhost:8001)
@@ -626,14 +592,14 @@ Your database and all the data will remain intact. Next time you want to start t
 
 ```bash
 cd jupyterhealth-exchange
-pipenv run python manage.py runserver
+uv run python manage.py runserver
 ```
 
-Or if you prefer using the shell:
+Or if you prefer an activated environment:
 
 ```bash
 cd jupyterhealth-exchange
-pipenv shell
+source .venv/bin/activate
 python manage.py runserver
 ```
 

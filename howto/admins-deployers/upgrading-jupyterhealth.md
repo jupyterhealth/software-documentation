@@ -41,7 +41,7 @@ ______________________________________________________________________
 - Database backup tools configured
 - Downtime maintenance window scheduled
 - Git access to repository
-- `pipenv` or `pip` installed
+- [`uv`](https://docs.astral.sh/uv/) installed
 
 ## Pre-Upgrade Checklist
 
@@ -269,15 +269,10 @@ git describe --tags
 ### 2. Update Dependencies
 
 ```bash
-# Using pipenv
-sudo -u jheapp pipenv sync
-
-# Using pip with venv
-source venv/bin/activate
-pip install -r requirements.txt
+sudo -u jheapp uv sync --frozen
 
 # Verify critical packages
-pipenv run python -c "import django; print(f'Django: {django.VERSION}')"
+sudo -u jheapp uv run python -c "import django; print(f'Django: {django.VERSION}')"
 ```
 
 ### 3. Review Environment Variable Changes
@@ -306,10 +301,10 @@ Add any missing variables to `.env`.
 cd /opt/jupyterhealth-exchange
 
 # Check migration status
-sudo -u jheapp pipenv run python manage.py showmigrations
+sudo -u jheapp uv run python manage.py showmigrations
 
 # List unapplied migrations
-sudo -u jheapp pipenv run python manage.py showmigrations --plan | grep "\[ \]"
+sudo -u jheapp uv run python manage.py showmigrations --plan | grep "\[ \]"
 ```
 
 ### 2. Backup Database Again (Before Migrations)
@@ -324,7 +319,7 @@ sudo -u postgres pg_dump jhe_production | \
 
 ```bash
 # Run migrations
-sudo -u jheapp pipenv run python manage.py migrate
+sudo -u jheapp uv run python manage.py migrate
 
 # Check for errors
 echo $?  # Should output 0
@@ -352,7 +347,7 @@ sudo -u postgres psql jhe_production -c "SELECT COUNT(*) FROM core_observation;"
 
 ```bash
 # Check all migrations applied
-sudo -u jheapp pipenv run python manage.py showmigrations | grep "\[ \]"
+sudo -u jheapp uv run python manage.py showmigrations | grep "\[ \]"
 
 # Should show no unchecked boxes
 ```
@@ -365,7 +360,7 @@ sudo -u jheapp pipenv run python manage.py showmigrations | grep "\[ \]"
 cd /opt/jupyterhealth-exchange
 
 # Collect static files
-sudo -u jheapp pipenv run python manage.py collectstatic --no-input
+sudo -u jheapp uv run python manage.py collectstatic --no-input
 
 # Verify files collected
 ls -la staticfiles/
@@ -567,7 +562,7 @@ cd /opt/jupyterhealth-exchange
 sudo -u jheapp git checkout v2.0.0
 
 # Restore old dependencies
-sudo -u jheapp pipenv sync
+sudo -u jheapp uv sync --frozen
 ```
 
 ### 3. Restore Database
@@ -637,10 +632,10 @@ sudo nano Pipfile
 # django = "==5.2.2"
 
 # Update dependencies
-sudo -u jheapp pipenv update django
+sudo -u jheapp uv lock --upgrade-package django && sudo -u jheapp uv sync --frozen
 
 # Run migrations (usually none for minor updates)
-sudo -u jheapp pipenv run python manage.py migrate
+sudo -u jheapp uv run python manage.py migrate
 
 # Restart
 sudo systemctl restart jhe

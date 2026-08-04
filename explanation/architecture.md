@@ -240,10 +240,10 @@ For local development and testing, JupyterHealth Exchange can be run using Djang
 **Setup Steps**:
 
 1. Set up Python environment (Python >= 3.10)
-1. Install dependencies: `pipenv sync` (or `pip install -r requirements.txt`)
+1. Install dependencies: `uv sync --frozen`
 1. Create PostgreSQL database
 1. Copy `dot_env_example.txt` to `.env` and update database credentials
-1. Load environment: `pipenv shell`
+1. Load environment: `source .venv/bin/activate` (or prefix commands with `uv run`)
 1. Run migrations: `python manage.py migrate`
 1. Seed database: `python manage.py seed`
 1. Start server: `python manage.py runserver`

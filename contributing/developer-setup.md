@@ -8,18 +8,14 @@ This guide provides a comprehensive walkthrough for setting up your development 
 
 1. Set up your Python environment. This project uses Django **version 5.2** which requires python **3.10, 3.11, 3.12 or 3.13**.
    ```{note}
-   If using pipenv it is recommended to run `pipenv sync` against the lock file to match package versions.
+   The project uses [uv](https://docs.astral.sh/uv/): run `uv sync --frozen` to match the locked package versions.
    ```
 1. Create a new Postgres DB. Currently only Postgres is supported because of json functions.
 1. Seed the DB by running the SQL commands found in `db/seed.sql`.
 1. Make a copy of `env_example.txt`, update the `DB_*` properties to match the new DB and save it as `.env`.
-1. Ensure the `.env` is loaded into your Python environment. For example, for pipenv:
+1. Start the server (`.env` is loaded automatically via python-dotenv).
    ```shell
-   pipenv shell
-   ```
-1. Start the server.
-   ```shell
-   python manage.py runserver
+   uv run python manage.py runserver
    ```
 1. Browse to http://localhost:8000/admin and enter the credentials `super@example.com` `Jhe1234!`.
 1. Browse to *Applications* under *Django OAuth Toolkit* and create a new application

@@ -123,6 +123,7 @@ The IdP is configured as a Social Application in the Django admin (`/admin/socia
 - `email_authentication` allows an existing password account with the same e-mail address to log in via SAML
   - Both are per-IdP settings and should only be enabled for IdPs that verify mailbox ownership
 - The `advanced` signing flags default to off in allauth; enable them (with a key pair) for IdPs that require signed requests/assertions
+- The IdP must assert a **stable user identifier**: either the `urn:oasis:names:tc:SAML:attribute:subject-id` attribute (allauth's default `uid` mapping) or an `attribute_mapping` entry mapping `uid` to a persistent attribute (eg `eduPersonPrincipalName`). Without one, allauth falls back to the SAML NameID — a *transient* NameID creates a new linked social account on every login. Verify at onboarding: log in twice and confirm the user still has exactly one entry under `/admin/socialaccount/socialaccount/`.
 
 With a Social Application slug of `mocksaml`:
 
@@ -146,3 +147,10 @@ With a Social Application slug of `mocksaml`:
 1. Click Sign in
 
 1. The JHE portal should be displayed with the user in the matching user name in the bottom left hand corner
+
+#### Disabling SAML SSO (back-out)
+
+1. Set the `auth.sso.saml2` System Setting to `0` — this only hides the login button; the `/allauth/saml/<slug>/` endpoints stay live.
+1. Delete the SAML Social Application in the Django admin — this is the real kill switch: every SAML endpoint for that slug then returns 404.
+1. If backing out permanently, also delete the provider's rows under `/admin/socialaccount/socialaccount/`. They are inert without the Social Application, but a future re-enable would silently re-link users under the old IdP's identifiers.
+1. Users who signed up via SSO have no password; if SSO is being retired they can set one via the password reset flow at `/allauth/password/reset/`. (Use that URL — the login page's "Forgot Password" link skips accounts that have no usable password.)

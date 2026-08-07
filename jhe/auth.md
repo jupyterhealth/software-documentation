@@ -83,25 +83,61 @@ The returned `access_token` must be included in the `Authorization` header for a
 
 ### Single Sign-On (SSO) with SAML2
 
-The [django-saml2-auth](https://github.com/grafana/django-saml2-auth) library is included to support SSO with SAML2.
+The [django-allauth SAML provider](https://docs.allauth.org/en/latest/socialaccount/providers/saml.html) is included to support SSO with SAML2.
+
+Users provisioned via SAML are created as Practitioners; existing Patient accounts are rejected from SAML login.
+
+#### System Settings
+
+| Key                      | Value Type | Value                     | Notes                                                            |
+| ------------------------ | ---------- | ------------------------- | ---------------------------------------------------------------- |
+| `auth.sso.saml2`         | int        | `1`                       | Set to 0 to disable SAML SSO                                     |
+| `auth.sso.valid_domains` | string     | `example.com,example.org` | Comma-separated email domains, restricts first-time sign-up only |
+
+#### IdP Configuration
+
+The IdP is configured as a Social Application in the Django admin (`/admin/socialaccount/socialapp/`). Exactly **one** SAML Social Application must exist (along with the `auth.sso.saml2` setting enabled) for the SSO login button to be displayed.
+
+- **Provider**: `saml`
+- **Name**: any display name, eg `Mock SAML`
+- **Client id**: the URL slug for the provider's endpoints, eg `mocksaml`
+- **Settings**: JSON configuring the IdP, eg:
+
+```json
+{
+  "idp": {
+    "metadata_url": "https://mocksaml.com/api/saml/metadata"
+  },
+  "verified_email": true,
+  "email_authentication": true,
+  "advanced": {
+    "authn_request_signed": true,
+    "want_assertion_signed": true,
+    "private_key": "<PEM>",
+    "x509cert": "<PEM>"
+  }
+}
+```
+
+- `verified_email` trusts e-mail addresses asserted by the IdP as verified
+- `email_authentication` allows an existing password account with the same e-mail address to log in via SAML
+  - Both are per-IdP settings and should only be enabled for IdPs that verify mailbox ownership
+- The `advanced` signing flags default to off in allauth; enable them (with a key pair) for IdPs that require signed requests/assertions
+
+With a Social Application slug of `mocksaml`:
+
+- The ACS URL is `http://localhost:8000/allauth/saml/mocksaml/acs/`
+- The SP metadata is served at `http://localhost:8000/allauth/saml/mocksaml/metadata/`
 
 #### Example SAML2 Flow with Mock SAML
-
-Ensure you have the following System Settings
-
-| Key                         | Value Type | Value                                    | Notes                                 |
-| --------------------------- | ---------- | ---------------------------------------- | ------------------------------------- |
-| `auth.sso.saml2`            | int        | `1`                                      | Set to 0 to disable SAML SSO          |
-| `auth.sso.idp_metadata_url` | string     | `https://mocksaml.com/api/saml/metadata` | SAML IdP metadata URL                 |
-| `auth.sso.valid_domains`    | string     | `example.com,example.org`                | Comma-separated email domains for SSO |
 
 ##### Test Flow
 
 1. Visit https://mocksaml.com/saml/login and enter the fields below:
 
-   - ACS URL: `http://localhost:8000/sso/acs/` (or substitute your hostname) **End with a trailing slash**
+   - ACS URL: `http://localhost:8000/allauth/saml/mocksaml/acs/` (or substitute your hostname) **End with a trailing slash**
 
-   - Audience: `http://localhost:8000/sso/acs/`
+   - Audience: `http://localhost:8000/allauth/saml/mocksaml/metadata/` (the SP entity ID, which allauth defaults to the SP metadata URL — not the ACS URL; it can be overridden with `sp.entity_id` in the Social Application settings JSON)
 
 1. Enter any email name `@example.com`
 

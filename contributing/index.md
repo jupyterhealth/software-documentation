@@ -9,9 +9,9 @@ title: Contributing
 git clone https://github.com/jupyterhealth/jupyterhealth-exchange.git
 cd jupyterhealth-exchange
 
-# 2. Install dependencies
-pipenv install --dev
-pipenv shell
+# 2. Install dependencies (creates .venv from uv.lock; dev deps included)
+uv sync
+source .venv/bin/activate
 
 # 3. Start the test database
 source ci/test_env.sh

@@ -8,7 +8,7 @@ title: Upgrading
 1. Stop the server
 1. From the root directory:
    1. Replace the source code by running: `git checkout tags/v0.0.8`
-   1. Migrate the database by running: `python manage.py migrate`
+   1. Migrate the database by running: `uv run python manage.py migrate`
 1. Start the server
 
 ## Rolling back
@@ -21,6 +21,6 @@ title: Upgrading
 1. In case of data loss, make a copy of your database by running the psql command:
    - `CREATE DATABASE jhe_backup WITH TEMPLATE jhe_original OWNER your_user;`
 1. From the root directory:
-   1. Roll back the database by running: `python manage.py migrate core 0011`
+   1. Roll back the database by running: `uv run python manage.py migrate core 0011`
    1. Replace the source code by running: `git checkout tags/v0.0.7`
 1. Start the server

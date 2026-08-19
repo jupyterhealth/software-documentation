@@ -89,13 +89,15 @@ project:
         - "http://localhost:8010/smart/callback"
         # epic.com blocks automated requests (403), so the checker can't verify it
         - "https://www.epic.com/software/mychart/"
-    # doi.org intermittently rate-limits CI runners; this citation lookup in
-    # tutorial-cgm.ipynb has flaked repeatedly (2026-07-12, 2026-07-15).
+    # tutorial-cgm.ipynb links a PLOS Biology *supplement* DOI (…2005143.s010)
+    # for its sample data. Supplement DOIs carry no article citation metadata,
+    # so doi.org returns malformed data and the check hard-fails the build. The
+    # base article DOI (…2005143) resolves fine and is left validated. Keyed by
+    # the link URL — the form MyST passes to the doi-link-valid rule.
     - rule: doi-link-valid
       severity: ignore
       keys:
-        - "10.1371/journal.pbio.2005143.s010"
-        - "doi:10.1371/journal.pbio.2005143.s010"
+        - "https://doi.org/10.1371/journal.pbio.2005143.s010"
 site:
   template: book-theme
   title: JupyterHealth Software

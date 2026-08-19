@@ -32,7 +32,7 @@ title: Web User Interface
 
 - An [Observation](https://www.hl7.org/fhir/observation.html) is Patient data and belongs to a single Patient.
 - An Observation must reference a Patient ID as the *subject* and a Data Source ID as the *device*.
-- Personal device data is expected to be in the [Open mHealth](https://www.openmhealth.org/documentation/#/overview/get-started) (JSON) format. However, the system can be easily extended to support any binary data attachments or discrete Observation records.
+- Personal device data is expected to be in the [Open mHealth](https://www.openmhealth.org/documentation/) (JSON) format. However, the system can be easily extended to support any binary data attachments or discrete Observation records.
 - Observation data is stored as a *valueAttachment* in Base 64 encoded JSON binary.
 - Authorization to view Observations depends on the relationship of Organization, Study, and Consents as described above.
 ```

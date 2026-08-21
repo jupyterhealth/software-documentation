@@ -9,6 +9,8 @@ The OAuth 2.0 Authorization Code flow with PKCE is used to issue access and refr
 Endpoints and configuration details can be discovered from the OIDC metadata endpoint:
 `/o/.well-known/openid-configuration`
 
+FHIR/SMART clients can equivalently discover the `authorize` and `token` endpoints from the [SMART App Launch discovery document](../reference/exchange-apis.md) at `/fhir/r5/.well-known/smart-configuration` (or the CapabilityStatement at `/fhir/r5/metadata`), so public PKCE clients need no hardcoded endpoint configuration.
+
 Separate OAuth clients are created for the Web UI (Practitioners) and for individual JHE (Patient) Clients.
 
 ### JHE Client Auth Flow

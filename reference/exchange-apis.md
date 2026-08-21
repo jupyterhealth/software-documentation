@@ -131,6 +131,69 @@ code=4AWKhgaaomTSf9PfwxN4ExnXjdSEqh&grant_type=authorization_code&redirect_uri=h
 
 ## FHIR REST API
 
+### Discovery
+
+- The FHIR API publishes two public discovery documents. Both require **no authentication** (they work even if an invalid token is attached), send permissive CORS headers so browser apps can fetch them cross-origin, and are cacheable (`Cache-Control: max-age=3600`).
+- `GET /fhir/r5/metadata` returns the server's **CapabilityStatement** (FHIR R5, `kind: instance`). It is rendered from the server's FHIR mapping configuration at request time, so it always reflects what the running deployment actually supports — resource types, allowed interactions, and search parameters — and it negotiates `application/fhir+json` as well as plain JSON.
+
+```json
+// GET /fhir/r5/metadata (abridged)
+{
+    "resourceType": "CapabilityStatement",
+    "status": "active",
+    "kind": "instance",
+    "fhirVersion": "5.0.0",
+    "format": ["json"],
+    "rest": [
+        {
+            "mode": "server",
+            "security": {
+                "extension": [
+                    {
+                        "url": "http://fhir-registry.smarthealthit.org/StructureDefinition/oauth-uris",
+                        "extension": [
+                            { "url": "authorize", "valueUri": "https://jhe.fly.dev/o/authorize/" },
+                            { "url": "token", "valueUri": "https://jhe.fly.dev/o/token/" }
+                        ]
+                    }
+                ],
+                "service": [{ "coding": [{ "code": "SMART-on-FHIR" }] }]
+            },
+            "resource": [
+                {
+                    "type": "Observation",
+                    "interaction": [{ "code": "create" }, { "code": "read" }, { "code": "search-type" }, ...],
+                    "searchParam": [{ "name": "date", "type": "date" }, { "name": "code", "type": "token" }, ...]
+                },
+                ...
+            ]
+        }
+    ]
+}
+```
+
+- Reading the CapabilityStatement correctly requires knowing that JHE serves resources from **two stores**: JHE-native records (backed by Django models) and imported records (opaque FHIR bodies linked to a registered FHIR source). Each resource entry declares the **union** of both stores' capabilities, with the caveats spelled out in its `documentation`:
+  - `update`, `patch`, and `delete` apply to **imported records only**; JHE-native records are read-only through FHIR (writes return `405`).
+  - Creates routed to the imported-record store must name a FHIR source via the `X-JHE-FHIR-Source-ID` header or the resource's `meta.source`.
+  - Search parameters declared only by the imported-record store (their `documentation` says so) apply only when selecting that store with `_source`; the default JHE-native search ignores them.
+  - JHE-native Observations code their measurement with system `https://w3id.org/openmhealth` and carry the full Open mHealth data point as a base64 JSON `valueAttachment`.
+- Every resource also supports `_id`, `_lastUpdated`, and `_source` search parameters, plus `_sort` (`date`, `lastUpdated`) and `_summary=count`; each declared interaction and parameter carries the US Core expectation extension (`SHALL`).
+- `GET /fhir/r5/.well-known/smart-configuration` returns the **SMART App Launch discovery document** — how a client (especially a public PKCE client) finds the OAuth endpoints without hardcoding them:
+
+```json
+// GET /fhir/r5/.well-known/smart-configuration
+{
+    "authorization_endpoint": "https://jhe.fly.dev/o/authorize/",
+    "token_endpoint": "https://jhe.fly.dev/o/token/",
+    "grant_types_supported": ["authorization_code"],
+    "response_types_supported": ["code"],
+    "code_challenge_methods_supported": ["S256"],
+    "capabilities": ["launch-standalone", "client-public", "client-confidential-symmetric"]
+}
+```
+
+- Both documents derive their absolute URLs from the request host, so every JHE deployment automatically advertises its own endpoints.
+
 ### Patients
 
 - The `FHIR Patient` endpoint returns a list of Patients as a FHIR Bundle for a given Study ID passed as query parameter`_has:Group:member:_id` or alternatively a single Patient matching the query parameter `identifier=<system>|<value>`

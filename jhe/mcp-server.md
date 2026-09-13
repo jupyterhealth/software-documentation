@@ -209,6 +209,8 @@ fly status -a jhe-mcp    # machine / image status
 
 The MCP server exposes the following tools to LLM clients. Every tool runs as the authenticated user and only returns data that user is authorized to see.
 
+The observation and patient-search tools use JHE's FHIR search support (the `date` search parameter, `_summary=count`, `_sort`, and the Patient search parameters). **Deploy order matters:** roll out a JHE backend that has this search support before deploying the MCP server against it — an older backend silently ignores unknown search parameters, which corrupts sorted queries rather than merely widening date windows. When the backend publishes a CapabilityStatement (`/fhir/r5/metadata`), the MCP server checks requested search parameters against it and returns a clear error for unsupported ones instead of letting them be silently ignored; against a backend without the endpoint it falls back to sending them as-is.
+
 **Studies:**
 
 - **`get_study_count`** - Returns the total number of studies the authenticated user can access.
@@ -218,19 +220,24 @@ The MCP server exposes the following tools to LLM clients. Every tool runs as th
 
 **Patients:**
 
+- **`search_patients`** - Finds patients by `name`/`family`/`given` (case-insensitive prefix match; a comma ORs values) and/or `birthdate` (`YYYY-MM-DD`, optional `ge`/`le`/`gt`/`lt` prefix), returning a page of slim demographics. At least one criterion is required; `limit` is capped at 1000.
 - **`get_patient_demographics`** - Returns demographic information for a specific patient by patient ID.
-- **`get_patient_date_range`** - Returns the earliest and latest observation dates and total count for a patient (first/last-data answers without paging).
+- **`get_patient_date_range`** - Returns the earliest and latest observation dates and total count for a patient, using two small server-side sorted probes (no paging through records).
 
 **Observations:**
 
 - **`count_patient_observations`** - Returns the exact observation count for a patient, optionally filtered by OMH data type and date range, without returning records.
 - **`count_study_observations`** - Returns the observation count across a whole study in one call; with `by_patient=True` returns a `{patient_id: count}` map.
-- **`summarize_patient_observations`** - Returns a compact per-data-type digest for a patient (`{type: {count, earliest, latest}}`) - the "show me everything" overview.
-- **`get_patient_observations`** - Fetches one page of a patient's observations (with total/pagination), optionally filtered by OMH data type and date range; defaults to compact records, with `verbosity="full"` for the raw OMH body.
+- **`summarize_patient_observations`** - Returns a compact per-data-type digest for a patient (`{truncated, types: {type: {count, earliest, latest}}}`) - the "show me everything" overview. `truncated: true` means the bounded fetch could not cover every record, so counts are lower bounds.
+- **`get_patient_observations`** - Fetches one page of a patient's observations (with total/pagination), optionally filtered by OMH data type and an inclusive `start`/`end` date window (applied server-side, compared in the server's timezone — UTC by default), ordered `newest` (default) or `oldest`; defaults to compact records, with `verbosity="full"` for the raw OMH body.
 
 **OMH schemas:**
 
 - **`get_omh_schema`** - Returns the full OMH JSON schema for a data type by short name (e.g. `heart-rate`, `blood-glucose`). Schemas are also browsable as resources at `omh://schema/<name>`.
+
+**Capabilities:**
+
+- **`get_server_capabilities`** - Returns a digest of the JHE instance's CapabilityStatement (`{available, fhir_version, resources: {type: {interactions, search_params}}}`) so a client can ask what this deployment supports; `available: false` means the instance predates the metadata endpoint.
 
 ## Local Development
 

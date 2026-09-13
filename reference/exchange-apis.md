@@ -133,7 +133,8 @@ code=4AWKhgaaomTSf9PfwxN4ExnXjdSEqh&grant_type=authorization_code&redirect_uri=h
 
 ### Discovery
 
-- The FHIR API publishes two public discovery documents. Both require **no authentication** (they work even if an invalid token is attached), send permissive CORS headers so browser apps can fetch them cross-origin, and are cacheable (`Cache-Control: max-age=3600`).
+- The FHIR API publishes two public discovery documents. Both require **no authentication** (they work even if an invalid token is attached) and are cacheable (`Cache-Control: public, max-age=3600`).
+- **They do not send CORS headers.** JHE's permissive-CORS middleware is scoped to the OAuth endpoints under `/o/`, so a browser app on another origin cannot fetch these two documents directly and must reach them through its own backend or a proxy. Server-side clients are unaffected.
 - `GET /fhir/r5/metadata` returns the server's **CapabilityStatement** (FHIR R5, `kind: instance`). It is rendered from the server's FHIR mapping configuration at request time, so it always reflects what the running deployment actually supports — resource types, allowed interactions, and search parameters — and it negotiates `application/fhir+json` as well as plain JSON.
 
 ```json

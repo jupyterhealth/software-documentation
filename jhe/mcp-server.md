@@ -66,11 +66,11 @@ The server speaks the modern MCP **Streamable HTTP transport** at `/mcp` and imp
 
 The server returns `401` **only** when JHE actually rejects the token. If JHE cannot be reached, or answers the validation call wrongly, the token was never checked - so the server answers with a `5xx` and **no `WWW-Authenticate` header**, because that header is what tells a client to discard its token and re-authenticate.
 
-| Response                      | Meaning                                                              | What the client should do                      |
-| ----------------------------- | -------------------------------------------------------------------- | ---------------------------------------------- |
-| `401` with `WWW-Authenticate` | JHE rejected the token - expired, revoked, or issued to another client | Re-authenticate                                |
-| `503` with `Retry-After`      | JHE unreachable, throttling, or erroring - transient                   | **Keep the token** and retry after the delay   |
-| `500`                         | Misconfiguration (e.g. a stale `JHE_BASE_URL`); retrying will not help | Keep the token; surface it to an operator      |
+| Response                      | Meaning                                                                | What the client should do                    |
+| ----------------------------- | ---------------------------------------------------------------------- | -------------------------------------------- |
+| `401` with `WWW-Authenticate` | JHE rejected the token - expired, revoked, or issued to another client | Re-authenticate                              |
+| `503` with `Retry-After`      | JHE unreachable, throttling, or erroring - transient                   | **Keep the token** and retry after the delay |
+| `500`                         | Misconfiguration (e.g. a stale `JHE_BASE_URL`); retrying will not help | Keep the token; surface it to an operator    |
 
 The `5xx` bodies carry the OAuth error vocabulary - `temporarily_unavailable` and `server_error` - in the same `{"error", "error_description"}` shape as the `401`. A client that treats *any* auth failure as "log the user out" will sign users out during a JHE outage, so branch on the status code rather than on failure alone.
 

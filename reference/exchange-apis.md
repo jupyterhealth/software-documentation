@@ -133,12 +133,12 @@ code=4AWKhgaaomTSf9PfwxN4ExnXjdSEqh&grant_type=authorization_code&redirect_uri=h
 
 ### Discovery
 
-- The FHIR API publishes two public discovery documents. Both require **no authentication** (they work even if an invalid token is attached) and are cacheable (`Cache-Control: public, max-age=3600`).
-- **They do not send CORS headers.** JHE's permissive-CORS middleware is scoped to the OAuth endpoints under `/o/`, so a browser app on another origin cannot fetch these two documents directly and must reach them through its own backend or a proxy. Server-side clients are unaffected.
-- `GET /fhir/r5/metadata` returns the server's **CapabilityStatement** (FHIR R5, `kind: instance`). It is rendered from the server's FHIR mapping configuration at request time, so it always reflects what the running deployment actually supports — resource types, allowed interactions, and search parameters — and it negotiates `application/fhir+json` as well as plain JSON.
+- The FHIR API publishes two public discovery documents. Both require **no authentication** (they work even if an invalid token is attached), send permissive CORS headers so browser apps can fetch them cross-origin, and are cacheable (`Cache-Control: public, max-age=3600`).
+- Use the canonical `/FHIR/R5/` base for these. The lowercase `/fhir/r5/` alias kept for pre-#661 clients serves the same documents but is **not** CORS-enabled ([jupyterhealth-exchange#779](https://github.com/jupyterhealth/jupyterhealth-exchange/issues/779)), so a browser app fetching it cross-origin will be blocked.
+- `GET /FHIR/R5/metadata` returns the server's **CapabilityStatement** (FHIR R5, `kind: instance`). It is rendered from the server's FHIR mapping configuration at request time, so it always reflects what the running deployment actually supports — resource types, allowed interactions, and search parameters — and it negotiates `application/fhir+json` as well as plain JSON.
 
 ```json
-// GET /fhir/r5/metadata (abridged)
+// GET /FHIR/R5/metadata (abridged)
 {
     "resourceType": "CapabilityStatement",
     "status": "active",
@@ -179,10 +179,10 @@ code=4AWKhgaaomTSf9PfwxN4ExnXjdSEqh&grant_type=authorization_code&redirect_uri=h
   - Search parameters declared only by the imported-record store (their `documentation` says so) apply only when selecting that store with `_source`; the default JHE-native search ignores them.
   - JHE-native Observations code their measurement with system `https://w3id.org/openmhealth` and carry the full Open mHealth data point as a base64 JSON `valueAttachment`.
 - Every resource also supports `_id`, `_lastUpdated`, and `_source` search parameters, plus `_sort` (`date`, `lastUpdated`) and `_summary=count`; each declared interaction and parameter carries the US Core expectation extension (`SHALL`).
-- `GET /fhir/r5/.well-known/smart-configuration` returns the **SMART App Launch discovery document** — how a client (especially a public PKCE client) finds the OAuth endpoints without hardcoding them:
+- `GET /FHIR/R5/.well-known/smart-configuration` returns the **SMART App Launch discovery document** — how a client (especially a public PKCE client) finds the OAuth endpoints without hardcoding them:
 
 ```json
-// GET /fhir/r5/.well-known/smart-configuration
+// GET /FHIR/R5/.well-known/smart-configuration
 {
     "authorization_endpoint": "https://jhe.fly.dev/o/authorize/",
     "token_endpoint": "https://jhe.fly.dev/o/token/",

@@ -32,9 +32,10 @@ So "Viewer" does not mean "can read less" — it means "can read the same, but c
 write." Keep this distinction in mind throughout.
 
 ```{important}
-**Role does not narrow reads.** If you need a practitioner to *not see* certain patients
-or studies, that is controlled by which organizations they belong to, not by giving them a
-lower role. Lowering the role only removes their ability to make changes.
+**Role does not narrow reads** — for patients, studies, and observations. **Organizations
+are the one exception**: role also gates the member roster, and visibility itself follows
+a narrower rule than plain org membership. See
+[Organization visibility](#organization-visibility) below.
 ```
 
 ## User Types
@@ -177,6 +178,7 @@ Each is checked by `IfUserCan("<resource>.<action>")` against the practitioner's
 | `patient.manage_for_organization`       |   ❌   |   ✅   |   ✅    |     ✅      |
 | `study.manage_for_organization`         |   ❌   |   ✅   |   ✅    |     ✅      |
 | `organization.manage_for_practitioners` |   ❌   |   ❌   |   ✅    |     ✅      |
+| `organization.view_members`             |   ❌   |   ✅   |   ✅    |     ✅      |
 | `organization.create_top_level`         |   ❌   |   ❌   |   ❌    |     ✅      |
 | `client.manage`                         |   ❌   |   ❌   |   ❌    |     ✅      |
 | `data_source.manage`                    |   ❌   |   ❌   |   ❌    |     ✅      |
@@ -191,6 +193,8 @@ Notes:
   sub-resources (patients, scope requests, clients, data sources).
 - `client.manage` and `data_source.manage` are held only by `super_user`, so the patient
   OAuth clients and data sources are effectively superuser-only.
+- `organization.view_members` gates the `/organizations/{id}/users` roster. Viewer doesn't
+  hold it, so a Viewer can't see members even of their own organization.
 
 ## How authorization is enforced
 
@@ -218,6 +222,7 @@ The targeting organization is derived differently per resource and action:
 | Update/delete **patient**                 | `organization_id` query parameter                                  |
 | Update/delete **study**                   | the study's own `organization`                                     |
 | Add/remove practitioner on an org         | **that organization itself** (`user` / `remove_user` actions)      |
+| View practitioners on an org (`users`)    | **that organization itself**                                       |
 | Update/delete the **organization** entity | the **parent** organization (or the org itself if it is top-level) |
 
 ### Read scoping (queryset filtering)
@@ -233,8 +238,11 @@ API, each model's `fhir_search`) restricts results to the caller's organizations
   organizations (`Observation.for_practitioner_organization_study_patient`).
 - **Patient self-reads**: a patient sees only their own record, enrollments, and
   observations.
+- **Organizations**: a narrower rule than plain membership — see
+  [Organization visibility](#organization-visibility).
 
-A practitioner of *any* role gets this full read scope; the role only governs writes.
+A practitioner of *any* role gets this full read scope for patients, studies, and
+observations; role only governs writes there. Organizations differ — see below.
 
 ## Organization hierarchy and authority
 
@@ -250,6 +258,31 @@ Organizations form a tree via `Organization.part_of`. Authority flows with the t
   (or against itself if it is top-level).
 - **Adding/removing practitioners** in an organization checks the manager role against
   **that organization itself**, not its parent.
+
+## Organization visibility
+
+Beyond authority (who can write), org **reads** have their own visibility rule.
+
+**Visible orgs** = orgs you hold a role in, plus their ancestors up the `part_of` chain.
+Everything else 404s on retrieve — no existence leak to organizations you have no
+connection to.
+
+**Ancestors are name/type only.** No members, no tree, no studies. Seeing that a parent
+org exists doesn't expose its other branches or who belongs to it.
+
+**Member roster** (`/organizations/{id}/users`) needs a direct role in that exact org,
+via `organization.view_members`. Viewer lacks it, so a Viewer can't see members even of
+their own org.
+
+**Tree and studies** (`/organizations/{id}/tree`, `/organizations/{id}/studies`) need a
+direct role in that exact org too — any role qualifies, including Viewer. Once granted,
+the tree returns everything below it, unfiltered. Access is checked at the entry point
+you open, not per descendant node.
+
+**Console**: the top-level dropdown and tree can only reach orgs below a top-level org
+you hold a role in. If you have no role anywhere above your own org, that path never
+reaches it. A "Your organizations" shortcut lists every org you belong to directly,
+hiding any already shown in the currently displayed tree.
 
 ## Patient consent and what it gates
 
@@ -362,6 +395,12 @@ patient's record → `403`.
 
 **Manager adds a practitioner to their organization** → granted via
 `organization.manage_for_practitioners`, checked against that organization.
+
+**Member of a sub-org opens a top-level ancestor with no role there** → sees its name,
+not its tree, members, or studies. 404 on any sibling branch under it.
+
+**Viewer opens their own organization** → sees its details and tree, but the member
+roster is hidden (`organization.view_members` excludes Viewer).
 
 ## Governance Best Practices
 

@@ -460,7 +460,7 @@ curl https://jhe.yourdomain.com/api/v1/patients/10001/invitation_link \
 
 ```bash
 # Upload test observation
-curl -X POST https://jhe.yourdomain.com/fhir/r5/Observation \
+curl -X POST https://jhe.yourdomain.com/FHIR/R5/Observation \
   -H "Authorization: Bearer $PATIENT_TOKEN" \
   -H "Content-Type: application/json" \
   -d @test-observation.json
@@ -474,7 +474,7 @@ Reference: `jupyterhealth-exchange/core/views/observation.py`
 
 ```bash
 # Retrieve observations
-curl "https://jhe.yourdomain.com/fhir/r5/Observation?patient=10001" \
+curl "https://jhe.yourdomain.com/FHIR/R5/Observation?patient=10001" \
   -H "Authorization: Bearer $PRACTITIONER_TOKEN"
 
 # Should return FHIR Bundle

@@ -134,7 +134,7 @@ code=4AWKhgaaomTSf9PfwxN4ExnXjdSEqh&grant_type=authorization_code&redirect_uri=h
 ### Discovery
 
 - The FHIR API publishes two public discovery documents. Both require **no authentication** (they work even if an invalid token is attached), send permissive CORS headers so browser apps can fetch them cross-origin, and are cacheable (`Cache-Control: public, max-age=3600`).
-- Use the canonical `/FHIR/R5/` base for these. The lowercase `/fhir/r5/` alias kept for pre-#661 clients serves the same documents but is **not** CORS-enabled ([jupyterhealth-exchange#779](https://github.com/jupyterhealth/jupyterhealth-exchange/issues/779)), so a browser app fetching it cross-origin will be blocked.
+- Use the canonical `/FHIR/R5/` base for these. The lowercase `/FHIR/R5/` alias kept for pre-#661 clients serves the same documents but is **not** CORS-enabled ([jupyterhealth-exchange#779](https://github.com/jupyterhealth/jupyterhealth-exchange/issues/779)), so a browser app fetching it cross-origin will be blocked.
 - `GET /FHIR/R5/metadata` returns the server's **CapabilityStatement** (FHIR R5, `kind: instance`). It is rendered from the server's FHIR mapping configuration at request time, so it always reflects what the running deployment actually supports — resource types, allowed interactions, and search parameters — and it negotiates `application/fhir+json` as well as plain JSON.
 
 ```json
@@ -205,7 +205,7 @@ code=4AWKhgaaomTSf9PfwxN4ExnXjdSEqh&grant_type=authorization_code&redirect_uri=h
 | `identifier`            | \`http://ehr.example.com | abc123\`                                               |
 
 ```json
-// GET /fhir/r5/Patient?_has:Group:member:_id=30001
+// GET /FHIR/R5/Patient?_has:Group:member:_id=30001
 {
     "resourceType": "Bundle",
     "type": "searchset",
@@ -263,7 +263,7 @@ code=4AWKhgaaomTSf9PfwxN4ExnXjdSEqh&grant_type=authorization_code&redirect_uri=h
 | `code`                          | \`https://w3id.org/openmhealth | omh:blood-pressure:4.0\`                               |
 
 ```json
-// GET /fhir/r5/Observation?patient._has:Group:member:_id=30001&patient=40001&code=https://w3id.org/openmhealth|omh:blood-pressure:4.0
+// GET /FHIR/R5/Observation?patient._has:Group:member:_id=30001&patient=40001&code=https://w3id.org/openmhealth|omh:blood-pressure:4.0
 {
     "resourceType": "Bundle",
     "type": "searchset",
@@ -308,7 +308,7 @@ code=4AWKhgaaomTSf9PfwxN4ExnXjdSEqh&grant_type=authorization_code&redirect_uri=h
 - Observations are uploaded as FHIR Batch bundles sent as a POST to the root endpoint
 
 ```json
-// POST /fhir/r5/
+// POST /FHIR/R5/
 {
   "resourceType": "Bundle",
   "type": "batch",

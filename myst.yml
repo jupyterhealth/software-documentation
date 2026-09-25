@@ -17,7 +17,10 @@ project:
       children:
         - file: jhe/getting-started.md
         - file: jhe/upgrading.md
-        - file: jhe/client-flow.md
+        - title: JHE Clients
+          children:
+            - file: jhe/jhe-clients/jhe-clients.md
+            - file: jhe/jhe-clients/jhe-client-auth-flow.md
         - file: jhe/auth.md
         - file: jhe/access-control.md
         - file: jhe/admin-api.md

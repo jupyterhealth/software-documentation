@@ -842,7 +842,7 @@ Reference: `jupyterhealth-exchange/core/models.py`
 #### Export Patient Data (FHIR)
 
 ```bash
-curl "https://your-jhe-instance.com/fhir/r5/Observation?patient=10001&patient._has:Group:member:_id=10001" \
+curl "https://your-jhe-instance.com/FHIR/R5/Observation?patient=10001&patient._has:Group:member:_id=10001" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 

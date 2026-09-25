@@ -393,7 +393,7 @@ suspend fun uploadObservations(observations: List<Observation>) {
     }
 
     httpClient.postJSON(
-        url = "$baseUrl/fhir/r5/",
+        url = "$baseUrl/FHIR/R5/",
         json = fhirParser.encodeResourceToString(bundle),
         headers = mapOf("Authorization" to "Bearer $accessToken")
     )
@@ -423,7 +423,7 @@ Upload a test observation:
 OMH_DATA=$(echo '{"header":{...},"body":{...}}' | base64)
 
 # Upload observation
-curl -X POST https://your-jhe-instance.com/fhir/r5/Observation \
+curl -X POST https://your-jhe-instance.com/FHIR/R5/Observation \
   -H "Authorization: Bearer $PATIENT_TOKEN" \
   -H "Content-Type: application/json" \
   -d "{
@@ -456,7 +456,7 @@ Reference: `jupyterhealth-exchange/core/views/observation.py`
 
 ```bash
 # Retrieve observations for patient
-curl "https://your-jhe-instance.com/fhir/r5/Observation?patient=10001&code=https://w3id.org/openmhealth|omh:blood-pressure:4.0" \
+curl "https://your-jhe-instance.com/FHIR/R5/Observation?patient=10001&code=https://w3id.org/openmhealth|omh:blood-pressure:4.0" \
   -H "Authorization: Bearer $PRACTITIONER_TOKEN"
 ```
 

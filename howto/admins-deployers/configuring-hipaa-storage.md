@@ -720,7 +720,7 @@ Test that observations cannot be uploaded without consent:
 
 ```bash
 # Attempt to upload observation without consent
-curl -X POST https://jhe.yourdomain.com/fhir/r5/Observation \
+curl -X POST https://jhe.yourdomain.com/FHIR/R5/Observation \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{

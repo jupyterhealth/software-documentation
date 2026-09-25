@@ -696,7 +696,7 @@ print(encoded)
 Upload:
 
 ```bash
-curl -X POST https://your-jhe-instance.com/fhir/r5/Observation \
+curl -X POST https://your-jhe-instance.com/FHIR/R5/Observation \
   -H "Authorization: Bearer $PATIENT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -741,7 +741,7 @@ Reference: `jupyterhealth-exchange/core/models.py`
 
 ```bash
 # Retrieve observations for patient
-curl "https://your-jhe-instance.com/fhir/r5/Observation?patient=10001&code=https://w3id.org/openmhealth|omh:step-count:2.0" \
+curl "https://your-jhe-instance.com/FHIR/R5/Observation?patient=10001&code=https://w3id.org/openmhealth|omh:step-count:2.0" \
   -H "Authorization: Bearer $PRACTITIONER_TOKEN"
 ```
 

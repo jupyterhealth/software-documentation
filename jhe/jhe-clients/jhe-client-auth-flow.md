@@ -1,8 +1,6 @@
 ---
-title: Client Flow
+title: Invitation Link Flow
 ---
-
-## Overview
 
 The practitioner uses JHE to create the organization and study, register the patient, and send the patient a secure invitation link.
 
@@ -60,9 +58,9 @@ sequenceDiagram
     end
 ```
 
-## Implementing a Client Step by Step
+## Configuring an Invitation Link Client
 
-1. The first thing you need to do is determine the invitation URL for your client and communicate this to the JHE admin to register and configure your client on the target JHE instance(s). The invitation URL is clicked/tapped by patients who receive an E-mail or SMS to join the study. For web based clients, the URL will typically point to a launch page, for app based clients, the URL will follow a domain or pattern that triggers the OS to launch the app. The position of the invitation code (`jhe.tcp.org_0wYuXvhoyRfko9yFYl9inpBiNkHLVBMy` in the example below) in the URL is configured when the client is registered, a couple of different examples:
+1. The first thing you need to do is determine the invitation URL for your client and communicate this to the JHE Admin to register and configure your client on the target JHE instance(s). The invitation URL is clicked/tapped by patients who receive an E-mail or SMS to join the study. For web based clients, the URL will typically point to a launch page, for app based clients, the URL will follow a domain or pattern that triggers the OS to launch the app. The position of the invitation code (`jhe.tcp.org_0wYuXvhoyRfko9yFYl9inpBiNkHLVBMy` in the example below) in the URL is configured when the client is registered, a couple of different examples:
    - `https://webapp.tcp.org/jhe/launch?invitation=jhe.tcp.org_0wYuXvhoyRfko9yFYl9inpBiNkHLVBMy`
    - `https://app.tcp.org/jhe/invitation/jhe.tcp.org_0wYuXvhoyRfko9yFYl9inpBiNkHLVBMy`
 1. Your client then needs to consume the the invitation code (`jhe.tcp.org_0wYuXvhoyRfko9yFYl9inpBiNkHLVBMy` in the example above) and exchange it for an access token that is specific to the patient. See [Auth](auth) for instructions on how to do this.
@@ -73,6 +71,6 @@ sequenceDiagram
 1. After the Patient has agreed/consented to the studies and scopes presented in your UI, you need to record this by sending a `POST /api/v1/patients/40001/consents` (see [Admin API](admin-api) for examples). Equivalent `PATCH` and `DELETE` requests can be used to update or revoke consents from your UI.
 1. Finally, now that JHE knows the Patient has consented to sharing their data, the Observations can be uploaded over FHIR.
    - Data is expected to be in [Open mHealth](https://www.openmhealth.org/documentation/) JSON format
-   - Because the FHIR spec does not include JSON as an Observation value, the closest thing we have is to convert it to binary and then Base 64 encode it and send it in the `valueAttachment` JSON property. See [FHIR API](fhir/fhir-api) for an example.
-   - Multiple Observations are uploaded at once by posting to the `/fhir/r5/` endpoint. See [FHIR API](fhir/fhir-api) for an example.
+   - Because the FHIR spec does not include JSON as an Observation value, the closest thing we have is to convert it to binary and then Base 64 encode it and send it in the `valueAttachment` JSON property. See [FHIR API](/jhe/fhir/fhir-api) for an example.
+   - Multiple Observations are uploaded at once by posting to the `/FHIR/R5/` endpoint. See [FHIR API](/jhe/fhir/fhir-api) for an example.
    - When the Observations hit JHE, the Open mHealth data is validated against the corresponding schema before it is accepted.

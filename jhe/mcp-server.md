@@ -221,7 +221,7 @@ fly status -a jhe-mcp    # machine / image status
 
 The MCP server exposes the following tools to LLM clients. Every tool runs as the authenticated user and only returns data that user is authorized to see.
 
-The observation and patient-search tools use JHE's FHIR search support (the `date` search parameter, `_summary=count`, `_sort`, and the Patient search parameters). **Deploy order matters:** roll out a JHE backend that has this search support before deploying the MCP server against it — an older backend silently ignores unknown search parameters, which corrupts sorted queries rather than merely widening date windows. When the backend publishes a CapabilityStatement (`/fhir/r5/metadata`), the MCP server checks requested search parameters against it and returns a clear error for unsupported ones instead of letting them be silently ignored; against a backend without the endpoint it falls back to sending them as-is.
+The observation and patient-search tools use JHE's FHIR search support (the `date` search parameter, `_summary=count`, `_sort`, and the Patient search parameters). **Deploy order matters:** roll out a JHE backend that has this search support before deploying the MCP server against it — an older backend silently ignores unknown search parameters, which corrupts sorted queries rather than merely widening date windows. When the backend publishes a CapabilityStatement (`/FHIR/R5/metadata`), the MCP server checks requested search parameters against it and returns a clear error for unsupported ones instead of letting them be silently ignored; against a backend without the endpoint it falls back to sending them as-is.
 
 **Studies:**
 

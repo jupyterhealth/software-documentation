@@ -252,13 +252,13 @@ import requests
 
 # Query JupyterHealth Exchange
 jhe_response = requests.get(
-    "https://exchange.example.org/fhir/r5/Observation?patient=123",
+    "https://exchange.example.org/FHIR/R5/Observation?patient=123",
     headers={"Authorization": f"Bearer {token}"},
 )
 
 # Query Hospital FHIR Server (same API!)
 hospital_response = requests.get(
-    "https://hospital.example.org/fhir/r5/Observation?patient=789",
+    "https://hospital.example.org/FHIR/R5/Observation?patient=789",
     headers={"Authorization": f"Bearer {hospital_token}"},
 )
 

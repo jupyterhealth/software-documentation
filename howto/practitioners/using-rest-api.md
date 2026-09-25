@@ -67,7 +67,7 @@ Traditional REST API for administrative operations:
 
 Base URL: `https://your-jhe-instance.com/api/v1/`
 
-#### FHIR API (`/fhir/r5/`)
+#### FHIR API (`/FHIR/R5/`)
 
 FHIR-compliant API for health data operations:
 
@@ -77,7 +77,7 @@ FHIR-compliant API for health data operations:
 
 **When to use**: Standards-based interoperability, FHIR Bundle operations, base64-encoded OMH data
 
-Base URL: `https://your-jhe-instance.com/fhir/r5/`
+Base URL: `https://your-jhe-instance.com/FHIR/R5/`
 
 Reference: `jupyterhealth-exchange/jhe/urls.py` and `jupyterhealth-exchange/core/urls.py`
 
@@ -623,7 +623,7 @@ Reference: `jupyterhealth-exchange/core/views/observation.py`
 FHIR API (recommended for interoperability):
 
 ```bash
-curl "https://your-jhe-instance.com/fhir/r5/Observation?patient._has:Group:member:_id=10001&patient=10001&code=https://w3id.org/openmhealth|omh:blood-glucose:4.0" \
+curl "https://your-jhe-instance.com/FHIR/R5/Observation?patient._has:Group:member:_id=10001&patient=10001&code=https://w3id.org/openmhealth|omh:blood-glucose:4.0" \
   -H "Authorization: Bearer $PRACTITIONER_TOKEN"
 ```
 
@@ -663,7 +663,7 @@ Reference: `jupyterhealth-exchange/core/views/observation.py`
 #### Search Patients (FHIR API)
 
 ```bash
-curl "https://your-jhe-instance.com/fhir/r5/Patient?_has:Group:member:_id=10001" \
+curl "https://your-jhe-instance.com/FHIR/R5/Patient?_has:Group:member:_id=10001" \
   -H "Authorization: Bearer $PRACTITIONER_TOKEN"
 ```
 
@@ -782,11 +782,11 @@ ______________________________________________________________________
    ```python
    # Efficient: one request with 100 observations
    bundle = create_fhir_bundle(observations)
-   post("/fhir/r5/", bundle)
+   post("/FHIR/R5/", bundle)
 
    # Inefficient: 100 individual requests
    for obs in observations:
-       post("/fhir/r5/Observation", obs)
+       post("/FHIR/R5/Observation", obs)
    ```
 
 1. **Filter at the API level**, not in client code:

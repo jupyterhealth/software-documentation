@@ -447,12 +447,24 @@ FHIR resources. CRUD lives at `api/v1/fhir_sources` via
 [`FhirSourceViewSet`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/fhir_source.py), scoped to the requesting patient (their `patient`
 is assigned server-side).
 
-A source is identified by its **pk** (machines) and its **label** (humans) — nothing else. It
-deliberately stores **no upstream endpoint**: a source may be a connected EHR, a one-off import
-unique to one patient, or any other FHIR speaker, so no field could generally answer "is this the
-same system?", and nothing needs one to. **Registration always creates** — reconnecting the same
-EHR simply makes another source. That is cheap and safe, because each source is its own identifier
-namespace, and upstream record ids are only ever unique within one.
+A source is identified by its **pk** (machines) and its **label** (humans). It deliberately stores
+**no upstream endpoint**: a source may be a connected EHR, a one-off import unique to one patient,
+or any other FHIR speaker, so no field could generally answer "is this the same system?". Each
+source is its own identifier namespace, and upstream record ids are only ever unique within one
+(the unique constraint on aux rows is per source).
+
+For an **EHR connection** the brand does answer that question, so registration is idempotent per
+brand. A patient has one source per EHR brand and data source: `POST api/v1/fhir_sources` returns the
+existing source (`200`) instead of creating another (`201`), because a second source would store
+every record again under its own namespace. The brand is resolved from the picked facility
+(`ehr_brand_location`, whose brand it belongs to) or, when none was picked, from `ehr_base_url` — the
+SMART `iss`, a write-only lookup hint that is matched against `EhrBrand.fhir_base_url` with or
+without a trailing slash and never stored. A registration that resolves to no brand (a one-off
+import) always creates, and is never matched by a later registration.
+
+The label is patient-facing. When an EHR registration sends none, it defaults to
+`<vendor name> - <brand name>`; the server URL is never put in it. The label is set once, so a
+later rename of the vendor or brand does not change existing sources.
 
 (metasource-discriminator-source-param)=
 

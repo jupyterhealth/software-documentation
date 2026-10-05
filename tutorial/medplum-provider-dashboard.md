@@ -63,9 +63,11 @@ On the JHE side ([details](../jhe/provider-ehr-launch.md#configuration)):
 
 - `auth.sof.trusted_issuers` → `["https://api.medplum.com/"]`
 - `auth.sof.trusted_audience` → your MedPlum client ID from step 2
-- Your JHE practitioner's `identifier` → your **MedPlum Practitioner ID** (open your
-  practitioner profile in MedPlum; the id is in the URL — the `fhirUser` claim in the
-  launch id_token carries the same value).
+- A **Practitioner identifier** on your JHE practitioner (Django admin →
+  **Practitioner identifiers** → **Add**): **System** `https://api.medplum.com/`,
+  **Value** your **MedPlum Practitioner ID** (open your practitioner profile in
+  MedPlum; the id is in the URL, and the `fhirUser` claim in the launch id_token
+  carries the same value).
 
 ## 4. Create the demo patient (the MRN join)
 

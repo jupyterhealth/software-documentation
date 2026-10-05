@@ -59,7 +59,7 @@ as that provider, under JHE's normal access control.
                │ 3. Discover JWKS: {iss}/.well-known/smart-configuration → jwks_uri         │
                │    (falls back to {iss}/.well-known/openid-configuration)                  │
                │ 4. Verify signature + exp/iat + aud == auth.sof.trusted_audience           │
-               │ 5. fhirUser ("Practitioner/<id>") → JheUser.identifier == <id>             │
+               │ 5. fhirUser ("Practitioner/<id>") → PractitionerIdentifier(iss, <id>)      │
                │ 6. Issue access token: user = the Practitioner, application = the client   │
                └────────────────────────────────────────────────────────────────────────────┘
                                                       │  { access_token, token_type: Bearer, expires_in }
@@ -110,10 +110,17 @@ backend) so the secret never reaches a browser.
 
 ### Per-provider mapping
 
-Each launching clinician must exist in JHE as a `Practitioner` whose
-`JheUser.identifier` equals the **bare FHIR id** from the EHR's `fhirUser` claim
-(`fhirUser: "Practitioner/abc123"` → `identifier == "abc123"`). Unmatched providers
-get `404`.
+Each launching clinician must exist in JHE as a `Practitioner` with a **Practitioner
+identifier** (Django admin → **Practitioner identifiers** → **Add**):
+
+- **System**: the EHR's `id_token` issuer, as listed in `auth.sof.trusted_issuers` (a
+  trailing slash does not matter).
+- **Value**: the **bare FHIR id** from the EHR's `fhirUser` claim
+  (`fhirUser: "Practitioner/abc123"` → `abc123`).
+
+Unmatched providers get `404`. When upgrading, existing ids are copied over once per
+trusted issuer; if you trust more than one issuer, delete the copies whose issuer does
+not own that id.
 
 ## The request
 
@@ -169,7 +176,7 @@ re-exchanges per launch.
 | `400`  | Missing/invalid parameter, malformed JWT, wrong `subject_token_type`, `audience` ≠ JHE site URL, missing `fhirUser` |
 | `401`  | Client authentication failed; or `id_token` signature/`exp`/`aud` invalid                                           |
 | `403`  | `id_token.iss` not trusted; or `fhirUser` is not a Practitioner                                                     |
-| `404`  | No `Practitioner` with `JheUser.identifier` == the `fhirUser` id                                                    |
+| `404`  | No Practitioner identifier with the token's issuer and the `fhirUser` id                                            |
 | `500`  | Token exchange not configured (`auth.sof.*` unset)                                                                  |
 | `502`  | JWKS discovery / signing-key resolution failed at the issuer                                                        |
 
@@ -181,10 +188,8 @@ re-exchanges per launch.
 - **No replay / one-time-use tracking.** A captured `id_token` can be re-exchanged within
   its validity window. Client authentication is the primary control; a leaked `id_token`
   alone is not sufficient without the client secret.
-- **Identity mapping is issuer-unscoped.** `fhirUser` is matched on the bare FHIR id,
-  which assumes **one trusted EHR per JHE instance**. Do not configure issuers from
-  multiple EHRs whose Practitioner ids could collide; `auth.sof.trusted_audience` is
-  likewise a single value.
+- **One SMART app audience.** Practitioner ids are scoped by issuer, so two EHRs can use
+  the same id safely, but `auth.sof.trusted_audience` is still a single value.
 - Issued JHE tokens have the standard JHE access-token lifetime (2 weeks by default) and
   are bound to both the Practitioner and the calling application, so they show up in —
   and can be revoked through — the normal per-client token management.

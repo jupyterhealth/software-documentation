@@ -59,11 +59,18 @@ which converts it via the HL7 cross-version maps and then runs the normal create
 resources that are not OMH/IEEE-1752-coded Observations in `FhirAuxResource`, linked to a
 `FhirSource` the patient registers on the fly.
 
-Every Connect registers a **new** `FhirSource` — a source stores no endpoint and is identified by
-its pk, so there is nothing to match a previous run against, and nothing needs one: each source is
-its own identifier namespace, so a reconnect re-imports into a fresh namespace rather than
-colliding with the earlier one. The authorized server URL is kept in the source's `label`, its only
-human-facing handle.
+The patient has **one `FhirSource` per EHR brand** (and data source). On Connect, the client asks
+to register a source; when the patient already has one for that brand, the server returns it
+(`200`) instead of creating a second (`201`). The brand comes from the facility picked in the
+hospital picker, or from the authorized server URL (the SMART `iss`) when none was picked. A new
+source is labelled `<vendor> - <brand>`. A launch whose brand cannot be resolved always gets a new
+source.
+
+A reconnect therefore imports into the same source as before, and the
+[R4 import](./fhir/r4-import.md#re-importing-a-record) **overwrites** each record already stored
+there instead of adding a second copy. Each entry answers `201 Created` for a new record or `200 OK`
+for one already stored, and the connect page reports the two counts separately ("3 new,
+40 existing").
 
 ## Hospital branding / selection (SMART App Launch 2.2)
 

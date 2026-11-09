@@ -292,7 +292,7 @@ The same scoping parameters apply to `Group` (Study), `Device` (Data Source), `O
 
 ## Working with other resources
 
-Any FHIR resource type not natively modeled in JHE (such as a non OMH/IEEE 1752 `Observation`, `QuestionnaireResponse`, `Condition`, or `MedicationRequest`) can be stored and retrieved via the auxiliary resource store. Before uploading, a patient must register a **FHIR Source** that identifies the upstream system the data originates from.
+Any FHIR resource type not natively modeled in JHE (such as a non OMH/IEEE 1752 `Observation`, `QuestionnaireResponse`, `Condition`, or `MedicationRequest`) can be stored and retrieved via the auxiliary resource store. Before uploading, a **FHIR Source** that identifies the upstream system the data originates from must be registered — by the patient, or by a practitioner on the patient's behalf.
 
 ### Step 1: Register a FHIR Source
 
@@ -323,6 +323,21 @@ Response:
 ```
 
 The `id` returned (`90001`) is the FHIR Source ID used in subsequent requests.
+
+A **practitioner** registers a source for a patient the same way, and names the patient with `patient_id`:
+
+```json
+{
+  "patient_id": 40001,
+  "data_source": 70005,
+  "label": "Clinic upload"
+}
+```
+
+- `patient_id` is required from a practitioner (`400` without it) and refused from a patient user (`400`), whose sources are always their own.
+- The practitioner must share an organization with the patient and hold `patient.manage_data` there (see **Writes**, below); otherwise `403`. An unknown `patient_id` is also `403`, so the response does not reveal whether a patient exists.
+- `patient_id` is write-only: the response carries `patient`, as above. A source's patient cannot be changed afterwards.
+- A patient has one source per EHR brand and data source, whoever registers it: when one exists already, it is returned (`200`) instead of a new one (`201`).
 
 ### Step 2: Upload the resource
 
@@ -442,7 +457,7 @@ Reads and writes are authorized differently, and a **patient** and a **practitio
 A read has no role or permission requirement — only organization membership:
 
 - A **patient** sees only their own data.
-- A **practitioner** sees data belonging to any patient who shares an organization with them, across all of their organizations at once.
+- A **practitioner** sees data belonging to any patient who shares an organization with them, across all of their organizations at once. This includes those patients' FHIR Sources (`GET /api/v1/fhir_sources`).
 
 ### Writes (create / update / delete)
 
@@ -454,6 +469,8 @@ A write additionally requires the actor to be authorized against the specific pa
 
   1. share an **organization** with the patient, and
   1. hold the **`patient.manage_data`** permission in that organization (see Role required, below).
+
+  The same two checks apply to registering, renaming or deleting a patient's FHIR Source, and to running `index_refs` on it: a `viewer` can list a patient's sources but not change them.
 
   Consent plays no part in a practitioner-authored write. Consent is a patient's own control over who sees their data, not a constraint on a practitioner who is otherwise authorized to manage it — a practitioner with organization membership and the right role/permission can create, update, or delete an OMH/IEEE Observation of any code, or any auxiliary resource, regardless of what the patient has or hasn't consented to.
 

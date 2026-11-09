@@ -398,6 +398,9 @@ whole FHIR body in `fhir_data`, served with full CRUD and no computation. Key po
   constraint (rows with no upstream id are exempt and always create). It is a property of the
   source, not of the create path: a `PUT`/`PATCH` that moves a row onto an upstream id a sibling
   already holds is refused with the same `409`.
+  **The R4 import is the one exception:** `POST /fhir-import/R4` overwrites a record already stored
+  under the same source (answering `200 OK` for that entry) instead of refusing it, so an EHR
+  reconnect refreshes what is stored. See [R4 import](./r4-import.md#re-importing-a-record).
 
 - **On create, the incoming `id` moves into an `identifier`** (`_extract_upstream_id` in
   [core/views/fhir.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/fhir.py)), with `system` = the FhirSource's URI — the same value
@@ -442,10 +445,18 @@ whole FHIR body in `fhir_data`, served with full CRUD and no computation. Key po
 ### FhirSource
 
 A `FhirSource` ([core/models/fhir_source.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/models/fhir_source.py)) is an upstream FHIR source
-a **patient registers for themselves** (fields: `patient`, `data_source`, `label`) before uploading
-FHIR resources. CRUD lives at `api/v1/fhir_sources` via
-[`FhirSourceViewSet`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/fhir_source.py), scoped to the requesting patient (their `patient`
-is assigned server-side).
+registered for a patient (fields: `patient`, `data_source`, `label`) before uploading FHIR
+resources. CRUD lives at `api/v1/fhir_sources` via
+[`FhirSourceViewSet`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/fhir_source.py). `patient` is always assigned server-side, never
+taken from the body:
+
+- a **patient user** registers sources for themselves and sees only their own; sending
+  `patient_id` is a `400`;
+- a **practitioner** names the patient with the write-only `patient_id` (required, `400` without
+  it) and sees the sources of every patient they share an organization with. Creating, updating or
+  deleting a source, and `index_refs`, also need `patient.manage_data` for that patient — the same
+  checks as a FHIR write (`403` otherwise; an unknown `patient_id` is also `403`). A source's
+  patient cannot be changed.
 
 A source is identified by its **pk** (machines) and its **label** (humans). It deliberately stores
 **no upstream endpoint**: a source may be a connected EHR, a one-off import unique to one patient,
@@ -540,7 +551,8 @@ is then resolved to `(patient, fhir_source)`:
 
 - **patient users** are scoped to themselves via the access token; the named source must be theirs;
 - **non-patient users** (practitioners) take the patient from the source's `patient`, authorized by
-  organization sharing.
+  organization sharing plus the `patient.manage_data` permission in a shared organization (a
+  `viewer` is refused).
 
 An unknown source is **400** and a source the user may not use is **403**. Whichever way the source
 was named, the stored `meta.source` is **(over)written to the canonical `.../fhir-source/<id>`** by
@@ -548,9 +560,10 @@ was named, the stored `meta.source` is **(over)written to the canonical `.../fhi
 of what the client sent.
 
 > **The R4 import endpoint** (`/fhir-import/R4`, [fhir_import.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/fhir_import.py))
-> still **requires the header** — it gates the whole request up front (a missing header is a
-> request-level **400**, not a per-entry outcome) — since it is a bulk R4→R5 conversion. The
-> `meta.source` fallback applies to the native `FHIR/R5` single-create and bundle-batch paths.
+> resolves a header **once for the whole request**: an unknown or forbidden source is a
+> request-level **400** / **403**, not a per-entry outcome. Without the header, each entry may name
+> its own source in `meta.source` and is resolved per entry; only when nothing names a source
+> anywhere is the request-level **400** raised.
 
 ## The unified endpoint
 

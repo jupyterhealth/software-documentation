@@ -14,15 +14,17 @@ write path. A small dict-based interpreter runs the official HL7 cross-version F
 A single view, [`FHIRImportView`](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/views/fhir_import.py) (a subclass of `FHIRResourceView`),
 mounted in [core/urls.py](https://github.com/jupyterhealth/jupyterhealth-exchange/blob/main/core/urls.py):
 
-| Method & path                     | Body                        | Behaviour                           |
-| --------------------------------- | --------------------------- | ----------------------------------- |
-| `POST /fhir-import/R4/<resource>` | one R4 resource             | convert → **normal create routing** |
-| `POST /fhir-import/R4`            | an R4 `Bundle` of resources | convert & create each entry         |
+| Method & path                     | Body                        | Behaviour                                     |
+| --------------------------------- | --------------------------- | --------------------------------------------- |
+| `POST /fhir-import/R4/<resource>` | one R4 resource             | convert → create, or overwrite the stored row |
+| `POST /fhir-import/R4`            | an R4 `Bundle` of resources | the same, for each entry                      |
 
-It is **create-only** — `GET`/`PUT`/`PATCH`/`DELETE` return `405`.
+It accepts **`POST` only** — `GET`/`PUT`/`PATCH`/`DELETE` return `405`.
 
-After conversion, each resource is handed to the inherited `FHIRResourceView._create`, so the R4
-path **reuses everything downstream unchanged**:
+After conversion, each resource goes through the same create routing as `FHIRResourceView`
+(`_create_store`). The one difference from a plain FHIR create is that an aux record already stored
+under the source is **overwritten** instead of refused (see
+[Re-importing a record](#re-importing-a-record)). Everything else downstream is reused unchanged:
 
 - **mapped-vs-aux routing** — an OMH- or IEEE-1752-coded `Observation` writes the `Observation`
   model; every other resource (and every otherwise-coded `Observation`) lands in `FhirAuxResource`
@@ -36,13 +38,37 @@ Because import is a **lossy conversion, not a pure create**, *both* endpoints al
 `200` `batch-response` **Bundle** (a single-resource POST yields a one-entry Bundle). Every entry
 carries an `OperationOutcome` at `response.outcome`:
 
-- **success, no loss** → `response.status: "201 Created"` + the created resource + an
-  `information` outcome (`"Converted R4 -> R5 with no detected field loss."`);
-- **success, with loss** → `201 Created` + the created resource + one `warning` issue **per
-  dropped R4 path** (see [Data-loss reporting](#data-loss-reporting));
+- **success, no loss** → `response.status: "201 Created"` (a new record) or `"200 OK"` (a record
+  already stored under this source) + the stored resource + an `information` outcome
+  (`"Converted R4 -> R5 with no detected field loss."`);
+- **success, with loss** → `201 Created` or `200 OK` + the stored resource + one `warning` issue
+  **per dropped R4 path** (see [Data-loss reporting](#data-loss-reporting));
 - **failure** (unsupported type, invalid R5, a required field dropped, …) → an error status and an
   `error` outcome (plus any drop `warning`s — a dropped *required* field is usually the cause of the
   failure), no `resource`.
+
+### Re-importing a record
+
+Posting a record that is already stored under the same `FhirSource` — same resource type and same
+upstream `id` — **overwrites** the stored record and answers `200 OK` for that entry. Reconnecting
+an EHR returns the patient's existing source for that brand (`FhirSourceViewSet.create`), so a
+reconnect posts the same records to the same source, and the EHR's latest copy should replace the
+stored one.
+
+- The overwritten record **keeps its JHE id**, so references to it stay valid.
+- A record **identical** to what is stored is not saved again: the entry still answers `200 OK`, but
+  `last_updated` does not move, so `_lastUpdated` searches only see records that changed.
+- A record with **no upstream `id`** cannot be matched and always creates a new row.
+- The same upstream `id` under a **different** source is a separate record — each source is its own
+  identifier namespace.
+- If two imports of a new record run at once, the one that loses the insert retries once as an
+  overwrite instead of failing.
+- The overwrite replaces the whole record: an edit made to it in JHE (an R5 `PUT`/`PATCH`) is lost
+  on the next re-import. The EHR is treated as the source of truth.
+- Records deleted in the EHR are **not** removed from JHE by a re-import.
+
+This applies to the R4 import only. A plain `POST /FHIR/R5/<resource>` is a FHIR create and still
+refuses a stored record with `409` (see [fhir-engine](./fhir-engine.md)).
 
 The `X-JHE-FHIR-Source-ID` header gates the **whole request** (one header for the batch), so a
 missing / unknown / forbidden source is a request-level `400` / `403`, not a per-entry outcome.
@@ -322,10 +348,9 @@ field loss is **reported, not silent** — see [Data-loss reporting](#data-loss-
 - **Resource `id` length.** FHIR caps `id` at 64 chars, but an over-long upstream id (e.g. Epic's
   "Unconstrained FHIR IDs") imports fine: the create moves every incoming `id` into an `identifier`
   namespaced by the FhirSource before validation, and the id space is JHE's own UUIDs anyway.
-- **Re-importing a record already stored under the same source** is refused per entry with a
-  `409` `OperationOutcome` whose issue `code` is `duplicate` — a create never refreshes an
-  existing record. This does not fire on an ordinary EHR reconnect: each Connect registers a new
-  `FhirSource`, and uniqueness is scoped to one source.
+- **Re-importing overwrites; it does not merge.** A record already stored under the same source is
+  replaced whole (see [Re-importing a record](#re-importing-a-record)), and nothing is removed for a
+  record the EHR no longer returns.
 
 ## Testing
 
@@ -354,6 +379,10 @@ field loss is **reported, not silent** — see [Data-loss reporting](#data-loss-
   the resource still created; an **error** entry (`Coverage.payor`) still carries the drop warning;
   request-level source header → `400`; unsupported type → error entry; `GET` → `405`; Bundle with
   per-entry success + error outcomes, each carrying an `OperationOutcome`.
+- **Re-import**: a re-post under the same source overwrites the record, keeps its JHE id and answers
+  `200 OK`; an identical re-post is not saved again; a Bundle reports `200 OK` / `201 Created` per
+  entry; an import that loses a race to a parallel insert overwrites that row; an over-64-char Epic
+  id is matched on re-import; the same upstream id under a second source creates a second record.
 
 A crash-smoke over all 28 configured aux resource types confirms every type converts without error.
 

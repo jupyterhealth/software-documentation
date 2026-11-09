@@ -37,6 +37,7 @@ JHE ships a [Bruno](https://www.usebruno.com/) API collection for exercising the
    | `USER_ID`        | A user id                                 |
    | `DATA_SOURCE_ID` | A data source id                          |
    | `CLIENT_APP_ID`  | An OAuth client (JheClient) id            |
+   | `FHIR_SOURCE_ID` | A FHIR Source id (for aux writes)         |
 
 1. Select the environment, then send any request.
 
@@ -44,10 +45,10 @@ The token expires after one year. Re-run `create_bruno_app` to mint a new one.
 
 ## Collection structure
 
-| Folder    | Covers                                                                                                 |
-| --------- | ------------------------------------------------------------------------------------------------------ |
-| **Admin** | Organizations, Patients, Studies, Users, Practitioners, Data Sources, Clients, Settings, Observations  |
-| **FHIR**  | FHIR R5 Patient, Observation (filtered search + `_summary=count`), and QuestionnaireResponse endpoints |
+| Folder    | Covers                                                                                                                                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Admin** | Organizations, Patients, Studies, Users, Practitioners, Data Sources, Clients, Settings, Observations                                                                                                  |
+| **FHIR**  | FHIR R5 Patient, Observation (filtered search + `_summary=count`) and QuestionnaireResponse endpoints; registering a FHIR Source (by a patient, or by a practitioner with `patient_id`); the R4 import |
 
 ## Keeping it in sync
 
